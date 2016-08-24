@@ -1,0 +1,181 @@
+
+#top {
+    position: relative;
+   // background-color: #036fab;
+    color: white;
+    padding: 5px;
+    margin: 0px 0px 10px 0px;
+}
+
+#bottom {
+    position: relative;
+    //background-color: #c2dfef;
+    padding: 5px;
+    margin: 10px 0px 0px 0px;
+}
+
+#left {
+    float: left;
+    //background-color: #ece3a5;
+    padding: 5px;
+    width: 150px;
+}
+
+#right {
+    float: right;
+    //background-color: #ece3a5;
+    padding: 5px;
+    width: 150px;
+}
+
+.center_content {
+    position: relative;
+    background-color: #dddddd;
+    padding: 5px;
+}
+
+.left_content {
+    background-color: #dddddd;
+    padding: 5px;
+    margin-left: 170px;
+}
+
+.right_content {
+    background-color: #dddddd;
+    padding: 5px;
+    margin: 0px 170px 0px 170px;
+}
+
+#top a:link, #top a:visited {
+  /* color: #F7F2F2; */
+  font-weight : bold;
+  text-decoration: none;
+}
+
+#top a:link:hover, #top a:visited:hover  {
+  color: black;
+  font-weight : bold;
+  text-decoration : underline;
+}
+
+.coluna_30{
+    width: 30px;
+}
+
+.coluna_50{
+    width: 50px;
+}
+
+.coluna_100{
+    width: 100px;
+}
+
+.coluna_130{
+    width: 130px;
+}
+
+.coluna_150{
+    width: 150px;
+}
+
+.coluna_161{
+    width: 161px;
+}
+
+.coluna_300{
+    width: 300px;
+}
+
+.coluna_400{
+    width: 400px;
+}
+
+.negrito{
+    font-weight: bold;
+}
+
+.font-calculo{
+    font-size: 8px;
+    font-weight: bold;
+    
+}
+
+.numero{
+    text-align: right;
+}
+
+.arriba{
+    padding-top: 0px;
+}
+
+.abaixo{
+    padding-bottom: 0px;
+}
+
+.ajax-status{
+    position: fixed;
+    right: 10px;
+    top: 60px;
+}
+
+.ui-menu .ui-menuitem-text {
+    float: left;
+    //background-color: greenyellow;
+    color: #AFAFAF;
+}
+
+
+.ui-inputfield {
+    margin: 0;
+    outline: medium none;
+    padding: 4px;
+    font-weight: bold;
+}
+
+
+.ui-widget {
+    font-family: Gill Sans,Arial,sans-serif;
+    font-size: 1.2em;
+}
+
+.ui-state-focus {
+    color:#D20005; 
+}
+
+.numero2{
+    text-align: right;
+    font-weight: bold;
+    color: #D20005;
+}
+
+
+/* ataca a sombra dos inputs*/
+.ui-inputfield, .ui-widget-content .ui-inputfield, .ui-widget-header .ui-inputfield{
+    background: #ffffff;
+    -moz-box-shadow: inset 0 0px 0px #8f8f8f;
+    -webkit-box-shadow: inset 0 0px 0px #8f8f8f;
+    box-shadow: inset 0 1px 1px #8f8f8f;
+    //color: #333333;
+   // font-style:  italic;
+   font-weight: bold;
+}
+
+
+/*
+//muda o fundo dos inputs
+.ui-widget-header .ui-inputfield, .ui-widget-content .ui-inputfield {
+    font-weight: normal;
+    color: red;
+    background-color: yellow;
+}
+*/
+
+
+/*.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
+    border: 1px solid #93c3cd;
+    //background: #93c3cd url("/SistemaWeb/faces/javax.faces.resource/images/ui-bg_diagonals-small_50_93c3cd_40x40.png?ln=primefaces-hot-sneaks") 50% 50% repeat;
+    font-weight: bold;
+    color: #333333;
+    color: blue;
+}
+*/

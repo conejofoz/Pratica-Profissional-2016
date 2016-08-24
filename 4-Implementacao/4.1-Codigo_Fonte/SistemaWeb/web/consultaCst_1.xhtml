@@ -1,0 +1,165 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+
+    <body>
+                <p:dialog id="dialogoConsultaCsts" widgetVar="wdialogoConsultaCsts" width="600" height="300" visible="false">
+                    <!--pra funcionar a consulta tem que tirar o prerender view-->
+                    <f:event type="preRenderView" listener="#{cstBean.listar()}" />
+                    <p:growl id="msjConsultaCsts" showDetail="true" />
+                    <h:form id="frmConsultaCsts" >
+                        <p:growl id="msgConsultaCst" showDetail="true" />
+                        
+                        <p:panelGrid columns="3" >
+                            <h:panelGroup >
+                                <p:outputLabel id="lblConsultaNome" value="Nome" /><br />
+                                <p:inputText id="edtConsultaNome" value="#{cstBean.consultaNome}" />
+                                <p:commandButton id="btnConsultar" value="Consultar" actionListener="#{cstBean.consultar}" update="dataTabela msgConsultaCst" />
+                            </h:panelGroup>
+                        </p:panelGrid>
+                        <p:commandButton id="btnAcao" value="Novo" oncomplete="PF('wdialogoCadastroCst').show();" actionListener="#{cstBean.setAccion('Registrar')}" action="#{cstBean.zerarCst}" update=":dialogoCadastroCst" />
+                        <p:dataTable id="dataTabela" value="#{cstBean.listaCst}" var="var_cst"
+                                     paginator="true" paginatorPosition="bottom"
+                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="5,10,15" rows="10">
+
+                            <p:column headerText="Código" width="100">
+                                <p:outputLabel value="#{var_cst.id}"/>
+                            </p:column>
+
+                            <p:column headerText="Nome do cst">
+                                <p:outputLabel value="#{var_cst.nomeCst}"/>
+                            </p:column>
+
+
+                            <p:column width="30" >
+                                <p:commandButton id="btnEditar" icon="ui-icon-pencil" actionListener="#{cstBean.buscaPorID(var_cst)}" oncomplete="PF('wdialogoCadastroCst').show();" update=":dialogoCadastroCst"  >
+                                    <f:setPropertyActionListener target="#{cstBean.cstSelecionado}" value="#{var_cst}"/>
+                                </p:commandButton>
+                            </p:column>
+
+                            <p:column width="30" >
+                                <p:commandButton id="btnLixeira" icon="ui-icon-trash" oncomplete="PF('wdialogoConfirmacaoExclusaoCst').show();">
+                                    <f:setPropertyActionListener target="#{cstBean.cstSelecionado}" value="#{var_cst}"/>
+                                </p:commandButton>
+                            </p:column>
+                            <p:column width="30">
+                                <p:commandButton icon="ui-icon-check" title="Selecionar"
+                                         update="frmDialogoCadastroProduto:edtCst frmDialogoCadastroProduto:edtNomeCst"
+                                         oncomplete="PF('wdialogoConsultaCsts').hide();"
+                                         process="@this" >
+                                    <f:setPropertyActionListener target="#{produtoBean.produto.cst}" value="#{var_cst}"/>
+                        </p:commandButton>
+                            </p:column>
+                        </p:dataTable>
+                         </h:form>
+                </p:dialog>
+
+                        <!--DIALOGO DE CONFIRMAÇÃO DE EXCLUSÃO**********************************************************************-->
+                        <p:confirmDialog id="dialogoConfirmacaoExclusaoCst" header="Exclusão"
+                                         message="Tem certeza que deseja excluir? #{cstBean.cst.nomeCst}"
+                                         widgetVar="wdialogoConfirmacaoExclusaoCst">
+                            <h:form id="frmExclusaoCst" >
+                            <p:commandButton id="btnApagar" value="Sim" update=":frmConsultaCsts:dataTabela :frmConsultaCsts:msgConsultaCst" oncomplete="PF('wdialogoConfirmacaoExclusaoCst').hide();" action="#{cstBean.apagar()}"/>
+                            <p:commandButton value="Não" oncomplete="PF('wdialogoConfirmacaoExclusaoCst').hide();" />
+                            </h:form>
+                        </p:confirmDialog>
+                   
+
+
+
+
+
+
+
+
+
+                    <!--DIALOGO DE CADASTRO-->
+                    <p:dialog header="Cadastro de csts" widgetVar="wdialogoCadastroCst" id="dialogoCadastroCst" position="center" showEffect="slide" width="600" height="100">
+                        <h:form id="frmDialogoCadastroCst" >
+                            <p:messages closable="true"/>
+                            <p:growl id="msjCadastroCst" showDetail="true" />
+                            <h:panelGrid columns="3" id="painelGridDialogoCadastroCst" >
+
+                                
+                                <h:panelGroup>
+                                    <p:outputLabel id="lblIdCst" value="Cst" styleClass="negrito" /><br />
+                                    <p:inputText id="edtIdCst" value="#{cstBean.cst.id}" maxlength="3" required="true" size="4"
+                                                 onkeypress="return TABEnter(event, 'edtCst');">
+                                        <p:ajax event="blur" update="@this" />
+                                    </p:inputText>
+                                </h:panelGroup>
+                                
+                                
+                                <h:panelGroup>
+                                    <p:outputLabel id="lblCst" value="Cst" styleClass="negrito" /><br />
+                                    <p:inputText id="edtCst" value="#{cstBean.cst.nomeCst}" maxlength="100" required="true" size="50"
+                                                 onkeypress="return TABEnter(event, 'edtCep');">
+                                        <p:ajax event="blur" update="@this" listener="#{cstBean.handleKeyEvent}" />
+                                    </p:inputText>
+                                </h:panelGroup>
+
+
+
+
+                                <!--fim busca cep-->
+
+
+
+                                <f:facet name="footer">
+                                    <h:panelGrid id="painelGridRodapeCadastroCst" columns="5">
+                                        <p:commandButton value="#{cstBean.accion}" actionListener="#{cstBean.operar}" oncomplete="tratarRequisicao(xhr, status, args)" update="frmDialogoCadastroCst :frmConsultaCsts:dataTabela" />
+                                        <p:commandButton value="Excluir" />
+                                        <p:commandButton value="Limpar" />
+                                        <p:commandButton value="Sair" oncomplete="PF('wdialogoCadastroCst').hide();" />
+                                    </h:panelGrid>
+                                </f:facet> 
+                            </h:panelGrid>
+
+
+                        </h:form>
+
+
+
+
+                    </p:dialog>
+
+                    <script type="text/javascript">
+                        function tratarRequisicao(xhr, status, args) {
+                            if (!args.fecharDialogo) {
+                                jQuery("#dialogoCadastroCst").effect("shake", {times: 10}, 100);
+                            } else {
+                                PF('wdialogoCadastroCst').hide();
+                            }
+                        }
+
+
+                        function TABEnter(pEvent, campo) {
+                            if (pEvent.keyCode === 13) {
+                                //return pEvent.keyCode = 9;  
+                                //document.getElementById('frmDialogoCadastroVenda:' + campo).focus();
+                                //document.getElementById('frmDialogoCadastroVenda:' + campo).value='';
+                                document.getElementById('frmDialogoCadastroCst:' + campo).select();
+                                return false;
+                            }
+                            return true;
+                        }
+
+
+
+
+
+
+
+
+
+
+                    </script>
+               
+           
+    </body>
+</html>

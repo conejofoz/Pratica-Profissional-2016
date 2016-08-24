@@ -1,0 +1,311 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+
+    <body>
+        <ui:composition template="./WEB-INF/templates/telaPadrao.xhtml">
+            <ui:define name="content">
+                <p:dialog id="dialogoConsultaTransportadoras" widgetVar="wdialogoConsultaTransportadoras" width="750" height="300" visible="true">
+                    <!--pra funcionar a consulta tem que tirar o prerender view-->
+                    <f:event type="preRenderView" listener="#{transportadoraBean.listar()}" />
+                    <h:form id="frmConsultaTransportadoras">
+                        <p:growl id="msgConsultaTransportadora" showDetail="true" />
+                        
+                        <p:panelGrid columns="3" >
+                            <h:panelGroup >
+                                <p:outputLabel id="lblConsultaNome" value="Nome" /><br />
+                                <p:inputText id="edtConsultaNome" value="#{transportadoraBean.consultaNome}" />
+                                <p:commandButton id="btnConsultar" value="Consultar" actionListener="#{transportadoraBean.consultar()}" update="dataTabela msgConsultaTransportadora" />
+                            </h:panelGroup>
+                        </p:panelGrid>
+                        <p:commandButton id="btnAcao" value="Novo" oncomplete="PF('wdialogoCadastroTransportadora').show();" actionListener="#{transportadoraBean.setAccion('Registrar')}" action="#{transportadoraBean.zerarTransportadora}" update=":dialogoCadastroTransportadora" />
+                        <p:dataTable id="dataTabela" value="#{transportadoraBean.listaTransportadora}" var="var_transportadora"
+                                     paginator="true" paginatorPosition="bottom"
+                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="5,10,15" rows="10">
+
+                            <p:column headerText="Código" style="width: 50px">
+                                <p:outputLabel value="#{var_transportadora.id}"/>
+                            </p:column>
+
+                            <p:column headerText="Nome do transportadora">
+                                <p:outputLabel value="#{var_transportadora.nomeTransportadora}"/>
+                            </p:column>
+
+                            <p:column headerText="Telefone" >
+                                <p:outputLabel value="#{var_transportadora.telefone}">
+                                </p:outputLabel>
+                            </p:column>
+
+                            <p:column headerText="E-mail">
+                                <p:outputLabel value="#{var_transportadora.email}" >
+                                </p:outputLabel> 
+                            </p:column>
+
+
+                            <p:column width="30" >
+                                <p:commandButton id="btnEditar" icon="ui-icon-pencil" actionListener="#{transportadoraBean.buscaPorID(var_transportadora)}" oncomplete="PF('wdialogoCadastroTransportadora').show();" update=":dialogoCadastroTransportadora :frmDialogoCadastroTransportadora:edtTipoPessoa"  >
+                                    <f:setPropertyActionListener target="#{transportadoraBean.transportadoraSelecionado}" value="#{var_transportadora}"/>
+                                </p:commandButton>
+                            </p:column>
+
+                            <p:column width="30" >
+                                <p:commandButton id="btnLixeira" icon="ui-icon-trash" oncomplete="PF('wdialogoConfirmacaoExclusaoTransportadora').show();">
+                                    <f:setPropertyActionListener target="#{transportadoraBean.transportadoraSelecionado}" value="#{var_transportadora}"/>
+                                </p:commandButton>
+                            </p:column>
+                            <p:column width="30">
+                                <p:commandButton icon="ui-icon-check" title="Selecionar"
+                                                 action="#{transportadoraBean.selecionar(var_transportadora)}"
+                                                 process="@this" />
+                            </p:column>
+                        </p:dataTable>
+
+                        <!--DIALOGO DE CONFIRMAÇÃO DE EXCLUSÃO**********************************************************************-->
+                        <p:confirmDialog id="dialogoConfirmacaoExclusaoTransportadora" header="Exclusão"
+                                         message="Tem certeza que deseja excluir? #{transportadoraBean.transportadora.nomeTransportadora}"
+                                         widgetVar="wdialogoConfirmacaoExclusaoTransportadora">
+
+                            <p:commandButton id="btnApagar" value="Sim" update=":frmConsultaTransportadoras:dataTabela :frmConsultaTransportadoras:msgConsultaTransportadora" oncomplete="PF('wdialogoConfirmacaoExclusaoTransportadora').hide();" action="#{transportadoraBean.apagar()}"/>
+                            <p:commandButton value="Não" oncomplete="PF('wdialogoConfirmacaoExclusaoTransportadora').hide();" />
+                        </p:confirmDialog>
+                    </h:form>
+                </p:dialog>
+
+
+
+
+
+
+
+
+
+                    <!--DIALOGO DE CADASTRO-->
+                    <p:dialog header="Cadastro de transportadoras" widgetVar="wdialogoCadastroTransportadora" id="dialogoCadastroTransportadora" position="center" showEffect="slide" width="1200" height="600">
+                        <h:form id="frmDialogoCadastroTransportadora" >
+                            <p:messages closable="true"/>
+                            <p:growl id="msjCadastroTransportadora" showDetail="true" />
+                            <h:panelGrid columns="3" id="painelGridDialogoCadastroTransportadora" >
+
+                                <h:panelGroup>
+                                    <p:outputLabel id="lblTransportadora" value="#{transportadoraBean.nomeCampoNome}" styleClass="negrito" /><br />
+                                    <p:inputText id="edtTransportadora" value="#{transportadoraBean.transportadora.nomeTransportadora}" maxlength="100" required="true" style="width: 300px"
+                                                 onkeyup="maiuscula(this);"
+                                                 onkeypress="return TABEnter(event, 'edtCep');">
+                                        <p:ajax event="blur" update="@this" listener="#{transportadoraBean.handleKeyEvent}" />
+                                    </p:inputText>
+                                </h:panelGroup>
+
+                                <h:panelGroup >
+                                    <h:outputText value="Tipo de pessoa:" /><br />
+                                    <p:selectOneButton id="edtTipoPessoa" value="#{transportadoraBean.transportadora.tipoPessoa}" required="true" requiredMessage="É nescessário escolher o tipo de pessoa">
+                                        <f:selectItem itemLabel="Fisica" itemValue="F" />
+                                        <f:selectItem itemLabel="Juridica" itemValue="J" />
+                                        <p:ajax event="change" listener="#{transportadoraBean.mostraCampoSexo}" update="painelGroupSexo painelGroupCpf painelGroupIdentidade painelGroupNascimento lblTransportadora painelGroupCnpj edtCpf edtSite painelGroupSite" />
+                                    </p:selectOneButton>
+                                </h:panelGroup>
+
+                                <h:panelGroup id="painelGroupSexo" >
+                                    <p:outputLabel id="lblSexo"  rendered="#{transportadoraBean.exibeCampoSexo}" styleClass="negrito" /><br />
+                                    <p:selectOneMenu id="edtSexo" value="#{transportadoraBean.transportadora.sexo}" rendered="#{transportadoraBean.exibeCampoSexo}" required="#{transportadoraBean.requerSexo}" requiredMessage="Escolha o sexo" >
+                                        <f:selectItem itemLabel="Selecione" itemValue="#{null}" />
+                                        <f:selectItem itemLabel="Feminino" itemValue="F" />
+                                        <f:selectItem itemLabel="Masculino" itemValue="M" />
+                                    </p:selectOneMenu>
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel value="CEP: " styleClass="negrito" /><br />
+                                    <p:inputMask id="edtCep" size="10" style="padding-top: 5px" mask="99999-999" value="#{transportadoraBean.transportadora.cep}" onkeypress="return TABEnter(event, 'edtNumero');" >
+                                        <p:ajax event="change" process="@this" listener="#{transportadoraBean.encontraCEP}" update="edtIdCidade edtEstado edtLogradouro edtNomeCidade edtBairro msjCadastroTransportadora" />
+                                    </p:inputMask>
+                                    <p:commandButton id="btnCep" value="+" icon="ui-icon-search" process="@this" action="#{transportadoraBean.encontraCEP}" update="edtIdCidade edtEstado edtLogradouro edtNomeCidade edtBairro msjCadastroTransportadora" />
+                                </h:panelGroup>
+
+                                
+                                <h:panelGroup>
+                                    <p:outputLabel value="Id. Cidade" styleClass="negrito" /><br />
+                                    <p:inputText id="edtIdCidade" value="#{transportadoraBean.transportadora.cidade.id}" size="5"
+                                                 onkeypress="return TABEnter(event, 'edtNomeCidade');">
+                                        <p:ajax listener="#{transportadoraBean.buscaPorID2(transportadoraBean.transportadora.cidade)}" event="change" process="edtIdCidade" update="edtNomeCidade msjCadastroTransportadora edtIdCidade" />
+                                    </p:inputText>
+                                    <p:inputText id="edtNomeCidade" value="#{transportadoraBean.transportadora.cidade.nomeCidade}" readonly="true" size="30"
+                                                 onkeypress="return TABEnter(event, 'edtTransportadora');">
+                                    </p:inputText>
+                                     <p:commandButton icon="ui-icon-search" title="Consultar ou cadastrar Cidades" value="..."
+                                                 process="@this" 
+                                                 oncomplete="PF('wdialogoConsultaCidades').show();" />  
+                                </h:panelGroup>
+
+
+                                <h:panelGroup id="painelEstado">
+                                    <h:outputLabel value="UF: " /><br />
+                                    <p:inputText id="edtEstado" size="5" value="#{transportadoraBean.transportadora.cidade.estado.siglaEstado}" maxlength="2" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel value="Logradouro: "  /><br />
+                                    <p:inputText id="edtLogradouro" size="50" value="#{transportadoraBean.transportadora.endereco}" maxlength="100" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel value="Número: "  /><br />
+                                    <p:inputText id="edtNumero" size="10" value="#{transportadoraBean.transportadora.numero}" maxlength="15" onkeypress="return TABEnter(event, 'edtComplemento');" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel value="Complemento: "  /><br />
+                                    <p:inputText id="edtComplemento" size="40" value="#{transportadoraBean.transportadora.complemento}" maxlength="50" onkeypress="return TABEnter(event, 'edtTelefone');" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel value="Bairro: " style="font-weight:bold; padding-right: 5px; " /><br />
+                                    <p:inputText id="edtBairro" size="50" value="#{transportadoraBean.transportadora.bairro}" maxlength="50" />
+                                </h:panelGroup>
+
+                                <p:outputLabel value="" /><p:outputLabel value="" />
+
+
+                                <h:panelGrid columns="4">
+                                    <h:panelGroup>
+                                        <p:outputLabel id="lblTelefone" value="Tel. residencial:" styleClass="negrito" /><br />
+                                        <p:inputMask mask="(99)99999999" id="edtTelefone" value="#{transportadoraBean.transportadora.telefone}" required="#{transportadoraBean.requererTelefone}" style="width: 100px"
+                                                     onkeypress="return TABEnter(event, 'edtTelefoneComercial');">
+                                        </p:inputMask>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <p:outputLabel id="lblTelefoneComercial" value="Tel. comercial:" styleClass="negrito" /><br />
+                                        <p:inputMask mask="(99)99999999" id="edtTelefoneComercial" value="#{transportadoraBean.transportadora.telefoneComercial}" required="#{transportadoraBean.requererTelefone}" style="width: 100px"
+                                                     onkeypress="return TABEnter(event, 'edtCelular');">
+                                        </p:inputMask>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <p:outputLabel id="lblCelular" value="Celular:" styleClass="negrito" /><br />
+                                        <p:inputMask mask="(99)99999999" id="edtCelular" value="#{transportadoraBean.transportadora.celular}" required="#{transportadoraBean.requererTelefone}" style="width: 100px"
+                                                     onkeypress="return TABEnter(event, 'edtFax');">
+                                        </p:inputMask>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <p:outputLabel id="lblFax" value="Fax:" styleClass="negrito" /><br />
+                                        <p:inputMask mask="(99)99999999" id="edtFax" value="#{transportadoraBean.transportadora.fax}" required="#{transportadoraBean.requererTelefone}" style="width: 100px"
+                                                     onkeypress="return TABEnter(event, 'edtEmail');">
+                                        </p:inputMask>
+                                    </h:panelGroup>
+
+                                </h:panelGrid>
+
+
+                                <h:panelGroup>
+                                    <p:outputLabel id="lblEmail" value="E-mail" styleClass="negrito" /><br />
+                                    <p:inputText id="edtEmail" value="#{transportadoraBean.transportadora.email}" maxlength="100" required="#{transportadoraBean.requerEmail}" size="40" 
+                                                 onkeypress="return TABEnter(event, 'edtSite');"
+                                                 requiredMessage="Por favor digite um e-mail"
+                                                 validatorMessage="Formato de e-mail inválido">
+                                        <p:ajax event="blur" update="@this msjCadastroTransportadora" listener="#{transportadoraBean.handleKeyEventEmail}" >  
+                                            <f:validateRegex pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" /> <!--COM AJAX PRA PEGAR IMEDIATAMENTE-->
+                                        </p:ajax>
+                                        <f:validateRegex pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" /> <!--FORA DO AJAX PRA PEGAR QUANDO MANDAR SALVAR-->
+                                    </p:inputText>
+                                </h:panelGroup>
+
+                                <h:panelGroup id="painelGroupSite">
+                                    <h:outputLabel value="Site" style="font-weight:bold; padding-right: 5px; " /><br />
+                                    <p:inputText id="edtSite" value="#{transportadoraBean.transportadora.site}" maxlength="100" size="40"
+                                                 onkeypress="return TABEnter(event, '#{transportadoraBean.enterSite}');"/>
+                                </h:panelGroup>
+
+                                <h:panelGrid columns="3">
+                                    <h:panelGroup id="painelGroupIdentidade">
+                                        <h:outputLabel value="Documento " style="font-weight:bold; padding-right: 5px; " rendered="#{transportadoraBean.transportadora.tipoPessoa == 'F'}" /><br />
+                                        <p:inputText id="edtDocumento" value="#{transportadoraBean.transportadora.documento}" maxlength="15" size="10" rendered="#{transportadoraBean.transportadora.tipoPessoa == 'F'}" onkeypress="return TABEnter(event, 'edtCpf');" />
+                                    </h:panelGroup>
+
+                                    <h:panelGroup id="painelGroupCpf" >
+                                        <p:outputLabel id="lblCpf" value="CPF:" rendered="#{transportadoraBean.transportadora.tipoPessoa == 'F'}" styleClass="negrito" /><br />
+                                        <p:inputText id="edtCpf" value="#{transportadoraBean.transportadora.cpf}" maxlength="15" required="true" rendered="#{transportadoraBean.transportadora.tipoPessoa == 'F'}"
+                                                     requiredMessage="Por favor digite o CPF"
+                                                     onkeypress="return TABEnter(event, 'edtNascimento');">
+                                            <p:ajax event="blur" update="@this msjCadastroTransportadora" listener="#{transportadoraBean.validacpf}" />
+                                        </p:inputText>
+                                    </h:panelGroup>
+
+
+                                    <h:panelGroup id="painelGroupNascimento">
+                                        <h:outputLabel value="Data nascimento " style="font-weight:bold; padding-right: 5px; " rendered="#{transportadoraBean.transportadora.tipoPessoa == 'F'}" /><br />
+                                        <p:calendar id="edtNascimento" value="#{transportadoraBean.transportadora.dataNascimento}" pattern="dd/MM/yyyy" locale="pt" size="10" rendered="#{transportadoraBean.transportadora.tipoPessoa == 'F'}"
+                                                    onkeypress="return TABEnter(event, 'edtTransportadora');"/>
+                                    </h:panelGroup>    
+                                </h:panelGrid>
+                                
+                                
+                                <p:outputLabel />
+                                <p:outputLabel />
+                                <h:panelGroup id="painelGroupCnpj" >
+                                    <p:outputLabel id="lblCnpj" value="CNPJ" styleClass="negrito" rendered="#{transportadoraBean.transportadora.tipoPessoa =='J'}" /><br />
+                                    <p:inputMask mask="99.999.999/9999-99" id="edtCnpj" value="#{transportadoraBean.transportadora.cnpj}" rendered="#{transportadoraBean.transportadora.tipoPessoa == 'J'}" onkeypress="return TABEnter(event, 'edtTransportadora');"  />
+                                </h:panelGroup>
+
+
+
+                                <!--fim busca cep-->
+
+
+
+                                <f:facet name="footer">
+                                    <h:panelGrid id="painelGridRodapeCadastroTransportadora" columns="5">
+                                        <p:commandButton value="#{transportadoraBean.accion}" actionListener="#{transportadoraBean.operar}" oncomplete="tratarRequisicaoTransportadoras(xhr, status, args)" update="frmDialogoCadastroTransportadora :frmConsultaTransportadoras:dataTabela" />
+                                        <p:commandButton value="Excluir" />
+                                        <p:commandButton value="Limpar" />
+                                        <p:commandButton value="Sair" oncomplete="PF('wdialogoCadastroTransportadora').hide();" />
+
+                                    </h:panelGrid>
+                                </f:facet> 
+                            </h:panelGrid>
+
+
+                        </h:form>
+
+
+
+                    </p:dialog>
+
+                    <script type="text/javascript">
+                        function tratarRequisicaoTransportadoras(xhr, status, args) {
+                            if (!args.fecharDialogo) {
+                                jQuery("#dialogoCadastroTransportadora").effect("shake", {times: 10}, 100);
+                            } else {
+                                PF('wdialogoCadastroTransportadora').hide();
+                            }
+                        }
+
+
+                        function TABEnter(pEvent, campo) {
+                            if (pEvent.keyCode === 13) {
+                                //return pEvent.keyCode = 9;  
+                                //document.getElementById('frmDialogoCadastroVenda:' + campo).focus();
+                                //document.getElementById('frmDialogoCadastroVenda:' + campo).value='';
+                                document.getElementById('frmDialogoCadastroTransportadora:' + campo).select();
+                                return false;
+                            }
+                            return true;
+                        }
+
+
+
+                    </script>
+                    <!--pagina cidades-->
+                <ui:include src="/consultaCidades_3.xhtml" />
+                <!--fim pagina cidades-->
+                
+            </ui:define>
+        </ui:composition>
+
+    </body>
+</html>

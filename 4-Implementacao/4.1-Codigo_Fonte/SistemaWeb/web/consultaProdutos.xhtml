@@ -1,0 +1,459 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+
+    <body>
+        <ui:composition template="./WEB-INF/templates/telaPadrao.xhtml">
+            <ui:define name="content">
+                <p:dialog header="Consulta de produtos" id="dialogoConsultaProdutos" widgetVar="wdialogoConsultaProdutos" width="900" height="600" visible="true">
+                    <p:growl id="msjConsultaProdutos" showDetail="true" />
+                    <h:form id="frmConsultaProdutos" >
+                        <p:growl id="msgConsultaProduto" showDetail="true" />
+                        <p:fieldset >
+                            <h:panelGrid id="painelConsulta" columns="3" >
+                                <h:panelGroup >
+                                    <p:outputLabel id="lblConsultaNome" value="Descrição" /><br />
+                                    <p:inputText id="edtConsultaNome" value="#{produtoBean.edtConsultaNome}" size="50" placeholder="Digite a descrição para consultar" />
+                                    <p:commandButton id="btnConsultar" value="Consultar" actionListener="#{produtoBean.consultar()}" update="dataTabela msgConsultaProduto frmConsultaProdutos" />
+                                </h:panelGroup>
+                            </h:panelGrid>
+                        </p:fieldset>
+                        <h:panelGrid />
+                        <p:commandButton id="btnAcao" value="Novo" oncomplete="PF('wdialogoCadastroProduto').show();" actionListener="#{produtoBean.setAccion('Registrar')}" action="#{produtoBean.iniciarObjeto}" update=":dialogoCadastroProduto" />
+                        <p:dataTable id="dataTabela" value="#{produtoBean.listaProduto}" var="var_produto" rendered="#{produtoBean.listaProduto.size()>0}"
+                                     paginator="true"
+                                     paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="5,10,15" rows="10">
+
+                            <p:column headerText="Código" style="width: 50px">
+                                <p:outputLabel value="#{var_produto.id}"/>
+                            </p:column>
+                            
+                            <p:column headerText="EAN" width="95" style="text-align: left; padding-left: 2px">
+                                <p:outputLabel value="#{var_produto.codigoBarras}" />
+                            </p:column>
+
+                            <p:column headerText="Nome do produto">
+                                <p:outputLabel value="#{var_produto.nomeProduto}"/>
+                            </p:column>
+
+                            <p:column headerText="Preço" style="width: 80px; text-align: right" >
+                                <p:outputLabel value="#{var_produto.precoVarejo}" >
+                                    <f:convertNumber type="currency" currencySymbol="R$ " minFractionDigits="2"/>
+                                </p:outputLabel>
+                            </p:column>
+
+                            <p:column headerText="Quantidade" style="width: 70px; text-align: right" >
+                                <p:outputLabel value="#{var_produto.estoqueAtual}" >
+                                    <f:convertNumber type="number" minFractionDigits="2" />
+                                </p:outputLabel> 
+                            </p:column>
+
+
+                            <p:column width="30" >
+                                <p:commandButton id="btnEditar" icon="ui-icon-pencil" actionListener="#{produtoBean.buscaPorID(var_produto)}" oncomplete="PF('wdialogoCadastroProduto').show();" update=":dialogoCadastroProduto"  >
+                                    <f:setPropertyActionListener target="#{produtoBean.produtoSelecionado}" value="#{var_produto}"/>
+                                </p:commandButton>
+                            </p:column>
+
+                            <p:column width="30" >
+                                <p:commandButton id="btnLixeira" icon="ui-icon-trash" oncomplete="PF('wdialogoConfirmacaoExclusaoProduto').show();">
+                                    <f:setPropertyActionListener target="#{produtoBean.produtoSelecionado}" value="#{var_produto}"/>
+                                </p:commandButton>
+                            </p:column>
+                            <p:column width="30">
+                                <p:commandButton icon="ui-icon-check" title="Selecionar"
+                                                 action="#{produtoBean.selecionar(var_produto)}"
+                                                 process="@this" />
+                            </p:column>
+                        </p:dataTable>
+
+                    </h:form>
+                </p:dialog>
+
+                <!--DIALOGO DE CONFIRMAÇÃO DE EXCLUSÃO**********************************************************************-->
+                <p:confirmDialog id="dialogoConfirmacaoExclusaoProduto" header="Exclusão"
+                                 message="Tem certeza que deseja excluir? #{produtoBean.produto.nomeProduto}"
+                                 widgetVar="wdialogoConfirmacaoExclusaoProduto">
+                    <h:form id="frmExclusaoProduto">
+                        <p:commandButton id="btnApagar" value="Sim" update=":frmConsultaProdutos:dataTabela :frmConsultaProdutos:msgConsultaProduto" oncomplete="PF('wdialogoConfirmacaoExclusaoProduto').hide();" action="#{produtoBean.apagar()}"/>
+                        <p:commandButton value="Não" oncomplete="PF('wdialogoConfirmacaoExclusaoProduto').hide();" />
+                    </h:form>
+                </p:confirmDialog>
+
+
+
+
+
+
+
+
+
+
+
+
+                <!--*************************DIALOGO DE CADASTRO*************************************-->
+                <p:dialog header="Cadastro de produtos - Código: [#{produtoBean.produto.id}]" widgetVar="wdialogoCadastroProduto" id="dialogoCadastroProduto" width="1100" height="600">
+
+                    <h:form id="frmDialogoCadastroProduto" >
+                        
+                        <p:growl id="msjCadastroProduto" showDetail="true" autoUpdate="false" />
+                        <h:panelGrid columns="1" id="painelGridDialogoCadastroProduto" >
+
+                            <p:fieldset >
+                                <h:panelGrid columns="4">
+                                    <h:panelGroup >
+                                        <p:outputLabel id="lblProduto" value="Descrição..:" styleClass="negrito" /> <br />
+                                        <p:inputText id="edtProduto" value="#{produtoBean.produto.nomeProduto}" maxlength="50" 
+                                                     required="true" requiredMessage="O produto é campo obrigatório" size="50" 
+                                                     onkeyup="maiuscula(this);"
+                                                     onkeypress="return TABEnter(event, 'edtCodigoGrupo');">
+                                            <p:ajax event="blur" update="@this" listener="#{produtoBean.handleKeyEvent}" />
+                                        </p:inputText>
+                                    </h:panelGroup>
+                                    <h:panelGroup >
+                                        <p:outputLabel id="lblCodigoBarras" value="Cód. de barras" styleClass="negrito" /><br />
+                                        <p:inputText id="edtCodigoBarras" value="#{produtoBean.produto.codigoBarras}" size="13" maxlength="13" />
+                                    </h:panelGroup>
+                                    <h:panelGroup >
+                                        <p:outputLabel id="codigoFornecedor" value="Código do fornecedor" styleClass="negrito"/><br />
+                                        <p:inputText id ="edtCodigoFornecedor" value="#{produtoBean.produto.codigoDoFornecedor}" size="20" maxlength="20" />
+
+                                    </h:panelGroup>
+
+                                    <h:panelGroup id="painelGroupMarca">
+                                        <p:outputLabel value="Marca" styleClass="negrito"/><br />  
+                                        <p:inputText id="edtIdMarca" value="#{produtoBean.produto.marca.id}" required="true" size="5" 
+                                                     onkeypress="return TABEnter(event, 'edtIdFornecedor');">
+                                            <p:ajax listener="#{produtoBean.buscaMarcaPorId(produtoBean.produto.marca)}" event="change" process="edtIdMarca edtNomeMarca" update="edtIdMarca edtNomeMarca msjCadastroProduto edtIdMarca" />
+                                        </p:inputText>
+                                        <p:inputText id="edtNomeMarca" value="#{produtoBean.produto.marca.nomeMarca}" size="20" />
+                                        <p:commandButton icon="ui-icon-search" title="Consultar ou cadastrar Marcas" value="..."
+                                                         process="@this edtIdMarca edtNomeMarca" 
+                                                         oncomplete="PF('wdialogoConsultaMarcas').show();" /> 
+
+                                    </h:panelGroup>
+                                </h:panelGrid>
+
+
+                                <h:panelGrid columns="2">
+                                    <h:panelGroup id="painelGroupFornecedor" >
+                                        <p:outputLabel id="lblCodigoFornecedor" value="Fornecedor" styleClass="negrito"/><br />
+                                        <p:inputText id="edtIdFornecedor" value="#{produtoBean.produto.fornecedor.id}" 
+                                                     required="true" requiredMessage="O Id do fornecedor é obrigatório" 
+                                                     size="5" 
+                                                     onkeypress="return TABEnter(event, 'edtPreco');">
+                                            <p:ajax listener="#{produtoBean.buscaPorID3(produtoBean.produto.fornecedor)}" event="change" process="edtIdFornecedor edtNomeFornecedor" update="edtIdFornecedor edtNomeFornecedor msjCadastroProduto edtIdFornecedor" />
+                                        </p:inputText>
+                                        <p:inputText id="edtNomeFornecedor" value="#{produtoBean.produto.fornecedor.nomeFornecedor}" size="50" />
+                                        <p:commandButton icon="ui-icon-search" title="Consultar ou cadastrar Fornecedores" value="..."
+                                                         process="@this edtIdFornecedor edtNomeFornecedor" 
+                                                         oncomplete="PF('wdialogoConsultaFornecedores').show();" /> 
+
+                                    </h:panelGroup>
+                                    <h:panelGroup id="painelGroupGrupo">
+                                        <p:outputLabel id="lblCodigoGrupo" value="Grupo" styleClass="negrito"/><br />
+                                        <p:inputText id="edtCodigoGrupo" value="#{produtoBean.produto.grupo.id}" required="true" size="5" 
+                                                     onkeypress="return TABEnter(event, 'edtPreco');">
+                                            <p:ajax listener="#{produtoBean.buscaPorID2(produtoBean.produto.grupo)}" event="change" process="edtCodigoGrupo edtNomeGrupo" update="edtCodigoGrupo edtNomeGrupo msjCadastroProduto edtCodigoGrupo" />
+                                        </p:inputText>
+                                        <p:inputText id="edtNomeGrupo" value="#{produtoBean.produto.grupo.nomeGrupo}" size="33" />
+                                        <p:commandButton icon="ui-icon-search" title="Consultar ou cadastrar Grupos" value="..."
+                                                         process="@this edtCodigoGrupo edtNomeGrupo" 
+                                                         oncomplete="PF('wdialogoConsultaGrupos').show();" /> 
+                                    </h:panelGroup>
+
+                                </h:panelGrid>
+                            </p:fieldset>
+
+                            <p:fieldset >
+                                <h:panelGrid columns="4">
+                                    <h:panelGroup >
+                                        <p:outputLabel id="lblQuantidadePorCaixa" value="Qt. por Caixa" styleClass="negrito" /><br />
+                                        <p:inputText id="edtQuantidadePorCaixa" value="#{produtoBean.produto.quantidadePorCaixa}" size="10" styleClass="numero" >
+                                        </p:inputText>
+                                    </h:panelGroup>
+                                    <h:panelGroup >
+                                        <p:outputLabel id="lblEstoqueMinimo" value="Estoque Mín." styleClass="negrito" /><br />
+                                        <p:inputText id="edtEstoqueMninimo" value="#{produtoBean.produto.estoqueMinimo}" size="10" styleClass="numero" onfocus="apagaZero(this);" onblur="insereZero(this);"  >
+                                            <f:convertNumber minFractionDigits="2" locale="pt_BR"/>
+                                            <p:ajax event="blur" update="@this" />
+                                        </p:inputText>
+                                    </h:panelGroup>
+                                    <h:panelGroup >
+                                        <p:outputLabel id="lblEstoqueMaximo" value="Estoque Máx." styleClass="negrito" /><br />
+                                        <p:inputText id="edtEstoqueMaximo" value="#{produtoBean.produto.estoqueMaximo}" size="10" styleClass="numero"  >
+
+                                        </p:inputText>
+                                    </h:panelGroup>
+                                    <h:panelGroup >
+                                        <p:outputLabel id="lblEstoqueAtual" value="Estoque Atual" styleClass="negrito" /><br />
+                                        <p:inputText id="edtEstoqueAtual" value="#{produtoBean.produto.estoqueAtual}" size="10" styleClass="numero"  readonly="true" >
+
+                                        </p:inputText>
+                                    </h:panelGroup>
+                                </h:panelGrid>
+                            </p:fieldset>
+
+                            <p:fieldset >
+                                <h:panelGrid columns="4">
+                                    <h:panelGroup >
+                                        <p:outputLabel id="lblPesoNeto" value="Peso neto" styleClass="negrito" /><br />
+                                        <p:inputText id="edtPesoNeto" value="#{produtoBean.produto.pesoNeto}" size="10" styleClass="numero"  >
+
+                                        </p:inputText>
+                                    </h:panelGroup>
+                                    <h:panelGroup >
+                                        <p:outputLabel id="lblPesoBruto" value="Peso Bruto" styleClass="negrito" /><br />
+                                        <p:inputText id="edtPesoBruto" value="#{produtoBean.produto.pesoBruto}" size="10" styleClass="numero"  >
+
+                                        </p:inputText>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup >
+                                        <p:outputLabel id="lblTamanho" value="Tamanho" styleClass="negrito" /><br />
+                                        <p:inputText id="edtTamanho" value="#{produtoBean.produto.tamanho}" size="10" styleClass="numero"  >
+
+                                        </p:inputText>
+                                    </h:panelGroup>
+                                    <h:panelGroup id="painelGroupUnidade">
+                                        <p:outputLabel value="Unidade" styleClass="negrito"/><br />  
+                                        <p:inputText id="edtIdUnidade" value="#{produtoBean.produto.unidade.siglaUnidade}" 
+                                                     required="true" requiredMessage="Unidade é campo obrigatório" size="5" 
+                                                     onkeypress="return TABEnter(event, 'edtValorCompra');">
+                                            <p:ajax listener="#{produtoBean.buscaUnidadePorId(produtoBean.produto.unidade)}" event="change" process="edtIdUnidade edtNomeUnidade" update="edtIdUnidade edtNomeUnidade msjCadastroProduto" />
+                                        </p:inputText>
+                                        <p:inputText id="edtNomeUnidade" value="#{produtoBean.produto.unidade.nomeUnidade}" size="20" />
+                                        <p:commandButton icon="ui-icon-search" title="Consultar ou cadastrar Unidade" value="..."
+                                                         process="@this edtIdUnidade edtNomeUnidade" 
+                                                         oncomplete="PF('wdialogoConsultaUnidades').show();" /> 
+
+                                    </h:panelGroup>
+                                </h:panelGrid>
+                            </p:fieldset>
+
+                            <p:fieldset id="fieldsetImpostos">
+                                <p:panelGrid id="panelGridPrincipalImpostos" columns="2">
+                                    <p:panelGrid id="panelGridSecundarioImpostos_1" columns="1" style="width: 450px">
+                                        <h:panelGrid columns="4">
+                                            <h:panelGroup >
+                                                <p:outputLabel id="lblValorCompra" value="Valor compra" styleClass="negrito" /><br />
+                                                <p:inputText id="edtValorCompra" value="#{produtoBean.produto.valorCompra}" size="10" styleClass="numero" ><f:convertNumber minFractionDigits="2" locale="pt_BR"/></p:inputText>    
+                                            </h:panelGroup>
+                                            <h:panelGroup >
+                                                <p:outputLabel id="lblIcms" value="ICMS(%)" styleClass="negrito" /><br />
+                                                <p:inputText id="edtIcms" value="#{produtoBean.produto.icms}" size="10" styleClass="numero" ><f:convertNumber minFractionDigits="2" locale="pt_BR"/></p:inputText>    
+                                            </h:panelGroup>
+                                            <h:panelGroup >
+                                                <p:outputLabel id="lblIss" value="ISS(%)" styleClass="negrito" /><br />
+                                                <p:inputText size="10" value="#{produtoBean.produto.iss}" styleClass="numero" ><f:convertNumber minFractionDigits="2" locale="pt_BR"/></p:inputText>    
+                                            </h:panelGroup>
+                                            <h:panelGroup >
+                                                <p:outputLabel id="lblIpi" value="IPI(%)" styleClass="negrito" /><br />
+                                                <p:inputText value="#{produtoBean.produto.ipi}" size="10" styleClass="numero" ><f:convertNumber minFractionDigits="2" locale="pt_BR"/></p:inputText>    
+                                            </h:panelGroup>
+                                        </h:panelGrid>
+
+
+
+                                        <h:panelGrid columns="4">
+                                            <h:panelGroup >
+                                                <p:outputLabel id="lblPrecoCusto" value="Preço custo" styleClass="negrito" /><br />
+                                                <p:inputText id="edtPrecoCusto" value="#{produtoBean.produto.precoCusto}" size="10" styleClass="numero" ><f:convertNumber minFractionDigits="2" locale="pt_BR"/></p:inputText>    
+                                            </h:panelGroup>
+                                            <h:panelGroup >
+                                                <p:outputLabel id="lblValorIcms" value="ICMS(R$)" styleClass="negrito" /><br />
+                                                <p:inputText id="edtValorIcms" value="#{produtoBean.produto.valorIcms}" size="10" styleClass="numero" ><f:convertNumber minFractionDigits="2" locale="pt_BR"/></p:inputText>    
+                                            </h:panelGroup>
+                                            <h:panelGroup >
+                                                <p:outputLabel id="lblValorIss" value="ISS(R$)" styleClass="negrito" /><br />
+                                                <p:inputText id="edtValorIss" value="#{produtoBean.produto.valorIss}" size="10" styleClass="numero" ><f:convertNumber minFractionDigits="2" locale="pt_BR"/></p:inputText>    
+                                            </h:panelGroup>
+                                            <h:panelGroup >
+                                                <p:outputLabel id="lblValorIpi" value="IPI(R$)" styleClass="negrito" /><br />
+                                                <p:inputText id="edtValorIpi" value="#{produtoBean.produto.valorIpi}" size="10" styleClass="numero" ><f:convertNumber minFractionDigits="2" locale="pt_BR"/></p:inputText>    
+                                            </h:panelGroup>
+                                        </h:panelGrid>
+                                    </p:panelGrid>
+                                    <p:panelGrid id="panelGridSecundarioImpostos_2" columns="1">
+                                        <h:panelGrid columns="2" >
+                                            <h:panelGroup >
+                                                <p:outputLabel id="lblNcm" value="NCM" styleClass="negrito" /><br />
+                                                <p:inputText id="edtNcm" value="#{produtoBean.produto.ncm.id}"  size="5" maxlength="8" styleClass="numero" >
+                                                    <p:ajax event="blur" listener="#{produtoBean.buscaNcmPorId(produtoBean.produto.ncm)}" process="@this edtNomeNcm" update="@this edtNomeNcm msjCadastroProduto" />
+                                                    <f:convertNumber minFractionDigits="2" locale="pt_BR"/>
+                                                </p:inputText>  
+                                                <p:inputText id="edtNomeNcm" value="#{produtoBean.produto.ncm.nomeNcm}" size="20" />
+                                                <p:commandButton icon="ui-icon-search" title="Consultar ou cadastrar NCM" 
+                                                         process="@this edtNcm edtNomeNcm" 
+                                                         oncomplete="PF('wdialogoConsultaNcms').show();" />
+                                            </h:panelGroup>
+                                            <h:panelGroup >
+                                                <p:outputLabel id="lblCst" value="CST" styleClass="negrito" /><br />
+                                                <p:inputText id="edtCst" value="#{produtoBean.produto.cst.id}"  size="3" maxlength="3" styleClass="numero" >
+                                                    <p:ajax event="blur" listener="#{produtoBean.buscaCstPorId(produtoBean.produto.cst)}" process="@this edtNomeCst" update="@this edtNomeCst msjCadastroProduto" />
+                                                </p:inputText>  
+                                                <p:inputText id="edtNomeCst" value="#{produtoBean.produto.cst.nomeCst}" size="20" />
+                                                <p:commandButton icon="ui-icon-search" title="Consultar ou cadastrar CST" 
+                                                         process="@this edtCst edtNomeCst" 
+                                                         oncomplete="PF('wdialogoConsultaCsts').show();" />
+                                            </h:panelGroup>
+                                        </h:panelGrid>
+                                        <h:panelGrid columns="2" >
+                                            <h:panelGroup >
+                                                <p:outputLabel id="lblCfop" value="CFOP" styleClass="negrito" /><br />
+                                                <p:inputText id="edtCfop" value="#{produtoBean.produto.cfop.id}"  size="5" maxlength="4" styleClass="numero" >
+                                                    <p:ajax event="blur" listener="#{produtoBean.buscaCfopPorId(produtoBean.produto.cfop)}" process="@this edtNomeCfop" update="@this edtNomeCfop msjCadastroProduto" />
+                                                    <f:convertNumber locale="pt_BR"/>
+                                                </p:inputText>  
+                                                <p:inputText id="edtNomeCfop" value="#{produtoBean.produto.cfop.nomeCfop}" size="20" />
+                                                <p:commandButton icon="ui-icon-search" title="Consultar ou cadastrar CFOP" 
+                                                         process="@this edtCfop edtNomeCfop" 
+                                                         oncomplete="PF('wdialogoConsultaCfops').show();" />
+                                            </h:panelGroup>
+                                        </h:panelGrid>
+                                    </p:panelGrid>
+                                </p:panelGrid>
+                            </p:fieldset><!--fim impostos-->
+
+                            <p:fieldset>
+                                <h:panelGrid columns="3">
+                                    <h:panelGroup >
+                                        <p:outputLabel id="lblPrecoMedio" value="Preço Médio" styleClass="negrito" /><br />
+                                        <p:inputText id="edtPrecoMedio" value="#{produtoBean.produto.precoMedio}" size="10" styleClass="numero">
+                                            <f:convertNumber minFractionDigits="2" maxFractionDigits="2" locale="pt_BR" /> 
+                                            <p:ajax event="blur" update="@this" process="@this"/>
+                                        </p:inputText>    
+                                    </h:panelGroup>
+                                    <h:panelGroup >
+                                        <p:outputLabel id="lblPrecoVarejo" value="Preço Varejo" styleClass="negrito" /><br />
+                                        <p:inputText id="edtPrecoVarejo" value="#{produtoBean.produto.precoVarejo}" size="10" styleClass="numero"  
+                                                     onkeyup="atualiza(this);"
+                                                     onkeypress="return TABEnter(event, 'edtQuantidade');">
+                                            <f:convertNumber minFractionDigits="2" locale="pt_BR"/>
+                                        </p:inputText>   
+                                    </h:panelGroup>
+                                    <h:panelGroup >
+                                        <p:outputLabel id="lblPrecoAtacado" value="Preço Atacado" styleClass="negrito" /><br />
+                                        <p:inputText id="edtPrecoAtacado" value="#{produtoBean.produto.precoAtacado}" size="10" styleClass="numero" ><f:convertNumber minFractionDigits="2" maxFractionDigits="2" locale="pt_BR"/> </p:inputText>    
+                                    </h:panelGroup>
+                                </h:panelGrid>
+                            </p:fieldset>
+
+                            <p:fieldset>
+                                <h:panelGrid columns="2">
+                                    <h:panelGroup>
+                                        <p:outputLabel id="lblDataUltimaCompra" value="Última compra" styleClass="negrito" /><br />
+                                        <p:calendar id="edtDataUltimaCompra" value="#{produtoBean.produto.dataUltimaCompra}" pattern="dd/MM/yyyy" locale="pt" size="10" readonly="true" />
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <p:outputLabel id="lblDataUltimaVenda" value="Última Venda" styleClass="negrito" /><br />
+                                        <p:calendar id="edtDataUltimaVenda" value="#{produtoBean.produto.dataUltimaVenda}" pattern="dd/MM/yyyy" locale="pt" size="10" readonly="true" />
+                                    </h:panelGroup>
+                                </h:panelGrid>
+                            </p:fieldset>
+
+                            <f:facet name="footer">
+                                <h:panelGrid id="painelGridRodapeCadastroProduto" columns="5">
+                                    <p:commandButton style="display: none" />
+                                    <p:commandButton value="#{produtoBean.accion}" actionListener="#{produtoBean.operar}" oncomplete="tratarRequisicaoProdutos(xhr, status, args)" update="frmDialogoCadastroProduto :frmConsultaProdutos:dataTabela" />
+                                    <p:commandButton value="Excluir" />
+                                    <p:commandButton value="Limpar" actionListener="#{produtoBean.limpar}" process="@this" update="@form" />
+                                    <p:commandButton value="Sair" oncomplete="PF('wdialogoCadastroProduto').hide();" />
+                                </h:panelGrid>
+                            </f:facet> 
+                        </h:panelGrid>
+                    </h:form>
+                </p:dialog>
+
+
+
+
+
+
+
+
+
+                <script type="text/javascript">
+                    function tratarRequisicaoProdutos(xhr, status, args) {
+                        if (!args.fecharDialogo) {
+                            jQuery("#dialogoCadastroProduto").effect("shake", {times: 10}, 100);
+                        } else {
+                            PF('wdialogoCadastroProduto').hide();
+                        }
+                    }
+
+
+
+
+                    function TABEnter(pEvent, campo) {
+                        if (pEvent.keyCode === 13) {
+                            //return pEvent.keyCode = 9;  
+                            //document.getElementById('frmDialogoCadastroVenda:' + campo).focus();
+                            //document.getElementById('frmDialogoCadastroVenda:' + campo).value='';
+                            document.getElementById('frmDialogoCadastroProduto:' + campo).select();
+                            return false;
+                        }
+                        return true;
+                    }
+
+                    function apagaZero(valorCampo) {
+                        //var str = valorCampo.value;
+                        //alert(valorCampo.value.substring(2,3));
+                        //alert(valorCampo.value.substring(0,1));
+                        //if (valorCampo.value==='0.0'){
+                        //if (valorCampo.value.substring(0,1)==='0'){  
+                        //if (parseFloat(valorCampo.value) === 0) {
+                        if (valorCampo.value === '0,00') {
+                            valorCampo.value = '';
+                        }
+                        return true;
+                    }
+
+
+                    function insereZero(valorCampo) {
+                        if (valorCampo.value === '') {
+                            valorCampo.value = '0,00';
+                        }
+                        return true;
+                    }
+                </script>
+
+                <!--pagina marcas-->
+                <ui:include src="/consultaMarcas_1.xhtml" />
+                <!--fim pagina marcas-->    
+
+                <!--pagina fornecedores-->
+                <ui:include src="/consultaFornecedores_1.xhtml" />
+                <!--fim pagina fornecedores-->
+
+                <!--pagina grupos-->
+                <ui:include src="/consultaGrupos_1.xhtml" />
+                <!--fim pagina grupos-->
+
+                <!--pagina unidades-->
+                <ui:include src="/consultaUnidade_1.xhtml" />
+                <!--fim pagina unidades-->
+                
+                <!--pagina ncms-->
+                <ui:include src="/consultaNcm_1.xhtml" />
+                <!--fim pagina ncms-->
+                
+                <!--pagina ncms-->
+                <ui:include src="/consultaCst_1.xhtml" />
+                <!--fim pagina ncms-->
+                
+                <!--pagina ncms-->
+                <ui:include src="/consultaCfop_1.xhtml" />
+                <!--fim pagina ncms-->
+
+                <!--fim pagina produtos-->
+            </ui:define>
+        </ui:composition>
+
+    </body>
+</html>

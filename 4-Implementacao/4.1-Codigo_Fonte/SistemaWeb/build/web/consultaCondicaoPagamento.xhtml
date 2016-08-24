@@ -1,0 +1,310 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:pe="http://primefaces.org/ui/extensions"
+      xmlns:p="http://primefaces.org/ui">
+
+    <body>
+        <ui:composition template="./WEB-INF/templates/telaPadrao.xhtml">
+            <ui:define name="content">
+                <p:panel header="Consulta de condicaoPagamentos" footer="SistemaWeb">
+                    <f:event type="preRenderView" listener="#{condicaoPagamentoBean.listar()}" />
+                    <p:growl id="msj" showDetail="true" />
+                    <h:form id="frmConsultaCondicaoPagamento" style="height: 600px" >
+                        <p:growl id="msgConsultaCondicaoPagamento" showDetail="true" />
+                        <p:commandButton id="btnAcao" value="Novo" oncomplete="PF('wdialogoCadastroCondicaoPagamento').show();" actionListener="#{condicaoPagamentoBean.setAccion('Registrar')}" action="#{condicaoPagamentoBean.zerarCondicaoPagamento}" update=":dialogoCadastroCondicaoPagamento" />
+                        <p:dataTable id="dataTabela" value="#{condicaoPagamentoBean.listaCondicaoPagamento}" var="var_condicaoPagamento"
+                                     paginator="true"
+                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="5,10,15">
+
+                            <p:column headerText="Código" style="width: 50px">
+                                <p:outputLabel value="#{var_condicaoPagamento.id}"/>
+                            </p:column>
+
+                            <p:column headerText="Nome do condicaoPagamento">
+                                <p:outputLabel value="#{var_condicaoPagamento.nomeCondicaoPagamento}"/>
+                            </p:column>
+
+
+
+
+                            <p:column width="30" >
+                                <p:commandButton id="btnEditar" icon="ui-icon-pencil" actionListener="#{condicaoPagamentoBean.buscaPorID(var_condicaoPagamento)}" oncomplete="PF('wdialogoCadastroCondicaoPagamento').show();" update=":dialogoCadastroCondicaoPagamento"  >
+                                    <f:setPropertyActionListener target="#{condicaoPagamentoBean.condicaoPagamentoSelecionado}" value="#{var_condicaoPagamento}"/>
+                                </p:commandButton>
+                            </p:column>
+
+                            <p:column width="30" >
+                                <p:commandButton id="btnLixeira" icon="ui-icon-trash" oncomplete="PF('wdialogoConfirmacaoExclusaoCondicaoPagamento').show();">
+                                    <f:setPropertyActionListener target="#{condicaoPagamentoBean.condicaoPagamentoSelecionado}" value="#{var_condicaoPagamento}"/>
+                                </p:commandButton>
+                            </p:column>
+                            <p:column width="30">
+                                <p:commandButton icon="ui-icon-check" title="Selecionar"
+                                                 action="#{condicaoPagamentoBean.selecionar(var_condicaoPagamento)}"
+                                                 process="@this" />
+                            </p:column>
+                        </p:dataTable>
+
+                        <!--DIALOGO DE CONFIRMAÇÃO DE EXCLUSÃO**********************************************************************-->
+                        <p:confirmDialog id="dialogoConfirmacaoExclusaoCondicaoPagamento" header="Exclusão"
+                                         message="Tem certeza que deseja excluir? #{condicaoPagamentoBean.condicaoPagamento.nomeCondicaoPagamento}"
+                                         widgetVar="wdialogoConfirmacaoExclusaoCondicaoPagamento">
+
+                            <p:commandButton id="btnApagar" value="Sim" update="dataTabela :frmConsultaCondicaoPagamento:msgConsultaCondicaoPagamento" oncomplete="PF('wdialogoConfirmacaoExclusaoCondicaoPagamento').hide();" action="#{condicaoPagamentoBean.apagar()}"/>
+                            <p:commandButton value="Não" oncomplete="PF('wdialogoConfirmacaoExclusaoCondicaoPagamento').hide();" />
+                        </p:confirmDialog>
+                    </h:form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    <!--DIALOGO DE CADASTRO********************************************************************************-->
+                    <p:dialog header="Cadastro de condicaoPagamentos" widgetVar="wdialogoCadastroCondicaoPagamento" id="dialogoCadastroCondicaoPagamento" width="1200" height="600">
+                        <h:form id="frmDialogoCadastroCondicaoPagamento" >
+                            <p:ajaxStatus styleClass="ajax-status" >
+                                <f:facet name="start" >
+                                    <h:graphicImage library="gifs" name="ajaxloadingbar.gif" />
+                                </f:facet>
+                                <f:facet name="complete" >
+                                    <h:outputText value="" />
+                                </f:facet>
+                            </p:ajaxStatus>
+                            <p:messages closable="true"/>
+                            <p:growl id="msjCadastroCondicaoPagamento" showDetail="true" />
+                            <h:panelGrid columns="1" id="painelGridDialogoCadastroCondicaoPagamento" >
+                                <p:fieldset id="fieldsetInsereCondicao" legend="Condição de pagamento">
+                                    <h:panelGrid id="painelCondicao" columns="5">
+                                        <h:panelGroup >
+                                            <p:outputLabel id="lblCondicaoPagamento" value="CondicaoPagamento" /><br />
+                                            <p:inputText id="edtCondicaoPagamento" value="#{condicaoPagamentoBean.condicaoPagamento.nomeCondicaoPagamento}" maxlength="100" required="true" style="width: 300px"
+                                                         onkeypress="return TABEnter(event, 'edtParcelas');">
+                                                <p:ajax event="blur" update="@this" listener="#{condicaoPagamentoBean.handleKeyEvent}" />
+                                            </p:inputText>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup >
+                                            <p:outputLabel value="Parcelas" /><br />
+                                            <p:inputText id="edtParcelas" value="#{condicaoPagamentoBean.condicaoPagamento.quantidadeParcelas}" onkeypress="return TABEnter(event, 'edtEntradaDias');" >
+                                                <p:ajax event="blur" update="painelParcelas" listener="#{condicaoPagamentoBean.mostrarFieldseParcelas}" />
+                                            </p:inputText>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup >
+                                            <p:outputLabel value="Entrada dia(s)" /><br />
+                                            <p:inputText id="edtEntradaDias" value="#{condicaoPagamentoBean.condicaoPagamento.entrada}" onkeypress="return TABEnter(event, 'edtIntervaloDias');" >
+                                                <p:ajax listener="#{condicaoPagamentoBean.calculaDiasParcela()}" event="blur" update="edtEntradaDias edtIntervaloDia edtVencimento" />
+                                            </p:inputText> 
+                                        </h:panelGroup>
+
+                                        <h:panelGroup >
+                                            <p:outputLabel value="Intervalo de dias" /><br />
+                                            <p:inputText id="edtIntervaloDias" value="#{condicaoPagamentoBean.condicaoPagamento.intervaloDias}" onkeypress="return TABEnter(event, 'edtData_input');" >
+
+                                            </p:inputText>
+                                        </h:panelGroup>
+                                        <h:panelGroup >
+                                            <p:outputLabel value="Data" /><br />
+                                            <p:calendar id="edtData" pattern="dd/MM/yyyy" locale="pt_BR" value="#{condicaoPagamentoBean.data}" onkeypress="return TABEnter(event, 'edtParcela');" >
+                                                <p:ajax listener="#{condicaoPagamentoBean.calculaVencimento()}" event="blur" update="edtData" />
+                                            </p:calendar>
+                                        </h:panelGroup>
+                                    </h:panelGrid>
+                                </p:fieldset>
+                                <br />
+                                <br />
+
+                                <h:panelGroup id="painelParcelas" >
+                                <p:fieldset id="fieldsetInsereParcela" legend="Parcelas da condição" rendered="#{condicaoPagamentoBean.mostrarFieldParcelas}" >
+                                    
+                                    <h:panelGrid id="painelInsereCondicao" columns="6" >
+
+                                        <h:panelGroup >
+                                            <h:outputLabel value="Parcela nº" /><br />
+                                            <p:inputText id="edtParcela" value="#{condicaoPagamentoBean.numeroParcela}" maxlength="10" size="10"
+                                                         onkeypress="return TABEnter(event, 'edtPorcentagem_input');" />
+                                        </h:panelGroup>
+
+                                        <h:panelGroup >
+                                            <h:outputLabel value="porcentagem" /><br />
+                                            <pe:inputNumber id="edtPorcentagem" value="#{condicaoPagamentoBean.parcela.porcentagem}" onfocus="volta()" style=" text-align: right; width: 100px"
+                                                            onkeypress="return TABEnter(event, 'edtIntervaloDia');" >
+                                                <!--<f:validateDoubleRange minimum="0.01" maximum="100.00" />-->
+                                                <p:ajax listener="#{condicaoPagamentoBean.calculaPorcentagemRestante()}" event="blur" update="edtPorcentagemRestante msjCadastroCondicaoPagamento" />
+                                            </pe:inputNumber> 
+                                        </h:panelGroup>
+
+                                        <h:panelGroup >
+                                            <h:outputLabel value="Dias" /><br />
+                                            <p:inputText id="edtIntervaloDia" value="#{condicaoPagamentoBean.dias}" onkeypress="return TABEnter(event, 'edtPorcentagemRestante');" maxlength="10" size="10" >
+                                                <p:ajax listener="#{condicaoPagamentoBean.calculaDiasParcela()}" event="blur" update="edtVencimento" />
+                                            </p:inputText>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup >
+                                            <h:outputLabel value="Restante Porc." /><br />
+                                            <p:inputText id="edtPorcentagemRestante" value="#{condicaoPagamentoBean.porcentagemRestante}" onblur="volta();" maxlength="10" size="10" />
+                                        </h:panelGroup>
+
+                                        
+                                        
+                                        <h:panelGroup >
+                                            <f:event type="preRenderView" listener="#{formaPagamentoBean.listar()}" />
+                                            <p:outputLabel value="Forma de pgto." />
+                                            <p:selectOneMenu value="#{condicaoPagamentoBean.parcela.formaPagamento}" converter="omnifaces.SelectItemsConverter" 
+                                                             required="true" requiredMessage="Preencha a forma de pgto." >
+                                                <f:selectItem noSelectionOption="true" itemLabel="Selecione" itemValue="#{null}"/>
+                                                <f:selectItems value="#{formaPagamentoBean.listaFormaPagamento}" var="par" itemLabel="#{par.nomeFormaPagamento}" itemValue="#{par}"/>
+                                            </p:selectOneMenu>
+                                        </h:panelGroup>
+
+                                        
+                                        
+                                        <h:panelGroup >
+                                            <h:outputLabel value="Vencimento" /><br />
+                                            <p:calendar id="edtVencimento" pattern="dd/MM/yyyy" locale="pt_BR" value="#{condicaoPagamentoBean.parcela.vencimento}" />
+
+                                            <p:commandButton actionListener="#{condicaoPagamentoBean.inserirNaGrid()}" update="dataTableParcelas fieldsetInsereParcela painelParcelas edtCondicaoPagamento" value="Inserir Parcela" onclick="volta()" />
+                                        </h:panelGroup>
+
+                                    </h:panelGrid>
+                                </p:fieldset>
+                                </h:panelGroup>
+
+
+
+
+
+
+
+
+
+
+
+                                <!-- T A B E L A-->
+                                <p:fieldset >
+                                <p:dataTable id="dataTableParcelas" value="#{condicaoPagamentoBean.listaParcelas}" var="parcela" >
+                                    <p:column headerText="Número" width="40" >
+                                        <p:inputText value="#{parcela.numero}" size="10" />
+                                    </p:column>
+
+                                    <p:column headerText="Porcentagem" width="40px" style="text-align: right" >
+                                        <p:inputText size="10" value="#{parcela.porcentagem}" style="text-align: right  " >
+                                            <f:convertNumber type="number" minFractionDigits="2"/>
+                                        </p:inputText>
+                                    </p:column>
+
+                                    <p:column headerText="Intervalo dias" width="40px" >
+                                        <p:inputText  size="10" value="#{parcela.dias}" >
+
+                                        </p:inputText>
+                                    </p:column>
+
+                                    <p:column headerText="Vencimento" width="10px" >
+                                        <p:calendar value="#{parcela.vencimento}" pattern="dd/MM/yyyy" locale="pt_BR" />
+                                    </p:column>
+
+                                    <p:column headerText="Forma pagamento" width="40px" >
+                                        <p:selectOneMenu value="#{parcela.formaPagamento}" converter="omnifaces.SelectItemsConverter" 
+                                                         required="true" requiredMessage="Preencha a forma de pgto." >
+                                            <f:selectItem noSelectionOption="true" itemLabel="Selecione" itemValue="#{null}"/>
+                                            <f:selectItems value="#{formaPagamentoBean.listaFormaPagamento}" var="par" itemLabel="#{par.nomeFormaPagamento}" itemValue="#{par}"/>
+                                        </p:selectOneMenu>
+                                    </p:column>
+
+
+                                    <p:column width="40px" >
+                                        <p:commandButton id="btnLixeira" icon="ui-icon-trash" actionListener="#{compraBean.removerDaGrid(var_itens)}" update="dataTableParcelas" >
+                                            <f:setPropertyActionListener target="#{compraBean.itensCompraSelecionada}" value="#{var_itens}"/>
+
+                                        </p:commandButton>
+                                    </p:column>
+
+                                    <p:columnGroup type="footer" >
+                                        <p:row>
+                                            <p:column id="edtTotal" colspan="2" footerText="#{condicaoPagamentoBean.porcentagemTotal}" style="text-align: right" />
+                                            <p:column footerText="000" style="text-align: right" />
+                                        </p:row>
+                                    </p:columnGroup>
+                                </p:dataTable>
+                                </p:fieldset>
+
+
+
+
+
+                                <f:facet name="footer">
+                                    <h:panelGrid id="painelGridRodapeCadastroCondicaoPagamento" columns="5">
+                                        <p:commandButton style="display: none" />
+                                        <p:commandButton value="#{condicaoPagamentoBean.accion}" actionListener="#{condicaoPagamentoBean.operar}" oncomplete="tratarRequisicao(xhr, status, args)" update="frmDialogoCadastroCondicaoPagamento :frmConsultaCondicaoPagamento:dataTabela" />
+                                        <p:commandButton value="Excluir" />
+                                        <p:commandButton value="Limpar" />
+                                        <p:commandButton value="Sair" />
+                                    </h:panelGrid>
+                                </f:facet> 
+                            </h:panelGrid>
+                        </h:form>
+                    </p:dialog>
+
+                    <script type="text/javascript">
+                        function tratarRequisicao(xhr, status, args) {
+                            if (!args.fecharDialogo) {
+                                jQuery("#dialogoCadastroCondicaoPagamento").effect("shake", {times: 10}, 100);
+                            } else {
+                                PF('wdialogoCadastroCondicaoPagamento').hide();
+                            }
+                        }
+
+
+                        function TABEnter(pEvent, campo) {
+                            if (pEvent.keyCode === 13) {
+                                //return pEvent.keyCode = 9;  
+                                //document.getElementById('frmDialogoCadastroVenda:' + campo).focus();
+                                //document.getElementById('frmDialogoCadastroVenda:' + campo).value='';
+                                document.getElementById('frmDialogoCadastroCondicaoPagamento:' + campo).select();
+                                return false;
+                            }
+                            return true;
+                        }
+
+                        function volta() {
+                            document.getElementById('frmDialogoCadastroCondicaoPagamento:edtPorcentagem_input').select();
+
+                            //alert('passou');
+                            //return false;
+                        }
+
+                        function vaiProCampoPorcentagem(evento, campo) {
+                            if (evento.keyCode === 13) {
+                                document.getElementById('frmDialogoCadastroCondicaoPagamento:' + campo).select();
+                                return false;
+                            }
+
+                            return true;
+                        }
+
+                    </script>
+                </p:panel>
+            </ui:define>
+        </ui:composition>
+
+    </body>
+</html>

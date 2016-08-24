@@ -1,0 +1,152 @@
+<?xml version='1.0' encoding='UTF-8' ?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+    <h:head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <h:outputStylesheet name="./css/default.css"/>
+        <h:outputStylesheet name="./css/cssLayout.css"/>
+        <h:outputScript name="./js/funcoes.js" />
+        <title>Infinity Group S.A.</title>
+
+        <script type="text/javascript">
+            function Enter(idinput) {
+                if (event.keyCode === 13) {
+                    document.getElementById(idinput).focus();
+                    //alert();
+                    return false;
+                }
+        </script>
+
+
+
+
+        <script type="text/javascript">
+                PrimeFaces.locales['pt'] = {
+                    closeText: 'Fechar',
+                    prevText: 'Anterior',
+                    nextText: 'Próximo',
+                    //currentText: 'Começo',  
+                    monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
+                    monthNamesShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+                    dayNames: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'],
+                    dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],
+                    dayNamesMin: ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'],
+                    weekHeader: 'Semana',
+                    firstDay: 1,
+                    isRTL: false,
+                    showMonthAfterYear: false,
+                    yearSuffix: '',
+                    timeOnlyTitle: 'Só Horas',
+                    timeText: 'Tempo',
+                    hourText: 'Hora',
+                    minuteText: 'Minuto',
+                    secondText: 'Segundo',
+                    currentText: 'Data Atual',
+                    ampm: false,
+                    month: 'Mês',
+                    week: 'Semana',
+                    day: 'Dia',
+                    allDayText: 'Todo Dia'
+            }
+            ;
+        </script>
+
+
+    </h:head>
+
+    <h:body>
+
+        <div id="top">
+            <ui:insert name="top">
+                <h:form >
+                    <p:menubar  autoDisplay="false" style="text-decoration:  #000000">
+                        <p:submenu label="Cadastros" style="color: #AFAFAF; text-decoration-color: #D20005" >
+                            <p:submenu label="Produtos" style="color: #AFAFAF; text-decoration-color: #D20005" >
+                                <p:menuitem value="Velas" url="/faces/consultaEstoqueVelas.xhtml" style="color: #AFAFAF"/>
+                                
+                            </p:submenu>
+
+
+
+
+
+
+                            <p:submenu label="Produto" style="color: #AFAFAF; text-decoration-color: #D20005" >
+                                <p:menuitem value="NCM"  style="color: #AFAFAF"/>
+                                <p:menuitem value="CST"  style="color: #AFAFAF"/>
+                                <p:menuitem value="CFOP"  style="color: #AFAFAF"/>
+                                <p:menuitem value="Produto"  style="color: #AFAFAF"/>
+                                <p:menuitem value="Grupos"  style="color: #AFAFAF"/>
+                                <p:menuitem value="Marcas"  style="color: #AFAFAF"/>
+                                <p:menuitem value="Unidade medida"  style="color: #AFAFAF"/>
+
+                            </p:submenu>
+
+                            <p:submenu label="Pessoas" style="color: #AFAFAF; text-decoration-color: #D20005" >
+                                <p:menuitem value="Cliente"  style="color: #AFAFAF"/>
+                                <p:menuitem value="Fornecedor"  style="color: #AFAFAF"/>
+                                <p:menuitem value="Cargo"  style="color: #AFAFAF"/>
+                                <p:menuitem value="Funcionário"  style="color: #AFAFAF"/>
+                                <p:menuitem value="Transportadoras"  style="color: #AFAFAF"/>
+
+                            </p:submenu>
+
+                            <p:submenu label="Financeiro" style="color: #AFAFAF; text-decoration-color: #D20005" >
+                                <p:menuitem value="Contas do caixa"  style="color: #AFAFAF"/>
+                                <p:menuitem value="Moedas"  style="color: #AFAFAF"/>
+                                <p:menuitem value="Formas de pagamento"  style="color: #AFAFAF"/>
+                                <p:menuitem value="Condições de pagamento"  style="color: #AFAFAF"/>
+                            </p:submenu>
+                            
+                            </p:submenu>
+
+
+                            <p:submenu label="Saídas">
+                                <p:menuitem value="Venda"  style="color: #AFAFAF"/>
+                            </p:submenu>
+
+                            <p:submenu label="Entradas">
+                                <p:menuitem value="Compra"  style="color: #AFAFAF"/>
+                            </p:submenu>
+
+                            <p:submenu label="Financeiro">
+                                <p:menuitem value="Caixa"/>
+                                <p:menuitem value="Contas a receber"/>
+                                <p:menuitem value="Contas a pagar"/>
+                            </p:submenu>
+
+
+                            <p:menuitem value="Início" url="/" />
+                        
+
+                    </p:menubar> 
+                </h:form>
+            </ui:insert>
+        </div>
+
+
+        <div>
+            <div id="left">
+                <ui:insert name="left"></ui:insert>
+            </div>
+            <div>
+                <div id="right">
+                    <ui:insert name="right"></ui:insert>
+                </div>
+                <div id="content" class="right_content">
+                    <ui:insert name="content">Content</ui:insert>
+                </div>
+            </div>
+        </div>
+        <div id="bottom">
+            <ui:insert name="bottom"></ui:insert>
+        </div>
+
+    </h:body>
+
+</html>

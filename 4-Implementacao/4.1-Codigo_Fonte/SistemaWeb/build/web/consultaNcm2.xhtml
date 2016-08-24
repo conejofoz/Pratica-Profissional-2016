@@ -1,0 +1,228 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+    
+    <h:head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <h:outputStylesheet name="./css/default.css"/>
+        <h:outputStylesheet name="./css/cssLayout.css"/>
+        <title>Consulta fornecedores auxiliar</title>
+        
+        <script type="text/javascript">
+            PrimeFaces.locales['pt'] = {
+                closeText: 'Fechar',
+                prevText: 'Anterior',
+                nextText: 'Próximo',
+                //currentText: 'Começo',  
+                monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
+                monthNamesShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+                dayNames: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'],
+                dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],
+                dayNamesMin: ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'],
+                weekHeader: 'Semana',
+                firstDay: 1,
+                isRTL: false,
+                showMonthAfterYear: false,
+                yearSuffix: '',
+                timeOnlyTitle: 'Só Horas',
+                timeText: 'Tempo',
+                hourText: 'Hora',
+                minuteText: 'Minuto',
+                secondText: 'Segundo',
+                currentText: 'Data Atual',
+                ampm: false,
+                month: 'Mês',
+                week: 'Semana',
+                day: 'Dia',
+                allDayText: 'Todo Dia'
+            };
+        </script>
+       
+        
+    </h:head>
+
+    <body>
+       
+                <p:panel id="painelPrincipal" header="Consulta de ncms" footer="SistemaWeb">
+                    <!--pra funcionar a consulta tem que tirar o prerender view-->
+                    <!--<f:event type="preRenderView" listener="" />-->
+                    <p:growl id="msj" showDetail="true" />
+                    <h:form id="frmConsultaNcm" style="height: 600px" >
+                        <p:growl id="msgConsultaNcm" showDetail="true" />
+                        
+                        <p:panelGrid columns="3" >
+                            <h:panelGroup >
+                                <p:outputLabel id="lblConsultaNome" value="Nome" /><br />
+                                <p:inputText id="edtConsultaNome" value="#{ncmBean.consultaNome}" />
+                                <p:commandButton id="btnConsultar" value="Consultar" actionListener="#{ncmBean.consultar}" update="dataTabela msgConsultaNcm" />
+                            </h:panelGroup>
+                        </p:panelGrid>
+                        <p:commandButton id="btnAcao" value="Novo" oncomplete="PF('wdialogoCadastroNcm').show();" actionListener="#{ncmBean.setAccion('Registrar')}" action="#{ncmBean.zerarNcm}" update=":dialogoCadastroNcm" />
+                        <p:dataTable id="dataTabela" value="#{ncmBean.listaNcm}" var="var_ncm"
+                                     paginator="true"
+                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="5,10,15" rows="10">
+
+                            <p:column headerText="Código" width="100">
+                                <p:outputLabel value="#{var_ncm.id}"/>
+                            </p:column>
+
+                            <p:column headerText="Nome do ncm">
+                                <p:outputLabel value="#{var_ncm.nomeNcm}"/>
+                            </p:column>
+
+
+                            <p:column width="30" >
+                                <p:commandButton id="btnEditar" icon="ui-icon-pencil" actionListener="#{ncmBean.buscaPorID(var_ncm)}" oncomplete="PF('wdialogoCadastroNcm').show();" update=":dialogoCadastroNcm"  >
+                                    <f:setPropertyActionListener target="#{ncmBean.ncmSelecionado}" value="#{var_ncm}"/>
+                                </p:commandButton>
+                            </p:column>
+
+                            <p:column width="30" >
+                                <p:commandButton id="btnLixeira" icon="ui-icon-trash" oncomplete="PF('wdialogoConfirmacaoExclusaoNcm').show();">
+                                    <f:setPropertyActionListener target="#{ncmBean.ncmSelecionado}" value="#{var_ncm}"/>
+                                </p:commandButton>
+                            </p:column>
+                            <p:column width="30">
+                                <p:commandButton icon="ui-icon-check" title="Selecionar"
+                                                 action="#{ncmBean.selecionar(var_ncm)}"
+                                                 process="@this" />
+                            </p:column>
+                        </p:dataTable>
+
+                        <!--DIALOGO DE CONFIRMAÇÃO DE EXCLUSÃO**********************************************************************-->
+                        <p:confirmDialog id="dialogoConfirmacaoExclusaoNcm" header="Exclusão"
+                                         message="Tem certeza que deseja excluir? #{ncmBean.ncm.nomeNcm}"
+                                         widgetVar="wdialogoConfirmacaoExclusaoNcm">
+
+                            <p:commandButton id="btnApagar" value="Sim" update="dataTabela :frmConsultaNcm:msgConsultaNcm" oncomplete="PF('wdialogoConfirmacaoExclusaoNcm').hide();" action="#{ncmBean.apagar()}"/>
+                            <p:commandButton value="Não" oncomplete="PF('wdialogoConfirmacaoExclusaoNcm').hide();" />
+                        </p:confirmDialog>
+                    </h:form>
+
+
+
+
+
+
+
+
+
+                    <!--DIALOGO DE CADASTRO-->
+                    <p:dialog header="Cadastro de ncms" widgetVar="wdialogoCadastroNcm" id="dialogoCadastroNcm" position="center" showEffect="slide" width="600" height="100">
+                        <h:form id="frmDialogoCadastroNcm" >
+                            <p:messages closable="true"/>
+                            <p:growl id="msjCadastroNcm" showDetail="true" />
+                            <h:panelGrid columns="3" id="painelGridDialogoCadastroNcm" >
+
+                                
+                                <h:panelGroup>
+                                    <p:outputLabel id="lblIdNcm" value="Ncm" styleClass="negrito" /><br />
+                                    <p:inputText id="edtIdNcm" value="#{ncmBean.ncm.id}" maxlength="8" required="true" size="8"
+                                                 onkeypress="return TABEnter(event, 'edtNcm');">
+                                        <p:ajax event="blur" update="@this" />
+                                    </p:inputText>
+                                </h:panelGroup>
+                                
+                                
+                                <h:panelGroup>
+                                    <p:outputLabel id="lblNcm" value="Ncm" styleClass="negrito" /><br />
+                                    <p:inputText id="edtNcm" value="#{ncmBean.ncm.nomeNcm}" maxlength="100" required="true" size="50"
+                                                 onkeypress="return TABEnter(event, 'edtCep');">
+                                        <p:ajax event="blur" update="@this" listener="#{ncmBean.handleKeyEvent}" />
+                                    </p:inputText>
+                                </h:panelGroup>
+
+
+
+
+                                <!--fim busca cep-->
+
+
+
+                                <f:facet name="footer">
+                                    <h:panelGrid id="painelGridRodapeCadastroNcm" columns="5">
+                                        <p:commandButton value="#{ncmBean.accion}" actionListener="#{ncmBean.operar}" oncomplete="tratarRequisicao(xhr, status, args)" update="frmDialogoCadastroNcm :frmConsultaNcm:dataTabela" />
+                                        <p:commandButton value="Excluir" />
+                                        <p:commandButton value="Limpar" />
+                                        <p:commandButton value="Sair" />
+
+                                    </h:panelGrid>
+                                </f:facet> 
+                            </h:panelGrid>
+
+
+                        </h:form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    </p:dialog>
+
+                    <script type="text/javascript">
+                        function tratarRequisicao(xhr, status, args) {
+                            if (!args.fecharDialogo) {
+                                jQuery("#dialogoCadastroNcm").effect("shake", {times: 10}, 100);
+                            } else {
+                                PF('wdialogoCadastroNcm').hide();
+                            }
+                        }
+
+
+                        function TABEnter(pEvent, campo) {
+                            if (pEvent.keyCode === 13) {
+                                //return pEvent.keyCode = 9;  
+                                //document.getElementById('frmDialogoCadastroVenda:' + campo).focus();
+                                //document.getElementById('frmDialogoCadastroVenda:' + campo).value='';
+                                document.getElementById('frmDialogoCadastroNcm:' + campo).select();
+                                return false;
+                            }
+                            return true;
+                        }
+
+
+
+
+
+
+
+
+
+
+                    </script>
+                </p:panel>
+           
+
+    </body>
+</html>

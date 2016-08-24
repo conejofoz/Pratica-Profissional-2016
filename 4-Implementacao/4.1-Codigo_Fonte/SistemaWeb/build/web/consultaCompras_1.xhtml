@@ -1,0 +1,914 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+
+    <body>
+
+        <ui:composition template="./WEB-INF/templates/telaPadrao.xhtml">
+            <ui:define name="content">
+                <p:panel header="Consulta de compras" footer="SistemaWeb">
+                    <f:event type="preRenderView" listener="#{compraBean.listar()}" />
+                    <p:growl id="msj" showDetail="true" />
+                    <h:form id="frmConsultaCompra" style="height: 600px" >
+                        <p:growl id="msgConsultaCompra" showDetail="true" />
+                        <p:commandButton id="btnAcao" value="Novo" oncomplete="PF('wdialogoCadastroCompra').show();" actionListener="#{compraBean.setAccion('Registrar')}" update=":dialogoCadastroCompra" >
+                            <p:ajax listener="#{compraBean.novaCompra()}" />
+                        </p:commandButton>
+
+
+
+
+
+                        <p:dataTable id="dataTabela" value="#{compraBean.listaCompra}" var="var_compra"
+                                     paginator="true" 
+                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="5,10,15" rows="13">
+
+                            <p:column headerText="Número" width="50">
+                                <p:outputLabel value="#{var_compra.nota}" />
+                            </p:column>
+
+                            <p:column headerText="Série"  width="30" style="text-align: center">
+                                <p:outputLabel value="#{var_compra.serie}"/>
+                            </p:column>
+
+                            <p:column headerText="Modelo" width="50">
+                                <p:outputLabel value="#{var_compra.modelo}"/>
+                            </p:column>
+
+                            <p:column headerText="Data" width="70">
+                                <p:outputLabel value="#{var_compra.emissao}">
+                                    <f:convertDateTime locale="pt_BR" />
+                                </p:outputLabel>
+                            </p:column>
+
+                            <p:column headerText="Total" width="120" style="text-align: right">
+                                <p:outputLabel value="#{var_compra.totalNota}" >
+                                    <f:convertNumber type="currency" currencySymbol="R$ " minFractionDigits="2"/>
+                                </p:outputLabel>
+                            </p:column>
+
+                            <p:column headerText="Fornecedor" width="30">
+                                <p:outputLabel value="#{var_compra.fornecedor.id}" /> 
+                            </p:column>
+
+                            <p:column headerText="Nome do fornecedor" >
+                                <p:outputLabel value="#{var_compra.fornecedor.nomeFornecedor}" /> 
+                            </p:column>
+
+
+                            <p:column width="30" >
+                                <p:commandButton id="btnEditar" icon="ui-icon-pencil" actionListener="#{compraBean.buscaPorID(var_compra)}" oncomplete="PF('wdialogoCadastroCompra').show();" update=":dialogoCadastroCompra"  >
+                                    <f:setPropertyActionListener target="#{compraBean.compraSelecionado}" value="#{var_compra}"/>
+                                </p:commandButton>
+                            </p:column>
+
+                            <p:column width="30" >
+                                <p:commandButton id="btnLixeira" icon="ui-icon-trash" oncomplete="PF('wdialogoConfirmacaoExclusaoCompra').show();">
+                                    <f:setPropertyActionListener target="#{compraBean.compraSelecionado}" value="#{var_compra}"/>
+                                </p:commandButton>
+                            </p:column>
+                            <p:column width="30">
+                                <p:commandButton icon="ui-icon-check" title="Selecionar"
+                                                 action="#{compraBean.selecionar(var_compra)}"
+                                                 process="@this" />
+                            </p:column>
+                        </p:dataTable>
+
+
+
+
+
+
+
+
+
+
+
+
+                        <!--DIALOGO DE CONFIRMAÇÃO DE EXCLUSÃO**********************************************************************-->
+                        <p:confirmDialog id="dialogoConfirmacaoExclusaoCompra" header="Exclusão"
+                                         message="Tem certeza que deseja excluir? #{compraBean.compra.nota}"
+                                         widgetVar="wdialogoConfirmacaoExclusaoCompra">
+
+                            <p:commandButton id="btnApagar" value="Sim" update="dataTabela :frmConsultaCompra:msgConsultaCompra" oncomplete="PF('wdialogoConfirmacaoExclusaoCompra').hide();" action="#{compraBean.apagar()}"/>
+                            <p:commandButton value="Não" oncomplete="PF('wdialogoConfirmacaoExclusaoCompra').hide();" />
+                        </p:confirmDialog>
+                    </h:form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    <!--DIALOGO DE CADASTRO-->
+                    <p:dialog header="Cadastro de compras" widgetVar="wdialogoCadastroCompra" id="dialogoCadastroCompra" width="1100" height="610">
+                        <p:growl id="msjCadastroCompra" showDetail="true" autoUpdate="true" />
+                        <h:form id="frmDialogoCadastroCompra" >
+                            <p:ajaxStatus styleClass="ajax-status" >
+                                <f:facet name="start" >
+                                    <h:graphicImage library="gifs" name="ajaxloadingbar.gif" />
+                                </f:facet>
+                                <f:facet name="complete" >
+                                    <h:outputText value="" />
+                                </f:facet>
+                            </p:ajaxStatus>
+                            <p:messages id="pMensagem" closable="true" autoUpdate="true" showDetail="true" />
+
+                            <h:panelGrid columns="1" id="painelGridDialogoCadastroCompra">
+
+                                <p:tabView id="tab" style="padding: 0px; width: 1070px;" >
+                                    <p:tab title="Dados da nota" >
+                                        <p:fieldset style="padding: 0px; width: 1000px" >
+
+                                            <h:panelGrid columns="6" >
+                                                <h:panelGroup >
+                                                    <p:outputLabel id="lblNota" value="Nota:" styleClass="negrito" /> <br />
+                                                    <p:inputText id="edtNota" value="#{compraBean.compra.nota}" size="10" required="true"
+                                                                 onkeypress="return TABEnter(event, 'tab:edtSerie', this);"
+                                                                 onfocus="return selecionaMesmoCampo(this);" />
+                                                </h:panelGroup>
+                                                <h:panelGroup >
+                                                    <p:outputLabel id="lblSerie" value="Serie" styleClass="negrito" /> <br />
+                                                    <p:inputText id="edtSerie" value="#{compraBean.compra.serie}" size="10" required="true"
+                                                                 onkeypress="return TABEnter(event, 'tab:edtModelo', this);"/>
+                                                </h:panelGroup>
+                                                <h:panelGroup >
+                                                    <p:outputLabel id="lblModelo" value="Modelo" styleClass="negrito" /> <br />
+                                                    <p:inputText id="edtModelo" value="#{compraBean.compra.modelo}" size="10" required="true"
+                                                                 onkeypress="return TABEnter(event, 'tab:edtFornecedor', this);"/>
+                                                </h:panelGroup>
+                                                <h:panelGroup >
+                                                    <p:outputLabel id="lblFornecedor" value="Fornecedor:" styleClass="negrito" /><br />
+                                                    <p:inputText  id="edtFornecedor" value="#{compraBean.compra.fornecedor.id}" label="Id fornecedor" maxlength="10" size="5" required="true" 
+                                                                  onkeypress="return TABEnter(event, 'tab:edtDataCompra_input', this);" onfocus="apagaZero(this);" >
+                                                        <p:ajax event="change" listener="#{compraBean.buscaFornecedorByCodigo}" 
+                                                                process="edtNota edtSerie edtModelo edtFornecedor" 
+                                                                update="edtNomeFornecedor edtFornecedor :msjCadastroCompra
+                                                                :frmDialogoCadastroCompra:tab:fieldDestinatario" /> <!--atualiza todos esses campos porque busca se ja existe a nota-->                                                       
+                                                    </p:inputText>
+                                                    <p:inputText id="edtNomeFornecedor" value="#{compraBean.compra.fornecedor.nomeFornecedor}" maxlength="50" size="40" />
+                                                    <p:commandButton id="btnConsultaFornecedor" icon="ui-icon-search" title="Consultar ou cadastrar fornecedores" 
+                                                                     action="#{fornecedorBean.abrirDialogoFornecedor2}" 
+                                                                     process="@this" update="@none">
+                                                        <p:ajax event="dialogReturn" listener="#{compraBean.setarFornecedorSelecionado}"
+                                                                process="@this" update="edtFornecedor edtNomeFornecedor :frmDialogoCadastroCompra:tab:fieldDestinatario" />    
+                                                    </p:commandButton>
+
+                                                    <!---->
+
+
+
+                                                    <!---->
+                                                </h:panelGroup>
+                                                <h:panelGroup >
+                                                    <p:outputLabel value="Data Emissão" styleClass="negrito" /><br />
+                                                    <p:calendar id="edtDataCompra" size="12" pattern="dd/MM/yyyy" locale="pt_BR" valueChangeListener="#{compraBean.verificaData}" required="true"
+                                                                value="#{compraBean.compra.emissao}" onkeypress="return TABEnter(event, 'tab:edtDataEnvio_input', this);" onblur="document.getElementById('frmDialogoCadastroCompra:btnNulo').click()" >
+                                                        <p:ajax event="blur" listener="#{compraBean.naoFazNada}" update=":msjCadastroCompra" />
+                                                    </p:calendar>
+                                                </h:panelGroup>
+                                                <h:panelGroup >
+                                                    <p:outputLabel value="Data Envio" styleClass="negrito" /><br />
+                                                    <p:calendar id="edtDataEnvio" size="12" pattern="dd/MM/yyyy" locale="pt_BR" valueChangeListener="#{compraBean.verificaDataEnvio}" required="true"
+                                                                value="#{compraBean.compra.dataEnvio}" onkeypress="return TABEnter(event, 'tab:edtCodigoProduto', this);" onblur="document.getElementById('frmDialogoCadastroCompra:btnNulo').click()" >
+                                                        <p:ajax event="blur" listener="#{compraBean.naoFazNada}" update=":msjCadastroCompra" />
+                                                    </p:calendar>
+                                                </h:panelGroup>
+                                            </h:panelGrid>
+
+                                        </p:fieldset>
+                                    </p:tab>
+
+
+
+
+                                    <p:tab title="Destinatário/Remetente" >
+                                        <p:fieldset id="fieldDestinatario" style="width: 1000px" >
+                                            <h:panelGrid columns="2" >
+                                                <h:panelGroup >
+                                                    <p:outputLabel value="NOME/RAZÃO SOCIAL" styleClass="font-calculo" /> <br />
+                                                    <p:inputText id="edtFornecedorDestinatario" size="30" value="#{compraBean.compra.fornecedor.nomeFornecedor}" />
+                                                </h:panelGroup>
+                                                <h:panelGroup >
+                                                    <p:outputLabel value="CNPJ/CPF" /> <br />
+                                                    <p:inputText size="30" value="#{compraBean.compra.fornecedor.cnpj}" />
+                                                </h:panelGroup>
+                                            </h:panelGrid>
+                                            <h:panelGrid columns="3" >
+                                                <h:panelGroup >
+                                                    <p:outputLabel value="Endereço" /> <br />
+                                                    <p:inputText size="30" value="#{compraBean.compra.fornecedor.endereco}" />
+                                                </h:panelGroup>
+                                                <h:panelGroup >
+                                                    <p:outputLabel value="Bairro/Distrito" /> <br />
+                                                    <p:inputText size="30" value="#{compraBean.compra.fornecedor.bairro}" />
+                                                </h:panelGroup>
+                                                <h:panelGroup >
+                                                    <p:outputLabel value="Cep" /> <br />
+                                                    <p:inputText size="30" value="#{compraBean.compra.fornecedor.cep}" />
+                                                </h:panelGroup>
+                                            </h:panelGrid>
+                                        </p:fieldset>
+
+                                    </p:tab>
+
+
+                                    <p:tab id="tabCalculoImposto" title="Cálculo do imposto" >
+                                        <p:fieldset id="fieldCalculoImposto" style="width: 1000px" >
+                                            <h:panelGrid columns="6" >
+                                                <h:panelGroup >
+                                                    <h:panelGroup styleClass="font-calculo">
+                                                        <p:outputLabel value="VALOR DO IRRF" /> <br />
+                                                    </h:panelGroup>
+                                                    <p:inputText size="15" />
+                                                </h:panelGroup>
+                                                <h:panelGroup >
+                                                    <h:panelGroup styleClass="font-calculo">
+                                                        <p:outputLabel value="BASE DE CÁLC. ICMS" /> <br />
+                                                    </h:panelGroup>
+                                                    <p:inputText size="15" />
+                                                </h:panelGroup>
+                                                <h:panelGroup >
+                                                    <h:panelGroup styleClass="font-calculo">
+                                                        <p:outputLabel value="VALOR DO ICMS" /> <br />
+                                                    </h:panelGroup>
+                                                    <p:inputText size="15" />
+                                                </h:panelGroup>
+                                                <h:panelGroup >
+                                                    <h:panelGroup styleClass="font-calculo">
+                                                        <p:outputLabel value="BASE DE CAL. ICMS ST" /> <br />
+                                                    </h:panelGroup>
+                                                    <p:inputText size="15" />
+                                                </h:panelGroup>
+                                                <h:panelGroup >
+                                                    <h:panelGroup styleClass="font-calculo">
+                                                        <p:outputLabel value="VALOR DO ICMS ST" /> <br />
+                                                    </h:panelGroup>
+                                                    <p:inputText size="15" />
+                                                </h:panelGroup>
+                                                <h:panelGroup >
+                                                    <h:panelGroup styleClass="font-calculo">
+                                                        <p:outputLabel value="VALOR TOTAL DOS PRODUTOS" /> <br />
+                                                    </h:panelGroup>
+                                                    <p:inputText id="edtTotalDosProdutos" value="#{compraBean.compra.totalProdutos}" size="15" readonly="true" styleClass="numero2">
+                                                        <f:convertNumber type="number" locale="pt-BR" minFractionDigits="2" />
+                                                    </p:inputText>
+                                                </h:panelGroup>
+                                            </h:panelGrid>
+
+                                            <h:panelGrid columns="6" >
+                                                <h:panelGroup >
+                                                    <h:panelGroup styleClass="font-calculo">
+                                                        <p:outputLabel value="VALOR DO FRETE" /> <br />
+                                                    </h:panelGroup>
+                                                    <p:inputText size="15" />
+                                                </h:panelGroup>
+                                                <h:panelGroup >
+                                                    <h:panelGroup styleClass="font-calculo">
+                                                        <p:outputLabel value="VALOR DO SEGURO" /> <br />
+                                                    </h:panelGroup>
+                                                    <p:inputText size="15" />
+                                                </h:panelGroup>
+                                                <h:panelGroup >
+                                                    <h:panelGroup styleClass="font-calculo">
+                                                        <p:outputLabel value="DESCONTO" /> <br />
+                                                    </h:panelGroup>
+                                                    <p:inputText id="edtTotalDescontoNota" value="#{compraBean.compra.totalDescontoNota}" size="15" styleClass="numero" >
+                                                        <f:convertNumber type="number" locale="pt_BR" minFractionDigits="2" maxFractionDigits="2" />
+                                                    </p:inputText>
+                                                </h:panelGroup>
+                                                <h:panelGroup >
+                                                    <h:panelGroup styleClass="font-calculo">
+                                                        <p:outputLabel value="OUTRAS DESPESAS ACESSÓRIAS" /> <br />
+                                                    </h:panelGroup>
+                                                    <p:inputText size="15" />
+                                                </h:panelGroup>
+                                                <h:panelGroup >
+                                                    <h:panelGroup styleClass="font-calculo">
+                                                        <p:outputLabel value="VALOR DO IPI" /> <br />
+                                                    </h:panelGroup>
+                                                    <p:inputText size="15" />
+                                                </h:panelGroup>
+                                                <h:panelGroup >
+                                                    <h:panelGroup styleClass="font-calculo">
+                                                        <p:outputLabel value="VALOR TOTAL DA NOTA" /> <br />
+                                                    </h:panelGroup>
+                                                    <p:inputText id="edtTotalDaNotaxxx" value="#{compraBean.compra.totalNota}" size="15" styleClass="numero" >
+                                                        <f:convertNumber type="number" locale="pt_BR" minFractionDigits="2" maxFractionDigits="2" />
+                                                    </p:inputText>
+                                                </h:panelGroup>
+                                            </h:panelGrid>
+                                        </p:fieldset>
+
+                                    </p:tab>
+
+                                    <p:tab title="Transportadora/Volumes" >
+                                        <p:fieldset id="fieldTransportadora" style="width: 1000px" >
+                                            <h:panelGrid columns="7" >
+
+                                                <h:panelGroup id="painelCodigoTransportadora" >
+                                                    <p:outputLabel value="Código" /><br />
+                                                    <p:tooltip style="width: 200px;color: blue;background-color: activeborder;font-weight: bold;font-size: 14px" id="toolTipGrow" for="edtCodigoTransportadora" value="Preencha o código da transportadora ou clique no botão para abrir a consulta " showEffect="clip" hideEffect="clip" />
+                                                    <p:inputText id="edtCodigoTransportadora" size="5" value="#{compraBean.compra.transportadora.id}">
+                                                        <p:ajax event="change" listener="#{compraBean.buscaTransportadoraByCodigo(compraBean.compra.transportadora)}" process="@this" 
+                                                                update=":frmDialogoCadastroCompra:tab:fieldTransportadora" />
+                                                        <!--update=":frmDialogoCadastroCompra:tab:edtRazaoSocialTransportadora :frmDialogoCadastroCompra:tab:edtCodigoTransportadora" />-->
+                                                    </p:inputText>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup >
+                                                    <p:outputLabel value="Razão Social" /><br />
+                                                    <p:inputText id="edtRazaoSocialTransportadora" value="#{compraBean.compra.transportadora.nomeTransportadora}" size="40" maxlength="100" readonly="true" />
+
+                                                    <p:commandButton id="btnConsultaTransportadora" icon="ui-icon-search" title="Consultar ou cadastrar transportadora" 
+                                                                     action="#{transportadoraBean.abrirDialogoTransportadora2}" 
+                                                                     process="@this" update="@none">
+                                                        <p:ajax event="dialogReturn" listener="#{compraBean.setarTransportadoraSelecionada}"
+                                                                process="@this" update=":frmDialogoCadastroCompra:tab:edtRazaoSocialTransportadora :frmDialogoCadastroCompra:tab:edtCodigoTransportadora" />    
+                                                    </p:commandButton>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup >
+                                                    <p:tooltip value="0-Emitente 1-Dest/Rem 2-Terceiros 9-Sem frete" style="color: blue;background-color: activeborder;font-weight: bold;font-size: 14px" id="toolTipGrowPorConta" for="edtFretePorConta" showEffect="clip" hideEffect="clip" />
+                                                    <p:outputLabel value="Frete por conta" /><br />
+                                                    <p:inputText id="edtFretePorConta" size="2" maxlength="1" 
+                                                                 title="0-Emitente    1-Dest/Rem     2-Terceiros     9-Sem frete" />
+                                                </h:panelGroup>
+
+                                                <h:panelGroup >
+                                                    <p:outputLabel value="Código ANTT" /><br />
+                                                    <p:inputText id="edtCodigoAntt" size="10" maxlength="10" />
+                                                </h:panelGroup>
+
+                                                <h:panelGroup >
+                                                    <p:outputLabel value="Placa do Veículo" /><br />
+                                                    <p:inputText id="edtPlacaVeiculo" size="8" maxlength="8" />
+                                                </h:panelGroup>
+
+                                                <h:panelGroup >
+                                                    <p:outputLabel value="UF" /><br />
+                                                    <p:inputText id="edtUfVeiculo" size="3" maxlength="2" />
+                                                </h:panelGroup>
+
+                                                <h:panelGroup >
+                                                    <p:outputLabel value="CNPJ/CPF" /><br />
+                                                    <p:inputText id="edtDocumento" value="#{compraBean.compra.transportadora.cnpj}" size="14" maxlength="20" readonly="true" />
+                                                </h:panelGroup>
+                                            </h:panelGrid>
+
+
+                                            <h:panelGrid columns="4" >
+                                                <h:panelGroup >
+                                                    <p:outputLabel value="Endereço" /><br />
+                                                    <p:inputText id="edtEnderecoTransportadora" value="#{compraBean.compra.transportadora.endereco}" size="40" maxlength="45" readonly="true" />
+                                                </h:panelGroup>
+
+                                                <h:panelGroup >
+                                                    <p:outputLabel value="Município" /><br />
+                                                    <p:inputText id="edtMunicipioTransportadora" value="#{compraBean.compra.transportadora.cidade.nomeCidade}" size="40" maxlength="45" readonly="true" />
+                                                </h:panelGroup>
+
+                                                <h:panelGroup >
+                                                    <p:outputLabel value="UF" /><br />
+                                                    <p:inputText id="edtUfTransportadora" value="#{compraBean.compra.transportadora.cidade.estado.siglaEstado}" size="3" maxlength="2" readonly="true" />
+                                                </h:panelGroup>
+
+                                                <h:panelGroup >
+                                                    <p:outputLabel value="Inscrição Estadual" /><br />
+                                                    <p:inputText id="edtInscricaoEstaudal" value="#{compraBean.compra.transportadora.inscricaoEstadual}" readonly="true" />
+                                                </h:panelGroup>
+                                            </h:panelGrid>
+
+
+                                            <h:panelGrid columns="6" >
+                                                <h:panelGroup >
+                                                    <p:outputLabel value="Quantidade" /><br />
+                                                    <p:inputText id="edtQuantidadeVolumes" size="10" >
+                                                        <f:convertNumber type="number" />
+                                                    </p:inputText>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup >
+                                                    <p:outputLabel value="Espécie" /><br />
+                                                    <p:inputText id="edtEspecie" size="10" maxlength="20" />
+                                                </h:panelGroup>
+
+                                                <h:panelGroup >
+                                                    <p:outputLabel value="Marca" /><br />
+                                                    <p:inputText id="edtMarca" size="10" maxlength="20" />
+                                                </h:panelGroup>
+
+                                                <h:panelGroup >
+                                                    <p:outputLabel value="Numeração" /><br />
+                                                    <p:inputText id="edtNumeracao" size="10" maxlength="20" />
+                                                </h:panelGroup>
+
+                                                <h:panelGroup >
+                                                    <p:outputLabel value="Peso Bruto" /><br />
+                                                    <p:inputText id="edtPesoBruto" size="10" >
+                                                        <f:convertNumber type="number" locale="pt_BR" maxFractionDigits="2" minFractionDigits="2" />
+                                                    </p:inputText>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup >
+                                                    <p:outputLabel value="Peso Bruto" /><br />
+                                                    <p:inputText id="edtPesoLiquido" size="10" >
+                                                        <f:convertNumber type="number" locale="pt_BR" maxFractionDigits="2" minFractionDigits="2" />
+                                                    </p:inputText>
+                                                </h:panelGroup>
+                                            </h:panelGrid>
+
+                                        </p:fieldset>
+
+                                    </p:tab>
+
+                                    <p:tab title="Fatura" >
+                                        <p:fieldset id="fieldFatura" style="padding: 0px" >
+
+                                            <h:panelGrid columns="4" >
+                                                <h:panelGroup >
+                                                    <p:outputLabel value="Valor total da nota: " /><br />
+                                                    <p:inputText id="edtTotalNotaFatura" value="#{compraBean.compra.totalNota}" styleClass="numero" size="15" style="font-weight: bold" >
+                                                        <f:convertNumber type="number" minFractionDigits="2" maxFractionDigits="2" locale="pt_BR" />
+                                                    </p:inputText>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup >
+                                                    <p:outputLabel value="Condição pagamento:" /> <br />
+                                                    <p:inputText id="edtCodigoCondicaoPagamento" value="#{compraBean.compra.condicaoPagamento.id}" >
+                                                        <p:ajax event="change" listener="#{compraBean.buscaCondicaoByCodigo(compraBean.compra.condicaoPagamento)}" process="@this" update="edtCodigoCondicaoPagamento edtCondicaoPagamento :msjCadastroCompra fieldParcelas edtTotalParcelas " />
+                                                    </p:inputText>
+
+                                                    <p:inputText id="edtCondicaoPagamento" value="#{compraBean.compra.condicaoPagamento.nomeCondicaoPagamento}" size="40">
+                                                    </p:inputText>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup >
+                                                    <p:outputLabel value="Total das parcelas: "/><br />
+                                                    <p:inputText id="edtTotalParcelas" value="#{compraBean.compra.totalParcelas}" size="15" styleClass="numero" style="color: red; font-weight: bold;font-size: 14px" >
+                                                        <f:convertNumber type="number" locale="pt_BR" minFractionDigits="2" maxFractionDigits="2" />
+                                                    </p:inputText>
+                                                </h:panelGroup>
+                                            </h:panelGrid>
+
+
+                                            <p:fieldset id="fieldParcelas" style="padding: 2px" >
+                                                <p:dataTable id="dataTableParcelas" value="#{compraBean.listaParcelas}" var="var_parcelas" 
+                                                             rows="10" rendered="#{compraBean.listaDetalhe.size()>0}"
+                                                             paginator="false" 
+                                                             scrollable="true" scrollRows="3" scrollHeight="100" 
+                                                             paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+
+                                                    <p:column headerText="Documento" width="100">
+                                                        <p:inputText value="#{var_parcelas.documento}" />
+                                                    </p:column>
+
+                                                    <p:column headerText="Núm.Parc." >
+                                                        <p:inputText value="#{var_parcelas.numero}" style="width: 98%" />
+                                                    </p:column>
+
+                                                    <p:column headerText="Porcentagem" width="100">
+                                                        <p:inputText value="#{var_parcelas.porcentagem}" />
+                                                    </p:column>
+
+                                                    <p:column headerText="Valor" width="100">
+                                                        <p:inputText value="#{var_parcelas.valorParcela}" style="width: 98%" >
+                                                            <f:convertNumber type="number" locale="pt_br" minIntegerDigits="2" maxFractionDigits="2" />
+                                                        </p:inputText>
+                                                    </p:column>
+
+                                                    <p:column headerText="Int. dias" width="100">
+                                                        <p:inputText value="#{var_parcelas.dias}" style="width: 98%" >
+
+                                                        </p:inputText>
+                                                    </p:column>
+
+                                                    <p:column headerText="Id. Form. Pgto." width="100">
+                                                        <p:inputText value="#{var_parcelas.formaPagamento.id}" style="width: 98%" />
+                                                    </p:column>
+
+                                                    <p:column headerText="Id. Cond. Pgto." width="100">
+                                                        <p:inputText value="#{var_parcelas.condicaoPagamento.id}" style="width: 98%" />
+                                                    </p:column>
+
+                                                </p:dataTable>
+                                            </p:fieldset>
+
+
+                                        </p:fieldset>
+                                    </p:tab><!--fatura-->
+                                </p:tabView>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                <!--painel dos dados do produto que vão ser inseridos na nota***************************-->
+                                <p:fieldset id="fieldProduto" style="padding: 0px; width: 1068px; background-color: #dddddd" >
+                                    <h:panelGrid columns="11" >
+                                        <h:panelGrid columns="1">
+                                            <p:outputLabel value="Código" />
+                                            <p:inputText id="edtCodigoProduto" style="width: 60px" value="#{compraBean.produto.id}" onfocus="return selecionaMesmoCampo(this);" >
+                                                <p:ajax listener="#{compraBean.buscaProdutoByCodigo}" event="change" process="edtCodigoProduto" update="fieldProduto :msjCadastroCompra" />
+                                                <p:focus for="edtQuantidade" rendered="#{compraBean.produto.nomeProduto != null}" />
+                                            </p:inputText>
+                                        </h:panelGrid>
+
+                                        <h:panelGroup id="painelNomeProduto" >
+                                            <h:panelGrid columns="2">
+                                                <p:outputLabel value="Descrição" /><br />
+                                                <p:inputText id="edtNomeProduto" value="#{compraBean.produto.nomeProduto}" size="20" />
+
+
+                                                <p:commandButton id="btnConsultaProduto" icon="ui-icon-search" title="Consultar ou cadastrar produtos" 
+                                                                 action="#{produtoBean.abrirDialogoProduto}" 
+                                                                 process="@this" update="@none">
+                                                    <p:ajax event="dialogReturn" listener="#{compraBean.setarProdutoSelecionado}"
+                                                            process="@this" update="fieldProduto :msjCadastroCompra" />    
+                                                </p:commandButton>
+                                            </h:panelGrid>
+                                        </h:panelGroup>
+
+                                        <h:panelGrid columns="1">    
+                                            <p:outputLabel value="Quantidade" />
+                                            <p:inputText id="edtQuantidade" value="#{compraBean.quantidade}" style="width: 60px" onkeypress="return TABEnter(event, 'edtPreco', this);" onfocus="return selecionaMesmoCampo(this);" >
+                                                <f:convertNumber type="number" locale="pt_BR" minFractionDigits="2" maxFractionDigits="2" />
+                                            </p:inputText>
+                                        </h:panelGrid>
+
+                                        <h:panelGroup >
+                                            <p:outputLabel value="Preço" /><br />
+                                            <p:inputText id="edtPreco" value="#{compraBean.precoUnitario}" size="10" onkeypress="return TABEnter(event, 'edtDesconto', this);" >
+                                                <f:convertNumber minFractionDigits="2" maxFractionDigits="2" locale="pt_BR"/>
+                                                <p:ajax event="blur" listener="#{compraBean.calculaPrecoTotalEdicaoProdutos}" 
+                                                        process="edtPreco edtQuantidade"
+                                                        update="edtPrecoTotal"
+                                                        />
+                                            </p:inputText>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup >
+                                            <p:outputLabel value="Total" /><br />
+                                            <p:inputText id="edtPrecoTotal" value="#{compraBean.precoTotal}" size="10" onkeypress="return TABEnter(event, 'edtDesconto', this);" readonly="true" >
+                                                <f:convertNumber minFractionDigits="2" maxFractionDigits="2" locale="pt_BR"/>
+                                            </p:inputText>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup >
+                                            <p:outputLabel value="Desconto" /><br />
+                                            <p:inputText id="edtDesconto" value="#{compraBean.desconto}" size="10" styleClass="numero" onkeypress="return TABEnter(event, 'edtCodigoProduto', this);" >
+                                                <f:convertNumber type="number" locale="pt_BR" minFractionDigits="2" maxFractionDigits="2" />
+                                            </p:inputText>
+                                        </h:panelGroup>
+
+
+
+
+
+                                        <h:panelGroup >
+                                            <p:outputLabel value="NCM" /><br />
+                                            <p:inputText id="edtNcm"  size="8" maxlength="8" styleClass="numero" onkeypress="return TABEnter(event, 'edtCodigoProduto', this);" 
+                                                         value="#{compraBean.produto.ncm.id}">
+
+                                            </p:inputText>
+                                            <p:commandButton id="btnConsultaNcm" icon="ui-icon-search" title="Consultar ou cadastrar NCM" 
+                                                             action="#{ncmBean.abrirDialogoNcm}" 
+                                                             process="@this" update="@none">
+                                                <p:ajax event="dialogReturn" listener="#{compraBean.setarNcmSelecionado}"
+                                                        process="@this" update="frmDialogoCadastroCompra:edtNcm" />    
+                                            </p:commandButton>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup >
+                                            <p:outputLabel value="CST" /><br />
+                                            <p:inputText id="edtCst"  size="4" maxlength="3" styleClass="numero" onkeypress="return TABEnter(event, 'edtCodigoProduto', this);" 
+                                                         value="#{compraBean.produto.cst.id}">
+                                                
+                                            </p:inputText>
+                                            <p:commandButton id="btnConsultaCst" icon="ui-icon-search" title="Consultar ou cadastrar CST" 
+                                                             action="#{cstBean.abrirDialogoCst}" 
+                                                             process="@this" update="@none">
+                                                <p:ajax event="dialogReturn" listener="#{compraBean.setarCstSelecionado}"
+                                                        process="@this" update="frmDialogoCadastroCompra:edtCst" />    
+                                            </p:commandButton>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup >
+                                            <p:outputLabel value="CFOP" /><br />
+                                            <p:inputText id="edtCfop"  size="4" maxlength="4" styleClass="numero" onkeypress="return TABEnter(event, 'edtCodigoProduto', this);" 
+                                                         value="#{compraBean.produto.cfop.id}">
+                                                <f:convertNumber type="number" locale="pt_BR"  />
+                                            </p:inputText>
+                                            <p:commandButton id="btnConsultaCfop" icon="ui-icon-search" title="Consultar ou cadastrar CFOP" 
+                                                             action="#{cfopBean.abrirDialogoCfop}" 
+                                                             process="@this" update="@none">
+                                                <p:ajax event="dialogReturn" listener="#{compraBean.setarCfopSelecionado}"
+                                                        process="@this" update="frmDialogoCadastroCompra:edtCfop" />    
+                                            </p:commandButton>
+                                        </h:panelGroup>
+
+
+
+
+
+                                        <h:panelGroup >
+                                            <p:commandButton id="btnInserirProduto" value="Inserir" actionListener="#{compraBean.inserirNaGrid}" 
+                                                             update="fieldProduto dataTableDetalheCompra tabelacompra frmDialogoCadastroCompra:tab:fieldCalculoImposto :msjCadastroCompra frmDialogoCadastroCompra:tab:edtTotalNotaFatura" 
+                                                             onclick="document.getElementById('frmDialogoCadastroCompra:edtCodigoProduto').select();" rendered="#{compraBean.liberaBotaoInserirProduto}" />
+                                        </h:panelGroup>
+
+                                    </h:panelGrid> <!--fim edição de produtos-->
+                                </p:fieldset>
+
+
+
+
+
+
+
+
+
+                                <p:fieldset id="tabelacompra" style="padding: 2px; width: 1065px" >
+                                    <p:dataTable id="dataTableDetalheCompra" value="#{compraBean.listaDetalhe}" var="var_itens" 
+                                                 rows="10" rendered="#{compraBean.listaDetalhe.size()>0}"
+                                                 paginator="false" 
+                                                 scrollable="true" scrollRows="5" scrollHeight="100" scrollWidth="1055"
+                                                 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+
+                                        <p:column width="40" >
+                                            <p:commandButton id="btnLixeira" icon="ui-icon-trash" actionListener="#{compraBean.removerDaGrid(var_itens)}" 
+                                                             update=":frmDialogoCadastroCompra:tabelacompra 
+                                                             :frmDialogoCadastroCompra:tab:fieldCalculoImposto 
+                                                             :frmDialogoCadastroCompra:tab:edtTotalNotaFatura" >
+                                                <f:setPropertyActionListener target="#{compraBean.itensCompraSelecionada}" value="#{var_itens}"/>
+
+                                            </p:commandButton>
+                                        </p:column>
+
+                                        <p:column headerText="Código" style="width: 70px">
+                                            <p:inputText value="#{var_itens.produto.id}" style="width: 98%" />
+                                        </p:column>
+
+                                        <p:column headerText="Descrição produto" style="width: 200px">
+                                            <p:outputLabel value="#{var_itens.produto.nomeProduto}" style="font-size: 10px" />
+                                        </p:column>
+
+                                        <p:column headerText="NCM" style="width: 70px">
+                                            <p:inputText  size="8" maxlength="8" value="#{var_itens.produto.ncm.id}" >
+
+                                            </p:inputText>
+                                        </p:column>
+
+                                        <p:column headerText="CST" style="width: 35px">
+                                            <p:inputText  size="3" value="#{var_itens.produto.cst.id}" >
+
+                                            </p:inputText>
+                                        </p:column>
+
+                                        <p:column headerText="CFOP" style="width: 35px">
+                                            <p:inputText  size="4" value="#{var_itens.produto.cfop.id}" >
+
+                                            </p:inputText>
+                                        </p:column>
+
+                                        <p:column headerText="UN" style="width: 20px">
+                                            <p:inputText  size="2" >
+
+                                            </p:inputText>
+                                        </p:column>
+
+                                        <p:column headerText="Quant." style="width: 70px">
+                                            <p:inputText value="#{var_itens.quantidade}" size="8" >
+                                                <f:convertNumber type="number" locale="pt_BR" minFractionDigits="2" maxFractionDigits="2" />
+                                                <p:ajax event="change" listener="#{compraBean.calcularTotalLinha()}" 
+                                                        update=":frmDialogoCadastroCompra:tabelacompra 
+                                                        :frmDialogoCadastroCompra:tab:fieldCalculoImposto
+                                                        :frmDialogoCadastroCompra:tab:edtTotalNotaFatura" />
+                                            </p:inputText>
+                                        </p:column>
+
+                                        <p:column headerText="Vlr. Unit." style="width: 70px">
+                                            <p:inputText value="#{var_itens.preco}" size="8" >
+                                                <f:convertNumber type="number" locale="pt_BR" minFractionDigits="2" maxFractionDigits="2" />
+                                            </p:inputText>
+                                        </p:column>
+
+
+
+                                        <p:column headerText="Vlr. Total" style="width: 100px">
+                                            <p:inputText value="#{var_itens.subTotal}" size="10" style="width: 98%" >
+                                                <f:convertNumber type="number" locale="pt_BR" minFractionDigits="2" maxFractionDigits="2" />
+                                            </p:inputText>
+                                        </p:column>
+
+                                        <p:column headerText="Vlr Desc." style="width: 100px">
+                                            <p:inputText value="#{var_itens.desconto}" size="10" style="width: 98%" >
+                                                <f:convertNumber type="number" minFractionDigits="2"/>
+                                            </p:inputText>
+                                        </p:column>
+
+                                        <p:column headerText="BC.ICMS" style="width: 100px">
+                                            <p:inputText  size="10" >
+
+                                            </p:inputText>
+                                        </p:column>
+
+                                        <p:column headerText="VL.ICMS" style="width: 100px">
+                                            <p:inputText  size="10" >
+
+                                            </p:inputText>
+                                        </p:column>
+
+                                        <p:column headerText="ALIQ.ICMS" style="width: 100px">
+                                            <p:inputText  size="10" >
+
+                                            </p:inputText>
+                                        </p:column>
+
+                                        <p:column headerText="BC.IPI" style="width: 100px">
+                                            <p:inputText  size="10" >
+
+                                            </p:inputText>
+                                        </p:column>
+
+                                        <p:column headerText="VLR.IPI" style="width: 100px">
+                                            <p:inputText  size="10" >
+
+                                            </p:inputText>
+                                        </p:column>
+
+                                        <p:column headerText="ALIQ.IPI" style="width: 100px">
+                                            <p:inputText  size="10" >
+
+                                            </p:inputText>
+                                        </p:column>
+
+
+
+                                        <p:columnGroup type="footer" >
+                                            <p:row>
+                                                <p:column id="edtTotal" colspan="4" footerText="Subtotal" style="text-align: right" />
+                                                <p:column footerText="#{compraBean.compra.totalProdutos}" style="text-align: right" >
+                                                    <p:inputText value="#{compraBean.compra.totalProdutos}" />
+                                                </p:column>
+                                            </p:row>
+                                        </p:columnGroup>
+                                    </p:dataTable>
+                                </p:fieldset>
+
+
+
+
+
+
+                                <f:facet name="footer">
+                                    <h:panelGrid id="painelGridRodapeCadastroCompra" columns="5">
+                                        <p:commandButton id="btnNulo" action="#{compraBean.naoFazNadaClique}" style="display: none" update=":msjCadastroCompra" />
+                                        <p:commandButton value="#{compraBean.accion}" actionListener="#{compraBean.operar}" oncomplete="tratarRequisicao(xhr, status, args)" update="frmDialogoCadastroCompra :frmConsultaCompra:dataTabela" />
+                                        <p:commandButton value="Excluir" />
+                                        <p:commandButton value="Limpar" />
+                                        <p:commandButton value="Sair" />
+                                    </h:panelGrid>
+
+                                </f:facet> 
+                            </h:panelGrid>
+
+                            <!--DIALOGO DE CONFIRMAÇÃO DE EXCLUSÃO**********************************************************************-->
+                            <p:confirmDialog id="dialogoConfirmacaoExclusaoDetalhe" header="Exclusão"
+                                             message="Tem certeza que deseja excluir? "
+                                             widgetVar="wdialogoConfirmacaoExclusaoDetalhe">
+
+                                <p:commandButton id="btnApagarDetalhe" value="Sim" update="dataTableDetalheCompra :frmConsultaCompra:msgConsultaCompra" oncomplete="PF('wdialogoConfirmacaoExclusaoDetalhe').hide();" action="#{compraBean.removerDaGrid}"/>
+                                <p:commandButton value="Não" oncomplete="PF('wdialogoConfirmacaoExclusaoDetalhe').hide();" />
+                            </p:confirmDialog>    
+                        </h:form>
+                    </p:dialog>
+
+
+
+                    <script type="text/javascript">
+                        function tratarRequisicao(xhr, status, args) {
+                            if (!args.fecharDialogo) {
+                                jQuery("#dialogoCadastroCompra").effect("shake", {times: 10}, 100);
+                            } else {
+                                PF('wdialogoCadastroCompra').hide();
+                            }
+                        }
+
+
+
+
+                        function TABEnter(pEvent, campo, campoAtual) {
+
+                            if (pEvent.keyCode === 13) {
+                                document.getElementById('frmDialogoCadastroCompra:' + campo).select();
+                                if (campoAtual.id === 'frmDialogoCadastroCompra:edtDesconto') {
+                                    document.getElementById('frmDialogoCadastroCompra:btnInserirProduto').click();
+                                }
+                                return false;
+                            }
+                            return true;
+                        }
+
+
+                        function apagaZero(valorCampo) {
+                            //var str = valorCampo.value;
+                            //alert(valorCampo.value.substring(2,3));
+                            //alert(valorCampo.value.substring(0,1));
+                            //if (valorCampo.value==='0.0'){
+                            //if (valorCampo.value.substring(0,1)==='0'){  
+                            //if (parseFloat(valorCampo.value) === 0) {
+                            if (valorCampo.value === '0,00' || valorCampo.value === '0') {
+                                valorCampo.value = '';
+                            }
+                            return true;
+                        }
+
+
+                        function insereZero(valorCampo) {
+                            if (valorCampo.value === '') {
+                                valorCampo.value = '0,00';
+                            }
+                            return true;
+                        }
+
+                        function testeJS() {
+                            alert('deu certo!');
+                        }
+
+                        function posicionaNoCampoCodigoDoProduto() {
+                            /* if (document.getElementById('frmDialogoCadastroCompra:edtNomeProduto').value === '') {
+                             alert('entrou no posiciona codigo do produto!');
+                             document.getElementById('frmDialogoCadastroCompra:edtCodigoProduto').select();
+                             }*/
+                        }
+
+                        function verificaProduto(campoX) {/*
+                         campoN = 'frmDialogoCadastroCompra:edtNomeProduto';
+                         campoC = 'frmDialogoCadastroCompra:edtCodigoProduto';
+                         if (document.getElementById(campoN).value === '') {
+                         document.getElementById(campoC).select();
+                         } else {
+                         document.getElementById('frmDialogoCadastroCompra:edtQuantidade').select();
+                         }*/
+                        }
+
+                        function setaCodigoProduto() {
+                            campoC = 'frmDialogoCadastroCompra:edtCodigoProduto';
+                            document.getElementById(campoC).select();
+                            //alert('passou no codigo');
+                        }
+
+                        function setaQuantidadeProduto() {
+                            campoQ = 'frmDialogoCadastroCompra:edtQuantidade';
+                            document.getElementById('frmDialogoCadastroCompra:edtNomeProduto').focus();
+                            document.getElementById('frmDialogoCadastroCompra:edtNomeProduto').select();
+                            alert('passou na quantidade');
+
+                        }
+
+                        function selecionaMesmoCampo(campo) {
+                            //y_campo = campo.id; 
+                            //document.getElementById('frmDialogoCadastroCompra:'+campo.id).select(); 
+                            document.getElementById(campo.id).select(); // quando usa o this na chamada da função js o filho da puta já traz o nome do formulário
+                            //alert('bbb'+y_campo);
+                            return true;
+                        }
+
+                        function zeraNomeProduto() {
+                            // (document.getElementById('frmDialogoCadastroCompra:edtNomeProduto').value='';
+                        }
+
+                    </script>
+                </p:panel>
+            </ui:define>
+        </ui:composition>
+
+    </body>
+</html>

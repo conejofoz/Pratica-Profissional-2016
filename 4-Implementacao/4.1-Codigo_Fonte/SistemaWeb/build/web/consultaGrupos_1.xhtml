@@ -1,0 +1,120 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+
+    <body>
+       
+                <!--pagina de grupos-->
+                <p:dialog header="Consulta de grupos de produtos" id="dialogoConsultaGrupos" widgetVar="wdialogoConsultaGrupos" width="700" height="300" visible="false" >
+                    <f:event type="preRenderView" listener="#{grupoBean.listar()}" />
+                        
+                    <h:form id="frmConsultaGrupos" >
+                        <p:growl id="msgConsultaGrupo" showDetail="true" />
+                        <p:commandButton id="btnAcao" value="Novo" oncomplete="PF('wdialogoCadastroGrupo').show();" actionListener="#{grupoBean.setAccion('Registrar')}" action="#{grupoBean.zerarGrupo}" update=":dialogoCadastroGrupo" />
+                        <p:dataTable id="dataTabela" value="#{grupoBean.listaGrupo}" var="var_grupo"
+                                     paginator="true" paginatorPosition="bottom"
+                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="5,10,15">
+
+                            <p:column headerText="Código" style="width: 50px">
+                                <p:outputLabel value="#{var_grupo.id}"/>
+                            </p:column>
+
+                            <p:column headerText="Nome do grupo">
+                                <p:outputLabel value="#{var_grupo.nomeGrupo}"/>
+                            </p:column>
+
+
+
+
+                            <p:column width="30" >
+                                <p:commandButton id="btnEditar" icon="ui-icon-pencil" actionListener="#{grupoBean.buscaPorID(var_grupo)}" oncomplete="PF('wdialogoCadastroGrupo').show();" update=":dialogoCadastroGrupo"  >
+                                    <f:setPropertyActionListener target="#{grupoBean.grupoSelecionado}" value="#{var_grupo}"/>
+                                </p:commandButton>
+                            </p:column>
+
+                            <p:column width="30" >
+                                <p:commandButton id="btnLixeira" icon="ui-icon-trash" oncomplete="PF('wdialogoConfirmacaoExclusaoGrupo').show();">
+                                    <f:setPropertyActionListener target="#{grupoBean.grupoSelecionado}" value="#{var_grupo}"/>
+                                </p:commandButton>
+                            </p:column>
+                            <p:column width="30">
+                                <p:commandButton icon="ui-icon-check" title="Selecionar"
+                                         update="frmDialogoCadastroProduto:edtCodigoGrupo frmDialogoCadastroProduto:edtNomeGrupo"
+                                         oncomplete="PF('wdialogoConsultaGrupos').hide();"
+                                         process="@this" >
+                                    <f:setPropertyActionListener target="#{produtoBean.produto.grupo}" value="#{var_grupo}"/>
+                        </p:commandButton>
+                            </p:column>
+                        </p:dataTable>
+                        </h:form>
+                </p:dialog>
+
+                        <!--DIALOGO DE CONFIRMAÇÃO DE EXCLUSÃO**********************************************************************-->
+                        <p:confirmDialog id="dialogoConfirmacaoExclusaoGrupo" header="Exclusão"
+                                         message="Tem certeza que deseja excluir? #{grupoBean.grupo.nomeGrupo}"
+                                         widgetVar="wdialogoConfirmacaoExclusaoGrupo">
+                            <h:form id="frmExclusaoGrupo" >
+                            <p:commandButton id="btnApagar" value="Sim" update=":frmConsultaGrupos:dataTabela :frmConsultaGrupos:msgConsultaGrupo" oncomplete="PF('wdialogoConfirmacaoExclusaoGrupo').hide();" action="#{grupoBean.apagar()}"/>
+                            <p:commandButton value="Não" oncomplete="PF('wdialogoConfirmacaoExclusaoGrupo').hide();" />
+                            </h:form>
+                        </p:confirmDialog>
+                    
+
+                    <!--DIALOGO DE CADASTRO-->
+                    <p:dialog header="Cadastro de grupos" widgetVar="wdialogoCadastroGrupo" id="dialogoCadastroGrupo" width="600" height="100">
+                        <h:form id="frmDialogoCadastroGrupo" >
+                            
+                            <p:growl id="msjCadastroGrupo" showDetail="true" />
+                            <h:panelGrid columns="2" id="painelGridDialogoCadastroGrupo" >
+
+                                <p:outputLabel id="lblGrupo" value="Grupo" />
+                                <p:inputText id="edtGrupo" value="#{grupoBean.grupo.nomeGrupo}" maxlength="100" required="true" style="width: 300px"
+                                             onkeypress="return TABEnterGrupo(event, 'edtTelefone');">
+                                    <p:ajax event="blur" update="@this" listener="#{grupoBean.handleKeyEvent}" />
+                                </p:inputText>
+
+
+
+
+
+                                <f:facet name="footer">
+                                    <h:panelGrid id="painelGridRodapeCadastroGrupo" columns="4">
+                                        <p:commandButton value="#{grupoBean.accion}" actionListener="#{grupoBean.operar}" oncomplete="tratarRequisicaoGrupo(xhr, status, args)" update="frmDialogoCadastroGrupo :frmConsultaGrupos:dataTabela" />
+                                        <p:commandButton value="Excluir" />
+                                        <p:commandButton value="Limpar" />
+                                        <p:commandButton value="Sair" oncomplete="PF('wdialogoCadastroGrupo').hide();" />
+                                    </h:panelGrid>
+                                </f:facet> 
+                            </h:panelGrid>
+                        </h:form>
+                    </p:dialog>
+
+                    <script type="text/javascript">
+
+                        function tratarRequisicaoGrupo(xhr, status, args) {
+                            if (!args.fecharDialogo) {
+                                jQuery("#dialogoCadastroGrupo").effect("shake", {times: 10}, 100);
+                            } else {
+                                PF('wdialogoCadastroGrupo').hide();
+                            }
+                        }
+
+                        function TABEnterGrupo(pEvent, campo) {
+                            if (pEvent.keyCode === 13) {
+                                document.getElementById('frmDialogoCadastroGrupo:' + campo).select();
+                                return false;
+                            }
+                            return true;
+                        }
+                        
+                    </script>
+               <!--fim pagina de grupos-->
+           
+
+    </body>
+</html>

@@ -1,0 +1,196 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+
+    <body>
+        <ui:composition template="./WEB-INF/templates/telaPadrao.xhtml">
+            <ui:define name="content">
+                <!--pagina de unidades-->
+                <p:dialog header="Consulta de unidades de medida" id="dialogoConsultaUnidades" widgetVar="wdialogoConsultaUnidades" width="600" height="400" visible="true">
+                    <!--pra funcionar a consulta tem que tirar o prerender view-->
+                    <f:event type="preRenderView" listener="#{unidadeBean.listar()}" />
+                    
+                    <h:form id="frmConsultaUnidades" >
+                        <p:growl id="msgConsultaUnidade" showDetail="true" />
+                        
+                        <p:panelGrid columns="3" >
+                            <h:panelGroup >
+                                <p:outputLabel id="lblConsultaNome" value="Nome" /><br />
+                                <p:inputText id="edtConsultaNome" value="#{unidadeBean.consultaNome}" />
+                                <p:commandButton id="btnConsultar" value="Consultar" actionListener="#{unidadeBean.consultar}" update="dataTabela msgConsultaUnidade" />
+                            </h:panelGroup>
+                        </p:panelGrid>
+                        <p:commandButton id="btnAcao" value="Novo" oncomplete="PF('wdialogoCadastroUnidade').show();" actionListener="#{unidadeBean.setAccion('Registrar')}" action="#{unidadeBean.zerarUnidade}" update=":dialogoCadastroUnidade" />
+                        <p:dataTable id="dataTabela" value="#{unidadeBean.listaUnidade}" var="var_unidade"
+                                     paginator="true" paginatorPosition="bottom"
+                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="5,10,15" rows="6">
+
+                            <p:column headerText="Código" width="100">
+                                <p:outputLabel value="#{var_unidade.siglaUnidade}"/>
+                            </p:column>
+
+                            <p:column headerText="Nome do unidade">
+                                <p:outputLabel value="#{var_unidade.nomeUnidade}"/>
+                            </p:column>
+
+
+                            <p:column width="30" >
+                                <p:commandButton id="btnEditar" icon="ui-icon-pencil" actionListener="#{unidadeBean.buscaPorID(var_unidade)}" oncomplete="PF('wdialogoCadastroUnidade').show();" update=":dialogoCadastroUnidade"  >
+                                    <f:setPropertyActionListener target="#{unidadeBean.unidadeSelecionado}" value="#{var_unidade}"/>
+                                </p:commandButton>
+                            </p:column>
+
+                            <p:column width="30" >
+                                <p:commandButton id="btnLixeira" icon="ui-icon-trash" oncomplete="PF('wdialogoConfirmacaoExclusaoUnidade').show();">
+                                    <f:setPropertyActionListener target="#{unidadeBean.unidadeSelecionado}" value="#{var_unidade}"/>
+                                </p:commandButton>
+                            </p:column>
+                            <p:column width="30">
+                                <p:commandButton icon="ui-icon-check" title="Selecionar"
+                                                 action="#{unidadeBean.selecionar(var_unidade)}"
+                                                 process="@this" />
+                            </p:column>
+                        </p:dataTable>
+                        
+                         </h:form>
+                </p:dialog>
+
+                        <!--DIALOGO DE CONFIRMAÇÃO DE EXCLUSÃO**********************************************************************-->
+                        <p:confirmDialog id="dialogoConfirmacaoExclusaoUnidade" header="Exclusão"
+                                         message="Tem certeza que deseja excluir? #{unidadeBean.unidade.nomeUnidade}"
+                                         widgetVar="wdialogoConfirmacaoExclusaoUnidade">
+                            <h:form id="frmExclusaoUnidade" >
+                            <p:commandButton id="btnApagar" value="Sim" update=":frmConsultaUnidades:dataTabela :frmConsultaUnidades:msgConsultaUnidade" oncomplete="PF('wdialogoConfirmacaoExclusaoUnidade').hide();" action="#{unidadeBean.apagar()}"/>
+                            <p:commandButton value="Não" oncomplete="PF('wdialogoConfirmacaoExclusaoUnidade').hide();" />
+                            </h:form>
+                        </p:confirmDialog>
+                   
+
+
+
+
+
+
+
+
+
+                    <!--DIALOGO DE CADASTRO-->
+                    <p:dialog header="Cadastro de unidades" widgetVar="wdialogoCadastroUnidade" id="dialogoCadastroUnidade" position="center" showEffect="slide" width="500" height="100">
+                        <h:form id="frmDialogoCadastroUnidade" >
+                            <p:messages closable="true"/>
+                            <p:growl id="msjCadastroUnidade" showDetail="true" />
+                            <h:panelGrid columns="3" id="painelGridDialogoCadastroUnidade" >
+
+                                
+                                <h:panelGroup>
+                                    <p:outputLabel id="lblIdUnidade" value="Unidade" styleClass="negrito" /><br />
+                                    <p:inputText id="edtIdUnidade" value="#{unidadeBean.unidade.siglaUnidade}" maxlength="8" required="true" size="8"
+                                                 onkeypress="return TABEnter(event, 'edtUnidade');">
+                                        <p:ajax event="blur" update="@this" listener="#{unidadeBean.siglaMaiuscula}" />
+                                    </p:inputText>
+                                </h:panelGroup>
+                                
+                                
+                                <h:panelGroup>
+                                    <p:outputLabel id="lblUnidade" value="Unidade" styleClass="negrito" /><br />
+                                    <p:inputText id="edtUnidade" value="#{unidadeBean.unidade.nomeUnidade}" maxlength="100" required="true" size="40"
+                                                 onkeypress="return TABEnter(event, 'edtCep');">
+                                        <p:ajax event="blur" update="@this" listener="#{unidadeBean.handleKeyEvent}" />
+                                    </p:inputText>
+                                </h:panelGroup>
+
+
+
+
+                                <!--fim busca cep-->
+
+
+
+                                <f:facet name="footer">
+                                    <h:panelGrid id="painelGridRodapeCadastroUnidade" columns="5">
+                                        <p:commandButton value="#{unidadeBean.accion}" actionListener="#{unidadeBean.operar}" oncomplete="tratarRequisicaoUnidades(xhr, status, args)" update="frmDialogoCadastroUnidade :frmConsultaUnidades:dataTabela" />
+                                        <p:commandButton value="Excluir" />
+                                        <p:commandButton value="Limpar" />
+                                        <p:commandButton value="Sair" oncomplete="PF('wdialogoCadastroUnidade').hide();" />
+
+                                    </h:panelGrid>
+                                </f:facet> 
+                            </h:panelGrid>
+
+
+                        </h:form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    </p:dialog>
+
+                    <script type="text/javascript">
+                        function tratarRequisicaoUnidades(xhr, status, args) {
+                            if (!args.fecharDialogo) {
+                                jQuery("#dialogoCadastroUnidade").effect("shake", {times: 10}, 100);
+                            } else {
+                                PF('wdialogoCadastroUnidade').hide();
+                            }
+                        }
+
+
+                        function TABEnter(pEvent, campo) {
+                            if (pEvent.keyCode === 13) {
+                                //return pEvent.keyCode = 9;  
+                                //document.getElementById('frmDialogoCadastroVenda:' + campo).focus();
+                                //document.getElementById('frmDialogoCadastroVenda:' + campo).value='';
+                                document.getElementById('frmDialogoCadastroUnidade:' + campo).select();
+                                return false;
+                            }
+                            return true;
+                        }
+
+
+
+
+
+
+
+
+
+
+                    </script>
+               <!--fim da pagina de unidades-->
+            </ui:define>
+        </ui:composition>
+
+    </body>
+</html>

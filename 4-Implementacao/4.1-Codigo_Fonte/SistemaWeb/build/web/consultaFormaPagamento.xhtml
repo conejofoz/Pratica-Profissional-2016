@@ -1,0 +1,121 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+
+    <body>
+        <ui:composition template="./WEB-INF/templates/telaPadrao.xhtml">
+            <ui:define name="content">
+                <!--pagina de formas de pagamento-->
+                <p:dialog id="dialogoConsultaFormasPagamento" widgetVar="wdialogoConsultaFormasPagamento" width="750" height="300" visible="true" >
+                    <f:event type="preRenderView" listener="#{formaPagamentoBean.listar()}" />
+                    <p:growl id="msj" showDetail="true" />
+                    <h:form id="frmConsultaFormasPagamento" >
+                        <p:growl id="msgConsultaFormaPagamento" showDetail="true" />
+                        <p:commandButton id="btnAcao" value="Novo" oncomplete="PF('wdialogoCadastroFormaPagamento').show();" actionListener="#{formaPagamentoBean.setAccion('Registrar')}" action="#{formaPagamentoBean.zerarFormaPagamento}" update=":dialogoCadastroFormaPagamento" />
+                        <p:dataTable id="dataTabela" value="#{formaPagamentoBean.listaFormaPagamento}" var="var_formaPagamento"
+                                     paginator="true" paginatorPosition="bottom"
+                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="5,10,15">
+
+                            <p:column headerText="Código" style="width: 50px">
+                                <p:outputLabel value="#{var_formaPagamento.id}"/>
+                            </p:column>
+
+                            <p:column headerText="Nome do formaPagamento">
+                                <p:outputLabel value="#{var_formaPagamento.nomeFormaPagamento}"/>
+                            </p:column>
+
+
+
+
+                            <p:column width="30" >
+                                <p:commandButton id="btnEditar" icon="ui-icon-pencil" actionListener="#{formaPagamentoBean.buscaPorID(var_formaPagamento)}" oncomplete="PF('wdialogoCadastroFormaPagamento').show();" update=":dialogoCadastroFormaPagamento"  >
+                                    <f:setPropertyActionListener target="#{formaPagamentoBean.formaPagamentoSelecionado}" value="#{var_formaPagamento}"/>
+                                </p:commandButton>
+                            </p:column>
+
+                            <p:column width="30" >
+                                <p:commandButton id="btnLixeira" icon="ui-icon-trash" oncomplete="PF('wdialogoConfirmacaoExclusaoFormaPagamento').show();">
+                                    <f:setPropertyActionListener target="#{formaPagamentoBean.formaPagamentoSelecionado}" value="#{var_formaPagamento}"/>
+                                </p:commandButton>
+                            </p:column>
+                            <p:column width="30">
+                                <p:commandButton icon="ui-icon-check" title="Selecionar"
+                                                 action="#{formaPagamentoBean.selecionar(var_formaPagamento)}"
+                                                 process="@this" />
+                            </p:column>
+                        </p:dataTable>
+                    </h:form> 
+                </p:dialog>
+
+                        <!--DIALOGO DE CONFIRMAÇÃO DE EXCLUSÃO**********************************************************************-->
+                        <p:confirmDialog id="dialogoConfirmacaoExclusaoFormaPagamento" header="Exclusão"
+                                         message="Tem certeza que deseja excluir? #{formaPagamentoBean.formaPagamento.nomeFormaPagamento}"
+                                         widgetVar="wdialogoConfirmacaoExclusaoFormaPagamento">
+                            <h:form id="frmFormasPagamento" >
+                            <p:commandButton id="btnApagar" value="Sim" update=":frmConsultaFormasPagamento:dataTabela :frmConsultaFormasPagamento:msgConsultaFormaPagamento" oncomplete="PF('wdialogoConfirmacaoExclusaoFormaPagamento').hide();" action="#{formaPagamentoBean.apagar()}"/>
+                            <p:commandButton value="Não" oncomplete="PF('wdialogoConfirmacaoExclusaoFormaPagamento').hide();" />
+                             </h:form>
+                        </p:confirmDialog>
+                   
+
+                    <!--DIALOGO DE CADASTRO-->
+                    <p:dialog header="Cadastro de formaPagamentos" widgetVar="wdialogoCadastroFormaPagamento" id="dialogoCadastroFormaPagamento" width="600" height="200">
+                        <h:form id="frmDialogoCadastroFormaPagamento" >
+                            <p:messages/>
+                            <p:growl id="msjCadastroFormaPagamento" showDetail="true" />
+                            <h:panelGrid columns="2" id="painelGridDialogoCadastroFormaPagamento" >
+
+                                <p:outputLabel id="lblFormaPagamento" value="FormaPagamento" />
+                                <p:inputText id="edtFormaPagamento" value="#{formaPagamentoBean.formaPagamento.nomeFormaPagamento}" maxlength="100" required="true" style="width: 300px"
+                                             onkeyup="maiuscula(this);"
+                                             onkeypress="return TABEnter(event, 'edtTelefone');">
+                                </p:inputText>
+
+
+
+
+
+                                <f:facet name="footer">
+                                    <h:panelGrid id="painelGridRodapeCadastroFormaPagamento" columns="4">
+                                        <p:commandButton value="#{formaPagamentoBean.accion}" actionListener="#{formaPagamentoBean.operar}" oncomplete="tratarRequisicaoFormasPagamento(xhr, status, args)" update="frmDialogoCadastroFormaPagamento :frmConsultaFormasPagamento:dataTabela" />
+                                        <p:commandButton value="Excluir" />
+                                        <p:commandButton value="Limpar" />
+                                        <p:commandButton value="Sair" oncomplete="PF('wdialogoCadastroFormaPagamento').hide();" />
+                                    </h:panelGrid>
+                                </f:facet> 
+                            </h:panelGrid>
+                        </h:form>
+                    </p:dialog>
+
+                    <script type="text/javascript">
+                        function tratarRequisicaoFormasPagamento(xhr, status, args) {
+                            if (!args.fecharDialogo) {
+                                jQuery("#dialogoCadastroFormaPagamento").effect("shake", {times: 10}, 100);
+                            } else {
+                                PF('wdialogoCadastroFormaPagamento').hide();
+                            }
+                        }
+
+
+                        function TABEnter(pEvent, campo) {
+                            if (pEvent.keyCode === 13) {
+                                //return pEvent.keyCode = 9;  
+                                //document.getElementById('frmDialogoCadastroVenda:' + campo).focus();
+                                //document.getElementById('frmDialogoCadastroVenda:' + campo).value='';
+                                document.getElementById('frmDialogoCadastroFormaPagamento:' + campo).select();
+                                return false;
+                            }
+                            return true;
+                        }
+                    </script>
+                 <!--fim da pagina de formas de pagamento-->
+            </ui:define>
+        </ui:composition>
+
+    </body>
+</html>

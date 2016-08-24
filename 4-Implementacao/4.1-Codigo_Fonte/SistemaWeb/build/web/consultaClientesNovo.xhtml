@@ -1,0 +1,248 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+
+    <body>
+        <ui:composition template="./WEB-INF/templates/telaPadrao.xhtml">
+            <ui:define name="content">
+                <p:panel id="painelPrincipal" header="Consulta de clientes" footer="SistemaWeb">
+                    <f:event type="preRenderView" listener="#{clienteBean.listar()}" />
+                    <p:growl id="msj" showDetail="true" />
+                    <h:form id="frmConsultaCliente" style="height: 600px" >
+                        <p:growl id="msgConsultaCliente" showDetail="true" />
+                        <p:commandButton id="btnAcao" value="Novo" oncomplete="PF('wdialogoCadastroCliente').show();" actionListener="#{clienteBean.setAccion('Registrar')}" action="#{clienteBean.zerarCliente}" update=":dialogoCadastroCliente" />
+                        <p:dataTable id="dataTabela" value="#{clienteBean.listaCliente}" var="var_cliente"
+                                     paginator="true"
+                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="5,10,15" rows="10">
+
+                            <p:column headerText="Código" style="width: 50px">
+                                <p:outputLabel value="#{var_cliente.id}"/>
+                            </p:column>
+
+                            <p:column headerText="Nome do cliente">
+                                <p:outputLabel value="#{var_cliente.nomeCliente}"/>
+                            </p:column>
+
+                            <p:column headerText="Telefone" >
+                                <p:outputLabel value="#{var_cliente.telefone}">
+                                    <f:convertNumber type="currency" currencySymbol="R$ " minFractionDigits="2"/>
+                                </p:outputLabel>
+                            </p:column>
+
+                            <p:column headerText="E-mail">
+                                <p:outputLabel value="#{var_cliente.email}" >
+                                    <f:convertNumber type="number" minFractionDigits="2" />
+                                </p:outputLabel> 
+                            </p:column>
+
+
+                            <p:column width="30" >
+                                <p:commandButton id="btnEditar" icon="ui-icon-pencil" actionListener="#{clienteBean.buscaPorID(var_cliente)}" oncomplete="PF('wdialogoCadastroCliente').show();" update=":dialogoCadastroCliente"  >
+                                    <f:setPropertyActionListener target="#{clienteBean.clienteSelecionado}" value="#{var_cliente}"/>
+                                </p:commandButton>
+                            </p:column>
+
+                            <p:column width="30" >
+                                <p:commandButton id="btnLixeira" icon="ui-icon-trash" oncomplete="PF('wdialogoConfirmacaoExclusaoCliente').show();">
+                                    <f:setPropertyActionListener target="#{clienteBean.clienteSelecionado}" value="#{var_cliente}"/>
+                                </p:commandButton>
+                            </p:column>
+                            <p:column width="30">
+                                <p:commandButton icon="ui-icon-check" title="Selecionar"
+                                                 action="#{clienteBean.selecionar(var_cliente)}"
+                                                 process="@this" />
+                            </p:column>
+                        </p:dataTable>
+
+                        <!--DIALOGO DE CONFIRMAÇÃO DE EXCLUSÃO**********************************************************************-->
+                        <p:confirmDialog id="dialogoConfirmacaoExclusaoCliente" header="Exclusão"
+                                         message="Tem certeza que deseja excluir? #{clienteBean.cliente.nomeCliente}"
+                                         widgetVar="wdialogoConfirmacaoExclusaoCliente">
+
+                            <p:commandButton id="btnApagar" value="Sim" update="dataTabela :frmConsultaCliente:msgConsultaCliente" oncomplete="PF('wdialogoConfirmacaoExclusaoCliente').hide();" action="#{clienteBean.apagar()}"/>
+                            <p:commandButton value="Não" oncomplete="PF('wdialogoConfirmacaoExclusaoCliente').hide();" />
+                        </p:confirmDialog>
+                    </h:form>
+
+                    <!--DIALOGO DE CADASTRO-->
+                    <p:dialog header="Cadastro de clientes" widgetVar="wdialogoCadastroCliente" id="dialogoCadastroCliente" position="center" showEffect="slide" width="1000" height="600">
+                        <h:form id="frmDialogoCadastroCliente" >
+                            <p:messages/>
+                            <p:growl id="msjCadastroCliente" showDetail="true" />
+                            <h:panelGrid id="painelGridDialogoCadastroCliente" columns="1" >
+                                <h:panelGrid id="painel1" columns="4" columnClasses="coluna_100, coluna_150, coluna_400, coluna_50" >
+                                    <p:outputLabel id="lblId" value="Código" />
+                                    <p:outputLabel id="lblTipoPessoa" value="Tipo Pessoa" />
+                                    <p:outputLabel id="lblNome" value="Nome"/>
+                                    <p:outputLabel id="lblSexo" value="Sexo" />
+                                </h:panelGrid>
+                                <h:panelGrid id="painel2" columns="4" columnClasses="coluna_100, coluna_150, coluna_400, coluna_50" >
+                                    <p:inputText id="edtId" style="width: 90px" />
+                                    <p:selectOneMenu id="edtTipoPessoa" style="width: 140px" ></p:selectOneMenu>
+                                    <p:inputText id="edtNomeCliente" style="width: 390px" />
+                                    <p:selectOneMenu id="edtSexo" style="width: 49px" ></p:selectOneMenu>
+                                </h:panelGrid>
+                                
+                                <p:spacer />
+                                <h:panelGrid id="painel3" columns="3" columnClasses="coluna_150,coluna_150,coluna_150">
+                                    <p:outputLabel id="lblIdentidade" value="Identidade" />
+                                    <p:outputLabel id="lblCpf" value="CPF" />
+                                    <p:outputLabel id="lblEstadoCivil" value="Estado Civil" />
+                                </h:panelGrid>
+                                <h:panelGrid id="painel4" columns="3" columnClasses="coluna_150,coluna_150,coluna_150" >
+                                    <p:inputText id="edtIdentidade" style="width: 140px" />
+                                    <p:inputText id="edtCpf" style="width: 140px" />
+                                    <p:selectOneMenu id="edtEstadoCivil" style="width: 140px" />
+                                </h:panelGrid>
+                                
+                                <p:spacer />
+                                <h:panelGrid id="painel5" columns="4" columnClasses="coluna_150,coluna_400,coluna_50, coluna_150">
+                                    <p:outputLabel id="lblCep" value="Cep" />
+                                    <p:outputLabel id="lblCidade" value="Cidade" />
+                                    <p:outputLabel id="lblEstado" value="Estado" />
+                                    <p:outputLabel id="lblPais" value="Pais" />
+                                </h:panelGrid>
+                                <h:panelGrid id="painel6" columns="4" columnClasses="coluna_150,coluna_400,coluna_50, coluna_150" >
+                                    <p:inputText id="edtCep" style="width: 140px" />
+                                    <h:panelGroup >
+                                    <p:inputText id="edtCidade" style="width: 340px" />
+                                    <p:commandButton id="btnConsultaCidade" value="..." />
+                                    </h:panelGroup>
+                                    <p:selectOneMenu id="edtEstado" style="width: 49px" />
+                                    <p:inputText id="edtPais" style="width: 140px" />
+                                </h:panelGrid>
+                                
+                                <p:spacer />
+                                <h:panelGrid id="painel7" columns="3" columnClasses="coluna_300,coluna_150,coluna_300">
+                                    <p:outputLabel id="lblLogradouro" value="Endereço" />
+                                    <p:outputLabel id="lblNumero" value="Número" />
+                                    <p:outputLabel id="lblComplemento" value="Complemento" />
+                                </h:panelGrid>
+                                <h:panelGrid id="painel8" columns="3" columnClasses="coluna_300,coluna_150,coluna_300" >
+                                    <p:inputText id="edtEndereco" style="width: 290px" />
+                                    <p:inputText id="edtNumero" style="width: 140px" />
+                                    <p:selectOneMenu id="edtComplemento" style="width: 290px" />
+                                </h:panelGrid>
+                                
+                                <p:spacer />
+                                <h:panelGrid id="painel9" columns="4" columnClasses="coluna_161,coluna_161,coluna_161,coluna_161">
+                                    <p:outputLabel id="lblTelResidencial" value="Tel. Residencial" />
+                                    <p:outputLabel id="lblTelComercial" value="Tel. Comercial" />
+                                    <p:outputLabel id="lblCelular" value="Celular" />
+                                    <p:outputLabel id="lblFax" value="Fax" />
+                                </h:panelGrid>
+                                <h:panelGrid id="painel10" columns="8" columnClasses="coluna_30, coluna_100,coluna_30, coluna_100,coluna_30, coluna_100,coluna_30, coluna_100,coluna_30, coluna_100," >
+                                    <p:inputText style="width: 20px" />
+                                    <p:inputText style="width: 100px"/>
+                                    <p:inputText style="width: 20px"/>
+                                    <p:inputText style="width: 100px"/>
+                                    <p:inputText style="width: 20px"/>
+                                    <p:inputText style="width: 100px"/>
+                                    <p:inputText style="width: 20px"/>
+                                    <p:inputText style="width: 100px"/>
+                                </h:panelGrid>
+                                
+                                <p:spacer />
+                                <h:panelGrid id="painel11" columns="2" columnClasses="coluna_300,coluna_300">
+                                    <p:outputLabel id="lblEmail" value="E-mail" />
+                                    <p:outputLabel id="lblSite" value="Site" />
+                                </h:panelGrid>
+                                <h:panelGrid id="painel12" columns="2" columnClasses="coluna_300,coluna_300" >
+                                    <p:inputText id="edtEmail" style="width: 290px" />
+                                    <p:inputText id="edtSite" style="width: 290px" />
+                                </h:panelGrid>
+                                <p:spacer />
+                                
+                                
+
+
+
+
+                                <f:facet name="footer">
+                                    <h:panelGrid id="painelGridRodapeCadastroCliente" columns="5">
+                                        <p:commandButton value="#{clienteBean.accion}" actionListener="#{clienteBean.operar}" oncomplete="tratarRequisicao(xhr, status, args)" update="frmDialogoCadastroCliente :frmConsultaCliente:dataTabela" />
+                                        <p:commandButton value="Excluir" />
+                                        <p:commandButton value="Limpar" />
+                                        <p:commandButton value="Sair" />
+
+                                    </h:panelGrid>
+                                </f:facet> 
+                            </h:panelGrid>
+
+
+                        </h:form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    </p:dialog>
+
+                    <script type="text/javascript">
+                        function tratarRequisicao(xhr, status, args) {
+                            if (!args.fecharDialogo) {
+                                jQuery("#dialogoCadastroCliente").effect("shake", {times: 10}, 100);
+                            } else {
+                                PF('wdialogoCadastroCliente').hide();
+                            }
+                        }
+
+
+                        function TABEnter(pEvent, campo) {
+                            if (pEvent.keyCode === 13) {
+                                //return pEvent.keyCode = 9;  
+                                //document.getElementById('frmDialogoCadastroVenda:' + campo).focus();
+                                //document.getElementById('frmDialogoCadastroVenda:' + campo).value='';
+                                document.getElementById('frmDialogoCadastroCliente:' + campo).select();
+                                return false;
+                            }
+                            return true;
+                        }
+
+
+
+
+
+
+
+
+
+
+                    </script>
+                </p:panel>
+            </ui:define>
+        </ui:composition>
+
+    </body>
+</html>

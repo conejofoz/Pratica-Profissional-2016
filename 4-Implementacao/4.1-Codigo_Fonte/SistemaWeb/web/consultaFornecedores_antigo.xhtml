@@ -1,0 +1,134 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+
+    <body>
+        <ui:composition template="./WEB-INF/templates/telaPadrao.xhtml">
+            <ui:define name="content">
+                <p:panel header="Consulta de fornecedors" footer="SistemaWeb">
+                    <f:event type="preRenderView" listener="#{fornecedorBean.listar()}" />
+                    <p:growl id="msj" showDetail="true" />
+                    <h:form id="frmConsultaFornecedor" style="height: 600px" >
+                        <p:growl id="msgConsultaFornecedor" showDetail="true" />
+                        <p:commandButton id="btnAcao" value="Novo" oncomplete="PF('wdialogoCadastroFornecedor').show();" actionListener="#{fornecedorBean.setAccion('Registrar')}" action="#{fornecedorBean.zerarFornecedor}" update=":dialogoCadastroFornecedor" />
+                        <p:dataTable id="dataTabela" value="#{fornecedorBean.listaFornecedor}" var="var_fornecedor"
+                                     paginator="true"
+                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="5,10,15">
+
+                            <p:column headerText="Código" style="width: 50px">
+                                <p:outputLabel value="#{var_fornecedor.id}"/>
+                            </p:column>
+                            
+                            <p:column headerText="Nome do fornecedor">
+                                <p:outputLabel value="#{var_fornecedor.nomeFornecedor}"/>
+                            </p:column>
+                            
+                            <p:column headerText="Telefone" >
+                                <p:outputLabel value="#{var_fornecedor.telefone}">
+                                   <f:convertNumber type="currency" currencySymbol="R$ " minFractionDigits="2"/>
+                                </p:outputLabel>
+                            </p:column>
+                            
+                            <p:column headerText="E-mail">
+                                <p:outputLabel value="#{var_fornecedor.email}" >
+                                    <f:convertNumber type="number" minFractionDigits="2" />
+                                </p:outputLabel> 
+                            </p:column>
+                            
+
+                            <p:column width="30" >
+                                <p:commandButton id="btnEditar" icon="ui-icon-pencil" actionListener="#{fornecedorBean.buscaPorID(var_fornecedor)}" oncomplete="PF('wdialogoCadastroFornecedor').show();" update=":dialogoCadastroFornecedor"  >
+                                    <f:setPropertyActionListener target="#{fornecedorBean.fornecedorSelecionado}" value="#{var_fornecedor}"/>
+                                </p:commandButton>
+                            </p:column>
+
+                            <p:column width="30" >
+                                <p:commandButton id="btnLixeira" icon="ui-icon-trash" oncomplete="PF('wdialogoConfirmacaoExclusaoFornecedor').show();">
+                                    <f:setPropertyActionListener target="#{fornecedorBean.fornecedorSelecionado}" value="#{var_fornecedor}"/>
+                                </p:commandButton>
+                            </p:column>
+                            <p:column width="30">
+                                <p:commandButton icon="ui-icon-check" title="Selecionar"
+                                                 action="#{fornecedorBean.selecionar(var_fornecedor)}"
+                                                 process="@this" />
+                            </p:column>
+                        </p:dataTable>
+                        
+                        <!--DIALOGO DE CONFIRMAÇÃO DE EXCLUSÃO**********************************************************************-->
+                        <p:confirmDialog id="dialogoConfirmacaoExclusaoFornecedor" header="Exclusão"
+                                         message="Tem certeza que deseja excluir? #{fornecedorBean.fornecedor.nomeFornecedor}"
+                                         widgetVar="wdialogoConfirmacaoExclusaoFornecedor">
+
+                            <p:commandButton id="btnApagar" value="Sim" update="dataTabela :frmConsultaFornecedor:msgConsultaFornecedor" oncomplete="PF('wdialogoConfirmacaoExclusaoFornecedor').hide();" action="#{fornecedorBean.apagar()}"/>
+                            <p:commandButton value="Não" oncomplete="PF('wdialogoConfirmacaoExclusaoFornecedor').hide();" />
+                        </p:confirmDialog>
+                    </h:form>
+
+                    <!--DIALOGO DE CADASTRO-->
+                    <p:dialog header="Cadastro de fornecedores" widgetVar="wdialogoCadastroFornecedor" id="dialogoCadastroFornecedor" width="600" height="300">
+                        <h:form id="frmDialogoCadastroFornecedor" >
+                            <p:messages/>
+                            <p:growl id="msjCadastroFornecedor" showDetail="true" />
+                            <h:panelGrid columns="2" id="painelGridDialogoCadastroFornecedor" >
+                                
+                                <p:outputLabel id="lblFornecedor" value="Descrição:" />
+                                <p:inputText id="edtFornecedor" value="#{fornecedorBean.fornecedor.nomeFornecedor}" maxlength="100" required="true" style="width: 300px"
+                                            onkeypress="return TABEnter(event, 'edtTelefone');">
+                                            <p:ajax event="blur" update="@this" listener="#{fornecedorBean.handleKeyEvent}" />
+                                </p:inputText>
+                                <p:outputLabel id="lblTelefone" value="Telefone:" />
+                                <p:inputMask mask="(999)9999-9999" id="edtTelefone" value="#{fornecedorBean.fornecedor.telefone}" required="true" style="width: 100px"
+                                             onkeypress="return TABEnter(event, 'edtEmail');">
+                                </p:inputMask>
+                                
+                                <p:outputLabel id="lblEmail" value="E-mail" />
+                                <p:inputText id="edtEmail" value="#{fornecedorBean.fornecedor.email}" required="true" style="width: 300px" 
+                                             onkeypress="return TABEnter(event, 'edtFornecedor');">
+                                    <p:ajax event="blur" update="@this" listener="#{fornecedorBean.handleKeyEventEmail}" />   
+                                </p:inputText>
+                                
+
+                                <f:facet name="footer">
+                                    <h:panelGrid id="painelGridRodapeCadastroFornecedor" columns="4">
+                                        <p:commandButton value="#{fornecedorBean.accion}" actionListener="#{fornecedorBean.operar}" oncomplete="tratarRequisicao(xhr, status, args)" update="frmDialogoCadastroFornecedor :frmConsultaFornecedor:dataTabela" />
+                                        <p:commandButton value="Excluir" />
+                                        <p:commandButton value="Limpar" />
+                                        <p:commandButton value="Sair" />
+                                    </h:panelGrid>
+                                </f:facet> 
+                            </h:panelGrid>
+                        </h:form>
+                    </p:dialog>
+
+                    <script type="text/javascript">
+                        function tratarRequisicao(xhr, status, args) {
+                            if (!args.fecharDialogo) {
+                                jQuery("#dialogoCadastroFornecedor").effect("shake", {times: 10}, 100);
+                            } else {
+                                PF('wdialogoCadastroFornecedor').hide();
+                            }
+                        }
+                        
+                        
+                        function TABEnter(pEvent, campo) {
+                            if (pEvent.keyCode === 13) {
+                                //return pEvent.keyCode = 9;  
+                                //document.getElementById('frmDialogoCadastroVenda:' + campo).focus();
+                                //document.getElementById('frmDialogoCadastroVenda:' + campo).value='';
+                                document.getElementById('frmDialogoCadastroFornecedor:' + campo).select();
+                                return false;
+                            }
+                            return true;
+                        }
+                    </script>
+                </p:panel>
+            </ui:define>
+        </ui:composition>
+
+    </body>
+</html>

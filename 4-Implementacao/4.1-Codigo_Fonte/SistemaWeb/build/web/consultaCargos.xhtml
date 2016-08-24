@@ -1,0 +1,121 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+
+    <body>
+        <ui:composition template="./WEB-INF/templates/telaPadrao.xhtml">
+            <ui:define name="content">
+                <p:dialog id="dialogoConsultaCargos" widgetVar="wdialogoConsultaCargos" width="750" height="350" visible="true" >
+                    <f:event type="preRenderView" listener="#{cargoBean.listar()}" />
+                    <p:growl id="msjCargos" showDetail="true" />
+                    <h:form id="frmConsultaCargos" >
+                        <p:growl id="msgConsultaCargo" showDetail="true" />
+                        <p:commandButton id="btnAcao" value="Novo" oncomplete="PF('wdialogoCadastroCargo').show();" actionListener="#{cargoBean.setAccion('Registrar')}" action="#{cargoBean.zerarCargo}" update=":dialogoCadastroCargo" />
+                        <p:dataTable id="dataTabela" value="#{cargoBean.listaCargo}" var="var_cargo"
+                                     paginator="true" paginatorPosition="bottom"
+                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="5,10,15">
+
+                            <p:column headerText="Código" style="width: 50px">
+                                <p:outputLabel value="#{var_cargo.id}"/>
+                            </p:column>
+                            
+                            <p:column headerText="Nome do cargo">
+                                <p:outputLabel value="#{var_cargo.nomeCargo}"/>
+                            </p:column>
+                            
+                            
+                            
+
+                            <p:column width="30" >
+                                <p:commandButton id="btnEditar" icon="ui-icon-pencil" actionListener="#{cargoBean.buscaPorID(var_cargo)}" oncomplete="PF('wdialogoCadastroCargo').show();" update=":dialogoCadastroCargo"  >
+                                    <f:setPropertyActionListener target="#{cargoBean.cargoSelecionado}" value="#{var_cargo}"/>
+                                </p:commandButton>
+                            </p:column>
+
+                            <p:column width="30" >
+                                <p:commandButton id="btnLixeira" icon="ui-icon-trash" oncomplete="PF('wdialogoConfirmacaoExclusaoCargo').show();">
+                                    <f:setPropertyActionListener target="#{cargoBean.cargoSelecionado}" value="#{var_cargo}"/>
+                                </p:commandButton>
+                            </p:column>
+                            <p:column width="30">
+                                <p:commandButton icon="ui-icon-check" title="Selecionar"
+                                                 action="#{cargoBean.selecionar(var_cargo)}"
+                                                 process="@this" />
+                            </p:column>
+                        </p:dataTable>
+                        
+                        <!--DIALOGO DE CONFIRMAÇÃO DE EXCLUSÃO**********************************************************************-->
+                        <p:confirmDialog id="dialogoConfirmacaoExclusaoCargo" header="Exclusão"
+                                         message="Tem certeza que deseja excluir? #{cargoBean.cargo.nomeCargo}"
+                                         widgetVar="wdialogoConfirmacaoExclusaoCargo">
+
+                            <p:commandButton id="btnApagar" value="Sim" update=":frmConsultaCargos:dataTabela :frmConsultaCargos:msgConsultaCargo" oncomplete="PF('wdialogoConfirmacaoExclusaoCargo').hide();" action="#{cargoBean.apagar()}"/>
+                            <p:commandButton value="Não" oncomplete="PF('wdialogoConfirmacaoExclusaoCargo').hide();" />
+                        </p:confirmDialog>
+                    </h:form>
+                    
+                    
+                </p:dialog>
+
+                    <!--DIALOGO DE CADASTRO-->
+                    <p:dialog header="Cadastro de cargos" widgetVar="wdialogoCadastroCargo" id="dialogoCadastroCargo" width="600" height="200">
+                        <h:form id="frmDialogoCadastroCargo" >
+                            <p:messages/>
+                            <p:growl id="msjCadastroCargo" showDetail="true" />
+                            <h:panelGrid columns="2" id="painelGridDialogoCadastroCargo" >
+                                
+                                <p:outputLabel id="lblCargo" value="Cargo" />
+                                <p:inputText id="edtCargo" value="#{cargoBean.cargo.nomeCargo}" maxlength="100" required="true" style="width: 300px"
+                                             onkeyup="maiuscula(this);"
+                                            onkeypress="return TABEnter(event, 'edtTelefone');">
+                                            <p:ajax event="blur" update="@this" listener="#{cargoBean.handleKeyEvent}" />
+                                </p:inputText>
+                                
+                                
+                               
+                                
+
+                                <f:facet name="footer">
+                                    <h:panelGrid id="painelGridRodapeCadastroCargo" columns="4">
+                                        <p:commandButton value="#{cargoBean.accion}" actionListener="#{cargoBean.operar}" oncomplete="tratarRequisicao(xhr, status, args)" update="frmDialogoCadastroCargo :frmConsultaCargos:dataTabela" />
+                                        <p:commandButton value="Excluir" />
+                                        <p:commandButton value="Limpar" />
+                                        <p:commandButton value="Sair" oncomplete="PF('wdialogoCadastroCargo').hide();" />
+                                    </h:panelGrid>
+                                </f:facet> 
+                            </h:panelGrid>
+                        </h:form>
+                    </p:dialog>
+
+                    <script type="text/javascript">
+                        function tratarRequisicao(xhr, status, args) {
+                            if (!args.fecharDialogo) {
+                                jQuery("#dialogoCadastroCargo").effect("shake", {times: 10}, 100);
+                            } else {
+                                PF('wdialogoCadastroCargo').hide();
+                            }
+                        }
+                        
+                        
+                        function TABEnter(pEvent, campo) {
+                            if (pEvent.keyCode === 13) {
+                                //return pEvent.keyCode = 9;  
+                                //document.getElementById('frmDialogoCadastroVenda:' + campo).focus();
+                                //document.getElementById('frmDialogoCadastroVenda:' + campo).value='';
+                                document.getElementById('frmDialogoCadastroCargo:' + campo).select();
+                                return false;
+                            }
+                            return true;
+                        }
+                    </script>
+                
+            </ui:define>
+        </ui:composition>
+
+    </body>
+</html>

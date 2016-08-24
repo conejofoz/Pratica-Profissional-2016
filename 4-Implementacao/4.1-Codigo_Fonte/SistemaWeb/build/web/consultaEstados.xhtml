@@ -1,0 +1,142 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+
+    <body>
+        <ui:composition template="./WEB-INF/templates/telaPadrao.xhtml">
+            <ui:define name="content">
+                <!--pagina estados-->
+                <p:dialog header="Consulta de estados" widgetVar="wdialogoConsultaEstados" visible="true" width="800" height="400" >
+                    <!-- <p:panel header="Consulta de estados" footer="SistemaWeb">-->
+                    <f:event type="preRenderView" listener="#{estadoBean.listar()}" />
+                    <p:growl id="msjConsultaEstado" showDetail="true" />
+                    <h:form id="frmConsultaEstado" >
+                        <p:growl id="msgConsultaEstado" showDetail="true" />
+                        <p:commandButton id="btnAcao" value="Novo" oncomplete="PF('wdialogoCadastroEstado').show();" actionListener="#{estadoBean.setAccion('Registrar')}" update=":dialogoCadastroEstado" />
+                        <p:dataTable id="dataTabela" value="#{estadoBean.listaEstado}" var="estado"
+                                     paginator="true" paginatorPosition="bottom"
+                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="5,10,15">
+
+                            <p:column headerText="Sigla" style="width: 30px">
+                                <p:outputLabel id="contatoColuna" value="#{estado.siglaEstado}" />
+                            </p:column>
+
+                            <p:column headerText="Nome do estado">
+                                <p:outputLabel value="#{estado.nomeEstado}"/>
+                            </p:column>
+
+                            <p:column headerText="País">
+                                <p:outputLabel value="#{estado.pais.nomePais}"/>
+                            </p:column>
+
+                            <p:column width="50" >
+                                <p:commandButton id="btnEditar" icon="ui-icon-pencil" actionListener="#{estadoBean.buscaPorID(estado)}" oncomplete="PF('wdialogoCadastroEstado').show();" update=":dialogoCadastroEstado"  >
+                                    <f:setPropertyActionListener target="#{estadoBean.estadoSelecionado}" value="#{estado}"/>
+                                </p:commandButton>
+                            </p:column>
+
+                            <p:column width="40" >
+                                <p:commandButton id="btnLixeira" icon="ui-icon-trash" oncomplete="PF('wdialogoConfirmacaoExclusaoEstado').show();">
+                                    <f:setPropertyActionListener target="#{estadoBean.estadoSelecionado}" value="#{estado}"/>
+                                </p:commandButton>
+                            </p:column>
+
+                            <p:column width="40">
+                                <p:commandButton icon="ui-icon-check" title="Selecionar"
+                                                 action="#{estadoBean.selecionar(estado)}"
+                                                 process="@this" />
+                            </p:column>
+
+                        </p:dataTable>
+
+                        <!--DIALOGO DE CONFIRMAÇÃO DE EXCLUSÃO**********************************************************************-->
+
+                    </h:form>
+                    <!--</p:panel>-->
+                </p:dialog>
+
+
+
+                <p:confirmDialog id="dialogoConfirmacaoExclusaoEstado" header="Exclusão"
+                                 message="Tem certeza que deseja excluir? #{estadoBean.estado.nomeEstado}"
+                                 widgetVar="wdialogoConfirmacaoExclusaoEstado">
+
+                    <h:form id="frmConfirmaExclusaoEstado" >
+                        <p:commandButton id="btnApagar" value="Sim" update=":frmConsultaEstado:dataTabela :frmConsultaEstado:msgConsultaEstado" oncomplete="PF('wdialogoConfirmacaoExclusaoEstado').hide();" action="#{estadoBean.apagar()}"/>
+                        <p:commandButton value="Não" oncomplete="PF('wdialogoConfirmacaoExclusaoEstado').hide();" />
+                    </h:form>
+                </p:confirmDialog>
+
+
+
+
+
+                <!--DIALOGO DE CADASTRO-->
+                <p:dialog header="Cadastro de estados" widgetVar="wdialogoCadastroEstado" id="dialogoCadastroEstado" width="600" height="300" modal="true">
+                    <h:form id="frmDialogoCadastroEstado" >
+                        <p:messages/>
+                        <p:growl id="msjCadastroEstado" showDetail="true" />
+                        <p:panelGrid columns="2" id="painelGridDialogoCadastroEstado" >
+                            <p:outputLabel id="lblSigla" value="Sigla" />
+                            <p:inputText id="edtSigla" value="#{estadoBean.estado.siglaEstado}" maxlength="2" required="true" style="width: 20px" />
+                            <p:outputLabel id="lblEstado" value="Estado" />
+                            <p:inputText id="edtEstado" value="#{estadoBean.estado.nomeEstado}" maxlength="100" required="true" style="width: 300px" />
+                            <p:outputLabel id="lblPais" value="Sigla país" />
+                            <p:inputText id="edtSiglaPais" value="#{estadoBean.estado.pais.siglaPais}" maxlength="2" required="true" style="width: 20px" >
+                                <p:ajax listener="#{estadoBean.buscaPaisBySigla}" event="change" process="edtSiglaPais" update="edtNomePais" />
+                            </p:inputText>    
+                            <p:outputLabel id="lblNomePais" value="Nome do país" />
+                            <p:inputText id="edtNomePais" value="#{estadoBean.estado.pais.nomePais}" maxlength="100" required="true" style="width: 300px" />
+
+                            <f:facet name="footer">
+                                <h:panelGrid id="painelGridRodapeCadastroEstado" columns="7">
+                                    <p:commandButton style="display: none" />
+                                    <p:commandButton value="#{estadoBean.accion}" actionListener="#{estadoBean.operar}" oncomplete="tratarRequisicaoEstado(xhr, status, args)" update="frmDialogoCadastroEstado :frmConsultaEstado:dataTabela" />
+                                    <p:commandButton value="Excluir" />
+                                    <p:commandButton value="Limpar" />
+                                    <p:commandButton value="Sair" actionListener="#{estadoBean.listavalor}" process="@this" update="@none" />
+                                    <p:commandButton value="País" icon="ui-icon-search" title="Pesquisa" 
+                                                     action="#{paisBean.abrirDialogoPais}" 
+                                                     process="@this" update="@none">
+                                        <p:ajax event="dialogReturn" listener="#{estadoBean.setarPaisSelecionado}"
+                                                process="@this" update="edtSiglaPais edtNomePais" />
+                                    </p:commandButton>
+                                    <p:commandButton id="btnConsultarPaises" process="@this" value="teste paises" oncomplete="PF('wdialogoConsultaPaises').show();"/>
+                                </h:panelGrid>
+                            </f:facet> 
+                        </p:panelGrid>
+                        
+                    </h:form>
+                </p:dialog>
+                
+
+                <script type="text/javascript">
+                    function tratarRequisicaoEstado(xhr, status, args) {
+                        if (!args.fecharDialogo) {
+                            jQuery("#dialogoCadastroEstado").effect("shake", {times: 10}, 100);
+                        } else {
+                            PF('wdialogoCadastroEstado').hide();
+                        }
+                    }
+                </script>
+                <!--fim pagina estados-->
+                
+                
+                <!--pagina paises-->
+                
+                <ui:include src="/consultaPaises_1.xhtml" />
+                <!--fim pagina paises-->
+
+                
+                
+            </ui:define>
+        </ui:composition>
+       
+
+    </body>
+</html>

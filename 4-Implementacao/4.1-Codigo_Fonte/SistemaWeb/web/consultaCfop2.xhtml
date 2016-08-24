@@ -1,0 +1,229 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+    
+    <h:head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <h:outputStylesheet name="./css/default.css"/>
+        <h:outputStylesheet name="./css/cssLayout.css"/>
+        <title>Consulta fornecedores auxiliar</title>
+        
+        <script type="text/javascript">
+            PrimeFaces.locales['pt'] = {
+                closeText: 'Fechar',
+                prevText: 'Anterior',
+                nextText: 'Próximo',
+                //currentText: 'Começo',  
+                monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
+                monthNamesShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+                dayNames: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'],
+                dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],
+                dayNamesMin: ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'],
+                weekHeader: 'Semana',
+                firstDay: 1,
+                isRTL: false,
+                showMonthAfterYear: false,
+                yearSuffix: '',
+                timeOnlyTitle: 'Só Horas',
+                timeText: 'Tempo',
+                hourText: 'Hora',
+                minuteText: 'Minuto',
+                secondText: 'Segundo',
+                currentText: 'Data Atual',
+                ampm: false,
+                month: 'Mês',
+                week: 'Semana',
+                day: 'Dia',
+                allDayText: 'Todo Dia'
+            };
+        </script>
+       
+        
+    </h:head>
+
+
+    <body>
+        
+                <p:panel id="painelPrincipal" header="Consulta de cfops" footer="SistemaWeb">
+                    <!--pra funcionar a consulta tem que tirar o prerender view-->
+                    <!--<f:event type="preRenderView" listener="" />-->
+                    <p:growl id="msj" showDetail="true" />
+                    <h:form id="frmConsultaCfop" style="height: 600px" >
+                        <p:growl id="msgConsultaCfop" showDetail="true" />
+                        
+                        <p:panelGrid columns="3" >
+                            <h:panelGroup >
+                                <p:outputLabel id="lblConsultaNome" value="Nome" /><br />
+                                <p:inputText id="edtConsultaNome" value="#{cfopBean.consultaNome}" />
+                                <p:commandButton id="btnConsultar" value="Consultar" actionListener="#{cfopBean.consultar}" update="dataTabela msgConsultaCfop" />
+                            </h:panelGroup>
+                        </p:panelGrid>
+                        <p:commandButton id="btnAcao" value="Novo" oncomplete="PF('wdialogoCadastroCfop').show();" actionListener="#{cfopBean.setAccion('Registrar')}" action="#{cfopBean.zerarCfop}" update=":dialogoCadastroCfop" />
+                        <p:dataTable id="dataTabela" value="#{cfopBean.listaCfop}" var="var_cfop"
+                                     paginator="true"
+                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="5,10,15" rows="10">
+
+                            <p:column headerText="Código" width="100">
+                                <p:outputLabel value="#{var_cfop.id}"/>
+                            </p:column>
+
+                            <p:column headerText="Nome do cfop">
+                                <p:outputLabel value="#{var_cfop.nomeCfop}"/>
+                            </p:column>
+
+
+                            <p:column width="30" >
+                                <p:commandButton id="btnEditar" icon="ui-icon-pencil" actionListener="#{cfopBean.buscaPorID(var_cfop)}" oncomplete="PF('wdialogoCadastroCfop').show();" update=":dialogoCadastroCfop"  >
+                                    <f:setPropertyActionListener target="#{cfopBean.cfopSelecionado}" value="#{var_cfop}"/>
+                                </p:commandButton>
+                            </p:column>
+
+                            <p:column width="30" >
+                                <p:commandButton id="btnLixeira" icon="ui-icon-trash" oncomplete="PF('wdialogoConfirmacaoExclusaoCfop').show();">
+                                    <f:setPropertyActionListener target="#{cfopBean.cfopSelecionado}" value="#{var_cfop}"/>
+                                </p:commandButton>
+                            </p:column>
+                            <p:column width="30">
+                                <p:commandButton icon="ui-icon-check" title="Selecionar"
+                                                 action="#{cfopBean.selecionar(var_cfop)}"
+                                                 process="@this" />
+                            </p:column>
+                        </p:dataTable>
+
+                        <!--DIALOGO DE CONFIRMAÇÃO DE EXCLUSÃO**********************************************************************-->
+                        <p:confirmDialog id="dialogoConfirmacaoExclusaoCfop" header="Exclusão"
+                                         message="Tem certeza que deseja excluir? #{cfopBean.cfop.nomeCfop}"
+                                         widgetVar="wdialogoConfirmacaoExclusaoCfop">
+
+                            <p:commandButton id="btnApagar" value="Sim" update="dataTabela :frmConsultaCfop:msgConsultaCfop" oncomplete="PF('wdialogoConfirmacaoExclusaoCfop').hide();" action="#{cfopBean.apagar()}"/>
+                            <p:commandButton value="Não" oncomplete="PF('wdialogoConfirmacaoExclusaoCfop').hide();" />
+                        </p:confirmDialog>
+                    </h:form>
+
+
+
+
+
+
+
+
+
+                    <!--DIALOGO DE CADASTRO-->
+                    <p:dialog header="Cadastro de cfops" widgetVar="wdialogoCadastroCfop" id="dialogoCadastroCfop" position="center" showEffect="slide" width="600" height="100">
+                        <h:form id="frmDialogoCadastroCfop" >
+                            <p:messages closable="true"/>
+                            <p:growl id="msjCadastroCfop" showDetail="true" />
+                            <h:panelGrid columns="3" id="painelGridDialogoCadastroCfop" >
+
+                                
+                                <h:panelGroup>
+                                    <p:outputLabel id="lblIdCfop" value="Cfop" styleClass="negrito" /><br />
+                                    <p:inputText id="edtIdCfop" value="#{cfopBean.cfop.id}" maxlength="4" required="true" size="5"
+                                                 onkeypress="return TABEnter(event, 'edtCfop');">
+                                        <p:ajax event="blur" update="@this" />
+                                    </p:inputText>
+                                </h:panelGroup>
+                                
+                                
+                                <h:panelGroup>
+                                    <p:outputLabel id="lblCfop" value="Cfop" styleClass="negrito" /><br />
+                                    <p:inputText id="edtCfop" value="#{cfopBean.cfop.nomeCfop}" maxlength="100" required="true" size="50"
+                                                 onkeypress="return TABEnter(event, 'edtCep');">
+                                        <p:ajax event="blur" update="@this" listener="#{cfopBean.handleKeyEvent}" />
+                                    </p:inputText>
+                                </h:panelGroup>
+
+
+
+
+                                <!--fim busca cep-->
+
+
+
+                                <f:facet name="footer">
+                                    <h:panelGrid id="painelGridRodapeCadastroCfop" columns="5">
+                                        <p:commandButton value="#{cfopBean.accion}" actionListener="#{cfopBean.operar}" oncomplete="tratarRequisicao(xhr, status, args)" update="frmDialogoCadastroCfop :frmConsultaCfop:dataTabela" />
+                                        <p:commandButton value="Excluir" />
+                                        <p:commandButton value="Limpar" />
+                                        <p:commandButton value="Sair" />
+
+                                    </h:panelGrid>
+                                </f:facet> 
+                            </h:panelGrid>
+
+
+                        </h:form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    </p:dialog>
+
+                    <script type="text/javascript">
+                        function tratarRequisicao(xhr, status, args) {
+                            if (!args.fecharDialogo) {
+                                jQuery("#dialogoCadastroCfop").effect("shake", {times: 10}, 100);
+                            } else {
+                                PF('wdialogoCadastroCfop').hide();
+                            }
+                        }
+
+
+                        function TABEnter(pEvent, campo) {
+                            if (pEvent.keyCode === 13) {
+                                //return pEvent.keyCode = 9;  
+                                //document.getElementById('frmDialogoCadastroVenda:' + campo).focus();
+                                //document.getElementById('frmDialogoCadastroVenda:' + campo).value='';
+                                document.getElementById('frmDialogoCadastroCfop:' + campo).select();
+                                return false;
+                            }
+                            return true;
+                        }
+
+
+
+
+
+
+
+
+
+
+                    </script>
+                </p:panel>
+           
+
+    </body>
+</html>

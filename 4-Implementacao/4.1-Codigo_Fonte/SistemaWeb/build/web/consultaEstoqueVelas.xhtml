@@ -1,0 +1,125 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+
+    <body>
+        <ui:composition template="./WEB-INF/templates/telaPadrao.xhtml">
+            <ui:define name="content">
+                <p:dialog id="dialogoConsultaEstoqueVelas" widgetVar="wdialogoConsultaEstoqueVelas" width="750" height="450" visible="true" >
+                    <f:event type="preRenderView" listener="#{estoqueVelaBean.listar()}" />
+                    <p:growl id="msjEstoqueVelas" showDetail="true" />
+                    <h:form id="frmConsultaEstoqueVelas" >
+                        <p:growl id="msgConsultaEstoqueVela" showDetail="true" />
+                        <p:commandButton id="btnAcao" value="Novo"  />
+                        <p:dataTable id="dataTabela" value="#{estoqueVelaBean.listaEstoqueVela}" var="var_estoqueVela"
+                                     paginator="true" paginatorPosition="bottom"
+                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="5,10,15,100" rows="10">
+
+                            <p:column headerText="Código" style="width: 50px">
+                                <p:outputLabel value="#{var_estoqueVela.id}"/>
+                            </p:column>
+                            
+                            <p:column headerText="Descrição do produto" style="width: 300px">
+                                <p:outputLabel value="#{var_estoqueVela.descricao}"/>
+                            </p:column>
+                            
+                            <p:column headerText="Quantidade">
+                                <p:outputLabel value="#{var_estoqueVela.quantidade}"/>
+                            </p:column>
+                            
+                            
+                            
+
+                            <p:column width="30" >
+                                <p:commandButton id="btnEditar" icon="ui-icon-pencil"  >
+                                    <f:setPropertyActionListener target="#{estoqueVelaBean.estoqueVelaSelecionado}" value="#{var_estoqueVela}"/>
+                                </p:commandButton>
+                            </p:column>
+
+                            <p:column width="30" >
+                                <p:commandButton id="btnLixeira" icon="ui-icon-trash" >
+                                    <f:setPropertyActionListener target="#{estoqueVelaBean.estoqueVelaSelecionado}" value="#{var_estoqueVela}"/>
+                                </p:commandButton>
+                            </p:column>
+                            <p:column width="30">
+                                <p:commandButton icon="ui-icon-check" title="Selecionar"
+                                                 action="#{estoqueVelaBean.selecionar(var_estoqueVela)}"
+                                                 process="@this" />
+                            </p:column>
+                        </p:dataTable>
+                        
+                        <!--DIALOGO DE CONFIRMAÇÃO DE EXCLUSÃO**********************************************************************-->
+                        <p:confirmDialog id="dialogoConfirmacaoExclusaoEstoqueVela" header="Exclusão"
+                                         message="Tem certeza que deseja excluir? #{estoqueVelaBean.estoqueVela.descricao}"
+                                         widgetVar="wdialogoConfirmacaoExclusaoEstoqueVela">
+
+                            <p:commandButton id="btnApagar" value="Sim" update=":frmConsultaEstoqueVelas:dataTabela :frmConsultaEstoqueVelas:msgConsultaEstoqueVela" oncomplete="PF('wdialogoConfirmacaoExclusaoEstoqueVela').hide();" action="#{estoqueVelaBean.apagar()}"/>
+                            <p:commandButton value="Não" oncomplete="PF('wdialogoConfirmacaoExclusaoEstoqueVela').hide();" />
+                        </p:confirmDialog>
+                    </h:form>
+                    
+                    
+                </p:dialog>
+
+                    <!--DIALOGO DE CADASTRO-->
+                    <p:dialog header="Cadastro de estoqueVelas" widgetVar="wdialogoCadastroEstoqueVela" id="dialogoCadastroEstoqueVela" width="600" height="200">
+                        <h:form id="frmDialogoCadastroEstoqueVela" >
+                            <p:messages/>
+                            <p:growl id="msjCadastroEstoqueVela" showDetail="true" />
+                            <h:panelGrid columns="2" id="painelGridDialogoCadastroEstoqueVela" >
+                                
+                                <p:outputLabel id="lblEstoqueVela" value="EstoqueVela" />
+                                <p:inputText id="edtEstoqueVela" value="#{estoqueVelaBean.estoqueVela.descricao}" maxlength="100" required="true" style="width: 300px"
+                                             onkeyup="maiuscula(this);"
+                                            onkeypress="return TABEnter(event, 'edtTelefone');">
+                                            <p:ajax event="blur" update="@this" listener="#{estoqueVelaBean.handleKeyEvent}" />
+                                </p:inputText>
+                                
+                                
+                               
+                                
+
+                                <f:facet name="footer">
+                                    <h:panelGrid id="painelGridRodapeCadastroEstoqueVela" columns="4">
+                                        <p:commandButton value="#{estoqueVelaBean.accion}" actionListener="#{estoqueVelaBean.operar}" oncomplete="tratarRequisicao(xhr, status, args)" update="frmDialogoCadastroEstoqueVela :frmConsultaEstoqueVelas:dataTabela" />
+                                        <p:commandButton value="Excluir" />
+                                        <p:commandButton value="Limpar" />
+                                        <p:commandButton value="Sair" oncomplete="PF('wdialogoCadastroEstoqueVela').hide();" />
+                                    </h:panelGrid>
+                                </f:facet> 
+                            </h:panelGrid>
+                        </h:form>
+                    </p:dialog>
+
+                    <script type="text/javascript">
+                        function tratarRequisicao(xhr, status, args) {
+                            if (!args.fecharDialogo) {
+                                jQuery("#dialogoCadastroEstoqueVela").effect("shake", {times: 10}, 100);
+                            } else {
+                                PF('wdialogoCadastroEstoqueVela').hide();
+                            }
+                        }
+                        
+                        
+                        function TABEnter(pEvent, campo) {
+                            if (pEvent.keyCode === 13) {
+                                //return pEvent.keyCode = 9;  
+                                //document.getElementById('frmDialogoCadastroVenda:' + campo).focus();
+                                //document.getElementById('frmDialogoCadastroVenda:' + campo).value='';
+                                document.getElementById('frmDialogoCadastroEstoqueVela:' + campo).select();
+                                return false;
+                            }
+                            return true;
+                        }
+                    </script>
+                
+            </ui:define>
+        </ui:composition>
+
+    </body>
+</html>

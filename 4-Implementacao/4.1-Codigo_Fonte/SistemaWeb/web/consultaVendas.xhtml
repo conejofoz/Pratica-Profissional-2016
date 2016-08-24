@@ -1,0 +1,285 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+
+    <body>
+        <ui:composition template="./WEB-INF/templates/telaPadrao.xhtml">
+            <ui:define name="content">
+                <p:panel header="Consulta de vendas" footer="SistemaWeb">
+                    <f:event type="preRenderView" listener="#{vendaBean.listar()}" />
+                    <p:growl id="msj" showDetail="true" />
+                    <h:form id="frmConsultaVenda" style="height: 600px" >
+                        <p:growl id="msgConsultaVenda" showDetail="true" />
+                        <p:commandButton id="btnAcao" value="Novo" oncomplete="PF('wdialogoCadastroVenda').show();" actionListener="#{vendaBean.setAccion('Registrar')}" update=":dialogoCadastroVenda" >
+                            <p:ajax listener="#{vendaBean.novaVenda()}" />
+                        </p:commandButton>
+
+
+
+
+
+                        <p:dataTable id="dataTabela" value="#{vendaBean.listaVenda}" var="var_venda"
+                                     paginator="true"
+                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="5,10,15" rows="13">
+
+                            <p:column headerText="Número">
+                                <p:outputLabel value="#{var_venda.id}"/>
+                            </p:column>
+
+                            <p:column headerText="Data">
+                                <p:outputLabel value="#{var_venda.data}"/>
+                            </p:column>
+
+                            <p:column headerText="Total" style="width: 60px">
+                                <p:outputLabel value="#{var_venda.total}" >
+                                    <f:convertNumber type="currency" currencySymbol="R$ " minFractionDigits="2"/>
+                                </p:outputLabel>
+                            </p:column>
+
+                            <p:column headerText="Cliente" style="width: 60px">
+                                <p:outputLabel value="#{var_venda.cliente.nomeCliente}" /> 
+                            </p:column>
+
+
+                            <p:column width="50" >
+                                <p:commandButton id="btnEditar" icon="ui-icon-pencil" actionListener="#{vendaBean.buscaPorID(var_venda)}" oncomplete="PF('wdialogoCadastroVenda').show();" update=":dialogoCadastroVenda"  >
+                                    <f:setPropertyActionListener target="#{vendaBean.vendaSelecionado}" value="#{var_venda}"/>
+                                </p:commandButton>
+                            </p:column>
+
+                            <p:column width="40" >
+                                <p:commandButton id="btnLixeira" icon="ui-icon-trash" oncomplete="PF('wdialogoConfirmacaoExclusaoVenda').show();">
+                                    <f:setPropertyActionListener target="#{vendaBean.vendaSelecionado}" value="#{var_venda}"/>
+                                </p:commandButton>
+                            </p:column>
+                            <p:column width="40">
+                                <p:commandButton icon="ui-icon-check" title="Selecionar"
+                                                 action="#{vendaBean.selecionar(var_venda)}"
+                                                 process="@this" />
+                            </p:column>
+                        </p:dataTable>
+
+
+
+
+
+
+
+
+
+
+
+
+                        <!--DIALOGO DE CONFIRMAÇÃO DE EXCLUSÃO**********************************************************************-->
+                        <p:confirmDialog id="dialogoConfirmacaoExclusaoVenda" header="Exclusão"
+                                         message="Tem certeza que deseja excluir? #{vendaBean.venda.id}"
+                                         widgetVar="wdialogoConfirmacaoExclusaoVenda">
+
+                            <p:commandButton id="btnApagar" value="Sim" update="dataTabela :frmConsultaVenda:msgConsultaVenda" oncomplete="PF('wdialogoConfirmacaoExclusaoVenda').hide();" action="#{vendaBean.apagar()}"/>
+                            <p:commandButton value="Não" oncomplete="PF('wdialogoConfirmacaoExclusaoVenda').hide();" />
+                        </p:confirmDialog>
+
+
+
+
+
+                    </h:form>
+
+
+                    <!--DIALOGO DE CADASTRO-->
+                    <p:dialog header="Cadastro de vendas" widgetVar="wdialogoCadastroVenda" id="dialogoCadastroVenda" width="1000" height="600">
+                        <h:form id="frmDialogoCadastroVenda" >
+                            <p:messages closable="true"/>
+                            <p:growl id="msjCadastroVenda" showDetail="true" />
+                            <p:panelGrid columns="1" id="painelGridDialogoCadastroVenda" >
+
+                                <p:outputLabel id="lblVenda" value="Cliente:" />
+                                <p:inputText  id="edtCliente" value="#{vendaBean.venda.cliente.id}" label="Id cliente" maxlength="100" required="true" onkeypress="return TABEnter(event, 'edtCodigoProduto', this);" onfocus="apagaZero(this);" />
+
+                                <p:outputLabel value="Data" />
+                                <p:calendar id="edtDataVenda" pattern="dd/MM/yyyy" locale="pt_BR" value="#{vendaBean.venda.data}" onkeypress="return TABEnter(event, 'edtCodigoProduto', this);" />
+
+
+
+
+                                <!--painel dos dados do produto-->
+                                <h:panelGrid columns="5" >
+                                    <h:panelGrid columns="1">
+                                        <p:outputLabel value="Código" />
+                                        <p:inputText id="edtCodigoProduto" style="width: 60px" value="#{vendaBean.produto.id}" onkeypress="return TABEnter(event, 'edtQuantidade', this);" >
+                                            <p:ajax listener="#{vendaBean.buscaProdutoByCodigo}" event="change" process="edtCodigoProduto" update="edtNomeProduto edtPreco msjCadastroVenda" />
+                                        </p:inputText>
+                                    </h:panelGrid>
+
+                                    <h:panelGrid columns="1">
+                                        <p:outputLabel value="Descrição" />
+                                        <p:inputText id="edtNomeProduto" value="#{vendaBean.produto.nomeProduto}" style="width: 300px" />
+                                    </h:panelGrid>
+
+
+                                    <h:panelGrid columns="1">    
+                                        <p:outputLabel value="Quantidade" />
+                                        <p:inputText id="edtQuantidade" value="#{vendaBean.quantidade}" style="width: 60px" onkeypress="return TABEnter(event, 'edtPreco', this);" />
+                                    </h:panelGrid>
+
+                                    <h:panelGroup >
+                                        
+                                            <p:outputLabel value="Preço" /><br />
+                                            <h:panelGrid columns="2">
+                                                <p:inputText id="edtPreco" value="#{vendaBean.precoUnitario}" style="width: 60px" onkeypress="return TABEnter(event, 'edtCodigoProduto', this);" >
+                                                    <f:convertNumber minFractionDigits="2" locale="pt_BR"/>
+                                                </p:inputText>
+                                                <p:commandButton id="btnInserirProduto" value="Inserir" actionListener="#{vendaBean.inserirNaGrid}" update="dataTableDetalheVenda" onclick="document.getElementById('frmDialogoCadastroVenda:edtCodigoProduto').select();" />
+                                            </h:panelGrid>
+                                    </h:panelGroup>
+
+                                </h:panelGrid>
+
+
+
+
+
+
+
+
+
+
+                                <p:dataTable id="dataTableDetalheVenda" value="#{vendaBean.listaDetalhe}" var="var_detalhe" >
+                                    <p:column headerText="Código" style="width: 120px">
+                                        <p:inputText value="#{var_detalhe.produto.id}" size="10" />
+                                    </p:column>
+
+                                    <p:column headerText="Descrição produto" >
+                                        <p:inputText value="#{var_detalhe.produto.nomeProduto}" style="width: 98%" />
+                                    </p:column>
+
+                                    <p:column headerText="Quant." style="width: 120px">
+                                        <p:inputText value="#{var_detalhe.quantidade}" size="10" >
+
+                                        </p:inputText>
+                                    </p:column>
+
+                                    <p:column headerText="Preço" style="width: 120px">
+                                        <p:inputText value="#{var_detalhe.preco}" size="10" >
+
+                                        </p:inputText>
+                                    </p:column>
+
+
+
+                                    <p:column headerText="Total" style="width: 60px">
+                                        <p:inputText value="#{var_detalhe.total}" size="10" >
+                                            <f:convertNumber type="currency" currencySymbol="R$ " minFractionDigits="2"/>
+                                        </p:inputText>
+                                    </p:column>
+
+                                    <p:column width="40" >
+                                        <p:commandButton id="btnLixeira" icon="ui-icon-trash" actionListener="#{vendaBean.removerDaGrid(var_detalhe)}" update="dataTableDetalheVenda" >
+                                            <f:setPropertyActionListener target="#{vendaBean.detalheVendaSelecionado}" value="#{var_detalhe}"/>
+
+                                        </p:commandButton>
+                                    </p:column>
+
+                                    <p:columnGroup type="footer" >
+                                        <p:row>
+                                            <p:column colspan="4" footerText="Subtotal" style="text-align: right" />
+                                            <p:column footerText="R$ 0,00" style="text-align: right" />
+                                        </p:row>
+                                    </p:columnGroup>
+                                </p:dataTable>
+
+
+
+
+
+
+                                <f:facet name="footer">
+                                    <h:panelGrid id="painelGridRodapeCadastroVenda" columns="4">
+                                        <p:commandButton value="#{vendaBean.accion}" actionListener="#{vendaBean.operar}" oncomplete="tratarRequisicao(xhr, status, args)" update="frmDialogoCadastroVenda :frmConsultaVenda:dataTabela" />
+                                        <p:commandButton value="Excluir" />
+                                        <p:commandButton value="Limpar" />
+                                        <p:commandButton value="Sair" />
+                                    </h:panelGrid>
+
+                                </f:facet> 
+                            </p:panelGrid>
+
+                            <!--DIALOGO DE CONFIRMAÇÃO DE EXCLUSÃO**********************************************************************-->
+                            <p:confirmDialog id="dialogoConfirmacaoExclusaoDetalhe" header="Exclusão"
+                                             message="Tem certeza que deseja excluir? "
+                                             widgetVar="wdialogoConfirmacaoExclusaoDetalhe">
+
+                                <p:commandButton id="btnApagarDetalhe" value="Sim" update="dataTableDetalheVenda :frmConsultaVenda:msgConsultaVenda" oncomplete="PF('wdialogoConfirmacaoExclusaoDetalhe').hide();" action="#{vendaBean.removerDaGrid}"/>
+                                <p:commandButton value="Não" oncomplete="PF('wdialogoConfirmacaoExclusaoDetalhe').hide();" />
+                            </p:confirmDialog>    
+                        </h:form>
+                    </p:dialog>
+
+
+
+                    <script type="text/javascript">
+                        function tratarRequisicao(xhr, status, args) {
+                            if (!args.fecharDialogo) {
+                                jQuery("#dialogoCadastroVenda").effect("shake", {times: 10}, 100);
+                            } else {
+                                PF('wdialogoCadastroVenda').hide();
+                            }
+                        }
+
+
+
+
+                        function TABEnter(pEvent, campo, campoAtual) {
+
+                            if (pEvent.keyCode === 13) {
+
+                                //return pEvent.keyCode = 9;  
+                                //document.getElementById('frmDialogoCadastroVenda:' + campo).focus();
+                                //document.getElementById('frmDialogoCadastroVenda:' + campo).value='';
+                                document.getElementById('frmDialogoCadastroVenda:' + campo).select();
+                                //alert(campoAtual.id);
+                                if (campoAtual.id === 'frmDialogoCadastroVenda:edtPreco') {
+
+                                    document.getElementById('frmDialogoCadastroVenda:btnInserirProduto').click();
+                                }
+                                return false;
+                            }
+
+                            return true;
+
+                        }
+                        
+                        
+                        function apagaZero(valorCampo) {
+                            //var str = valorCampo.value;
+                            //alert(valorCampo.value.substring(2,3));
+                            //alert(valorCampo.value.substring(0,1));
+                            //if (valorCampo.value==='0.0'){
+                            //if (valorCampo.value.substring(0,1)==='0'){  
+                            //if (parseFloat(valorCampo.value) === 0) {
+                            if (valorCampo.value==='0,00' || valorCampo.value==='0'){
+                                valorCampo.value = '';
+                            }
+                            return true;
+                        }
+                        
+                        
+                        function insereZero(valorCampo) {
+                            if (valorCampo.value===''){
+                                valorCampo.value = '0,00';
+                            }
+                            return true;
+                        }
+
+                    </script>
+                </p:panel>
+            </ui:define>
+        </ui:composition>
+
+    </body>
+</html>

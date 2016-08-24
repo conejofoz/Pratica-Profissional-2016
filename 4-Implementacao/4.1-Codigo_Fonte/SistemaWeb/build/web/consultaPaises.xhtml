@@ -1,0 +1,116 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head >
+        <h:outputStylesheet name="./css/default.css"/>
+        <h:outputStylesheet name="./css/cssLayout.css"/>
+    </h:head>
+
+    <body>
+        <ui:composition template="./WEB-INF/templates/telaPadrao.xhtml">
+            <ui:define name="content">
+                <!--pagina estados-->
+                <p:dialog id="dialogoConsultaPaises" header="Consula de países" widgetVar="wdialogoConsultaPaises" visible="true" width="750" height="350" >        
+                    <!-- <p:panel header="Consulta de países" footer="SistemaWeb">-->
+                    <f:event type="preRenderView" listener="#{paisBean.listar()}" />
+                    <p:growl id="msj" showDetail="true" />
+                    <h:form id="frmConsultaPais" >
+                        <p:growl id="msgConsultaPais" showDetail="true" />
+                        <p:commandButton id="btnAcao" value="Novo" oncomplete="PF('wdialogoCadastroPais').show();" actionListener="#{paisBean.setAccion('Registrar')}" action="#{paisBean.iniciarObjeto()}" update=":dialogoCadastroPais" />
+                        <p:dataTable id="dataTabela" value="#{paisBean.listaPais}" var="var_pais"
+                                     paginator="true" paginatorPosition="bottom"
+                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="5,10,15" rows="7">
+
+                            <p:column headerText="Sigla" style="width: 30px">
+                                <p:outputLabel id="contatoColuna" value="#{var_pais.siglaPais}" />
+                            </p:column>
+
+                            <p:column headerText="Nome do país">
+                                <p:outputLabel value="#{var_pais.nomePais}"/>
+                            </p:column>
+
+                            <p:column width="50" >
+                                <p:commandButton id="btnEditar" icon="ui-icon-pencil" actionListener="#{paisBean.buscaPorID(var_pais)}" oncomplete="PF('wdialogoCadastroPais').show();" update=":dialogoCadastroPais"  >
+                                    <f:setPropertyActionListener target="#{paisBean.paisSelecionado}" value="#{var_pais}"/>
+                                </p:commandButton>
+                            </p:column>
+
+                            <p:column width="40" >
+                                <p:commandButton id="btnLixeira" icon="ui-icon-trash" oncomplete="PF('wdialogoConfirmacaoExclusaoPais').show();">
+                                    <f:setPropertyActionListener target="#{paisBean.paisSelecionado}" value="#{var_pais}"/>
+                                </p:commandButton>
+                            </p:column>
+                            <p:column width="40">
+                                <p:commandButton icon="ui-icon-check" title="Selecionar"
+                                                 action="#{paisBean.selecionar(var_pais)}">
+                                </p:commandButton>
+                            </p:column>
+                        </p:dataTable>
+
+
+                    </h:form>
+
+                </p:dialog>
+
+
+                <!--DIALOGO DE CONFIRMAÇÃO DE EXCLUSÃO**********************************************************************-->
+                <p:confirmDialog id="dialogoConfirmacaoExclusaoPais" header="Exclusão"
+                                 message="Tem certeza que deseja excluir? #{paisBean.pais.nomePais}"
+                                 widgetVar="wdialogoConfirmacaoExclusaoPais">
+                    <h:form id="frmExclusaoPaises" >
+
+                        <p:commandButton id="btnApagar" value="Sim" update=":frmConsultaPais:dataTabela :frmConsultaPais:msgConsultaPais" oncomplete="PF('wdialogoConfirmacaoExclusaoPais').hide();" action="#{paisBean.apagar()}"/>
+                        <p:commandButton value="Não" oncomplete="PF('wdialogoConfirmacaoExclusaoPais').hide();" />
+                    </h:form>
+                </p:confirmDialog>
+
+                <!--DIALOGO DE CADASTRO-->
+                <p:dialog header="Cadastro de países" widgetVar="wdialogoCadastroPais" id="dialogoCadastroPais" width="600" height="200" modal="true">
+
+                    <h:form id="frmDialogoCadastroPais" >
+                        <!--<p:messages autoUpdate="true" closable="true" escape="true" />-->
+                        <p:growl id="msjCadastroPais" showDetail="true" />
+                        <p:panel style="height: 100px; padding-top: 20px" >
+                            <h:panelGrid columns="2" id="painelGridDialogoCadastroPais" >
+                                
+                                <p:outputLabel id="lblSigla" value="Sigla" />
+                                <p:inputText id="edtSigla" value="#{paisBean.pais.siglaPais}" maxlength="2" size="3" required="true" onkeyup="maiuscula(this)" />
+                                <p:outputLabel id="lblPais" value="País" />
+                                <p:inputText id="edtPais" value="#{paisBean.pais.nomePais}" maxlength="100" required="true" onkeyup="maiuscula(this)" />
+                            </h:panelGrid> 
+                        </p:panel>
+                        <p:panel >
+                        <h:panelGrid id="painelGridRodapeCadastroPais" columns="5">
+                            <p:commandButton style="display: none" />
+                            <p:commandButton value="#{paisBean.accion}" actionListener="#{paisBean.operar}" oncomplete="tratarRequisicaoPaises(xhr, status, args)" update="frmDialogoCadastroPais :frmConsultaPais:dataTabela" />
+                            <p:commandButton value="Excluir" />
+                            <p:commandButton value="Limpar" />
+                            <p:commandButton value="Sair" oncomplete="PF('wdialogoCadastroPais').hide();" />
+                        </h:panelGrid>
+                        </p:panel>
+
+                    </h:form>
+
+                </p:dialog>
+
+                <script type="text/javascript">
+                    function tratarRequisicaoPaises(xhr, status, args) {
+                        if (!args.fecharDialogo) {
+                            jQuery("#dialogoCadastroPais").effect("shake", {times: 10}, 100);
+                        } else {
+                            PF('wdialogoCadastroPais').hide();
+                        }
+                    }
+                </script>
+                <!--</p:panel>-->
+                <!--fim pagina paises-->
+
+            </ui:define>
+        </ui:composition>
+    </body>
+</html>

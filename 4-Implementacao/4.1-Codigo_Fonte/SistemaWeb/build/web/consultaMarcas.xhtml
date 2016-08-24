@@ -1,0 +1,165 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+
+    <body>
+        <ui:composition template="./WEB-INF/templates/telaPadrao.xhtml">
+            <ui:define name="content">
+                <!--pagina marcas-->
+                <p:dialog header="Consulta de marcas" id="dialogoConsultaMarcas" widgetVar="wdialogoConsultaMarcas" width="600" height="300" visible="true" >
+                    <!--pra funcionar a consulta tem que tirar o prerender view-->
+                    <f:event type="preRenderView" listener="#{marcaBean.listar()}" />
+
+                    <h:form id="frmConsultaMarcas" >
+                        <p:growl id="msgConsultaMarca" showDetail="true" />
+
+                        <p:panelGrid columns="3" >
+                            <h:panelGroup >
+                                <p:outputLabel id="lblConsultaNome" value="Nome" /><br />
+                                <p:inputText id="edtConsultaNome" value="#{marcaBean.consultaNome}" />
+                                <p:commandButton id="btnConsultar" value="Consultar" actionListener="#{marcaBean.consultar}" update="dataTabela msgConsultaMarca" />
+                            </h:panelGroup>
+                        </p:panelGrid>
+                        <p:commandButton id="btnAcao" value="Novo" oncomplete="PF('wdialogoCadastroMarca').show();" actionListener="#{marcaBean.setAccion('Registrar')}" action="#{marcaBean.zerarMarca}" update=":dialogoCadastroMarca" />
+                        <p:dataTable id="dataTabela" value="#{marcaBean.listaMarca}" var="var_marca"
+                                     paginator="true" paginatorPosition="bottom"
+                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="5,10,15" rows="10">
+
+                            <p:column headerText="Código" width="100">
+                                <p:outputLabel value="#{var_marca.id}"/>
+                            </p:column>
+
+                            <p:column headerText="Nome do marca">
+                                <p:outputLabel value="#{var_marca.nomeMarca}"/>
+                            </p:column>
+
+
+                            <p:column width="30" >
+                                <p:commandButton id="btnEditar" icon="ui-icon-pencil" actionListener="#{marcaBean.buscaPorID(var_marca)}" oncomplete="PF('wdialogoCadastroMarca').show();" update=":dialogoCadastroMarca"  >
+                                    <f:setPropertyActionListener target="#{marcaBean.marcaSelecionado}" value="#{var_marca}"/>
+                                </p:commandButton>
+                            </p:column>
+
+                            <p:column width="30" >
+                                <p:commandButton id="btnLixeira" icon="ui-icon-trash" oncomplete="PF('wdialogoConfirmacaoExclusaoMarca').show();">
+                                    <f:setPropertyActionListener target="#{marcaBean.marcaSelecionado}" value="#{var_marca}"/>
+                                </p:commandButton>
+                            </p:column>
+                            <p:column width="30">
+                                <p:commandButton icon="ui-icon-check" title="Selecionar"
+                                                 action="#{marcaBean.selecionar(var_marca)}"
+                                                 process="@this" />
+                            </p:column>
+                        </p:dataTable>
+
+                    </h:form>
+                </p:dialog>
+
+
+
+
+
+                <!--DIALOGO DE CONFIRMAÇÃO DE EXCLUSÃO**********************************************************************-->
+                <p:confirmDialog id="dialogoConfirmacaoExclusaoMarca" header="Exclusão"
+                                 message="Tem certeza que deseja excluir? #{marcaBean.marca.nomeMarca}"
+                                 widgetVar="wdialogoConfirmacaoExclusaoMarca">
+                    <h:form id="frmExclusaoMarca" >
+                        <p:commandButton id="btnApagar" value="Sim" update=":frmConsultaMarcas:dataTabela :frmConsultaMarcas:msgConsultaMarca" oncomplete="PF('wdialogoConfirmacaoExclusaoMarca').hide();" action="#{marcaBean.apagar()}"/>
+                        <p:commandButton value="Não" oncomplete="PF('wdialogoConfirmacaoExclusaoMarca').hide();" />
+                    </h:form>
+                </p:confirmDialog>
+
+
+
+
+
+
+
+
+
+
+                <!--DIALOGO DE CADASTRO-->
+                <p:dialog header="Cadastro de marcas" widgetVar="wdialogoCadastroMarca" id="dialogoCadastroMarca" position="center" showEffect="slide" width="500" height="100">
+                    <h:form id="frmDialogoCadastroMarca" >
+                        
+                        <p:growl id="msjCadastroMarca" showDetail="true" />
+                        <h:panelGrid columns="3" id="painelGridDialogoCadastroMarca" >
+
+
+
+
+
+                            <h:panelGroup>
+                                <p:outputLabel id="lblMarca" value="Marca" styleClass="negrito" /><br />
+                                <p:inputText id="edtMarca" value="#{marcaBean.marca.nomeMarca}" maxlength="100" required="true" size="50"
+                                             onkeypress="return TABEnter(event, 'edtCep');">
+                                    <p:ajax event="blur" update="@this" listener="#{marcaBean.handleKeyEvent}" />
+                                </p:inputText>
+                            </h:panelGroup>
+
+
+
+
+                            <!--fim busca cep-->
+
+
+
+                            <f:facet name="footer">
+                                <h:panelGrid id="painelGridRodapeCadastroMarca" columns="5">
+                                    <p:commandButton value="#{marcaBean.accion}" actionListener="#{marcaBean.operar}" oncomplete="tratarRequisicaoMarcas(xhr, status, args)" update="frmDialogoCadastroMarca :frmConsultaMarcas:dataTabela" />
+                                    <p:commandButton value="Excluir" />
+                                    <p:commandButton value="Limpar" />
+                                    <p:commandButton value="Sair" oncomplete="PF('wdialogoCadastroMarca').hide();" />
+
+                                </h:panelGrid>
+                            </f:facet> 
+                        </h:panelGrid>
+                    </h:form>
+
+
+
+
+                </p:dialog>
+
+                <script type="text/javascript">
+                    function tratarRequisicaoMarcas(xhr, status, args) {
+                        if (!args.fecharDialogo) {
+                            jQuery("#dialogoCadastroMarca").effect("shake", {times: 10}, 100);
+                        } else {
+                            PF('wdialogoCadastroMarca').hide();
+                        }
+                    }
+
+
+                    function TABEnter(pEvent, campo) {
+                        if (pEvent.keyCode === 13) {
+                            //return pEvent.keyCode = 9;  
+                            //document.getElementById('frmDialogoCadastroVenda:' + campo).focus();
+                            //document.getElementById('frmDialogoCadastroVenda:' + campo).value='';
+                            document.getElementById('frmDialogoCadastroMarca:' + campo).select();
+                            return false;
+                        }
+                        return true;
+                    }
+
+
+
+
+
+
+
+
+
+
+                </script>
+                <!--fim pagina marcas-->
+            </ui:define>
+        </ui:composition>
+
+    </body>
+</html>

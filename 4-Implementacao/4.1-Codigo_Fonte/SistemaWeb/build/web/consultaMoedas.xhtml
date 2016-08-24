@@ -1,0 +1,128 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+
+    <body>
+        <ui:composition template="./WEB-INF/templates/telaPadrao.xhtml">
+            <ui:define name="content">
+                <p:panel header="Consulta de moedas" footer="SistemaWeb">
+                    <f:event type="preRenderView" listener="#{moedaBean.listar()}" />
+                    <p:growl id="msj" showDetail="true" />
+                    <h:form id="frmConsultaMoeda" style="height: 600px" >
+                        <p:growl id="msgConsultaMoeda" showDetail="true" />
+                        <p:commandButton id="btnAcao" value="Novo" oncomplete="PF('wdialogoCadastroMoeda').show();" actionListener="#{moedaBean.setAccion('Registrar')}" action="#{moedaBean.zerarMoeda}" update=":dialogoCadastroMoeda" />
+                        <p:dataTable id="dataTabela" value="#{moedaBean.listaMoeda}" var="var_moeda"
+                                     paginator="true"
+                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="5,10,15">
+
+                            <p:column headerText="Código" style="width: 50px">
+                                <p:outputLabel value="#{var_moeda.id}"/>
+                            </p:column>
+                            
+                            <p:column headerText="Sigla" style="width: 30px">
+                                <p:outputLabel value="#{var_moeda.siglaMoeda}"/>
+                            </p:column>
+                            
+                            <p:column headerText="Nome do moeda">
+                                <p:outputLabel value="#{var_moeda.nomeMoeda}"/>
+                            </p:column>
+                            
+                            
+                            
+
+                            <p:column width="30" >
+                                <p:commandButton id="btnEditar" icon="ui-icon-pencil" actionListener="#{moedaBean.buscaPorID(var_moeda)}" oncomplete="PF('wdialogoCadastroMoeda').show();" update=":dialogoCadastroMoeda"  >
+                                    <f:setPropertyActionListener target="#{moedaBean.moedaSelecionado}" value="#{var_moeda}"/>
+                                </p:commandButton>
+                            </p:column>
+
+                            <p:column width="30" >
+                                <p:commandButton id="btnLixeira" icon="ui-icon-trash" oncomplete="PF('wdialogoConfirmacaoExclusaoMoeda').show();">
+                                    <f:setPropertyActionListener target="#{moedaBean.moedaSelecionado}" value="#{var_moeda}"/>
+                                </p:commandButton>
+                            </p:column>
+                            <p:column width="30">
+                                <p:commandButton icon="ui-icon-check" title="Selecionar"
+                                                 action="#{moedaBean.selecionar(var_moeda)}"
+                                                 process="@this" />
+                            </p:column>
+                        </p:dataTable>
+                        
+                        <!--DIALOGO DE CONFIRMAÇÃO DE EXCLUSÃO**********************************************************************-->
+                        <p:confirmDialog id="dialogoConfirmacaoExclusaoMoeda" header="Exclusão"
+                                         message="Tem certeza que deseja excluir? #{moedaBean.moeda.nomeMoeda}"
+                                         widgetVar="wdialogoConfirmacaoExclusaoMoeda">
+
+                            <p:commandButton id="btnApagar" value="Sim" update="dataTabela :frmConsultaMoeda:msgConsultaMoeda" oncomplete="PF('wdialogoConfirmacaoExclusaoMoeda').hide();" action="#{moedaBean.apagar()}"/>
+                            <p:commandButton value="Não" oncomplete="PF('wdialogoConfirmacaoExclusaoMoeda').hide();" />
+                        </p:confirmDialog>
+                    </h:form>
+
+                    <!--DIALOGO DE CADASTRO-->
+                    <p:dialog header="Cadastro de moedas" widgetVar="wdialogoCadastroMoeda" id="dialogoCadastroMoeda" width="600" height="300">
+                        <h:form id="frmDialogoCadastroMoeda" >
+                            <p:messages/>
+                            <p:growl id="msjCadastroMoeda" showDetail="true" />
+                            <h:panelGrid columns="2" id="painelGridDialogoCadastroMoeda" >
+                                
+                                
+                                <p:outputLabel id="lblSiglaMoeda" value="Sigla" />
+                                <p:inputText id="edtSiglaMoeda" value="#{moedaBean.moeda.siglaMoeda}" maxlength="2" required="true" style="width: 30px"
+                                            onkeypress="return TABEnter(event, 'edtMoeda');">
+                                            <p:ajax event="blur" update="@this" listener="#{moedaBean.handleKeyEventSiglaMoeda}" />
+                                </p:inputText>
+                                
+                                <p:outputLabel id="lblMoeda" value="Moeda" />
+                                <p:inputText id="edtMoeda" value="#{moedaBean.moeda.nomeMoeda}" maxlength="100" required="true" style="width: 300px"
+                                            onkeypress="return TABEnter(event, 'edtSiglaMoeda');">
+                                            <p:ajax event="blur" update="@this" listener="#{moedaBean.handleKeyEvent}" />
+                                </p:inputText>
+                                
+                                
+                               
+                                
+
+                                <f:facet name="footer">
+                                    <h:panelGrid id="painelGridRodapeCadastroMoeda" columns="4">
+                                        <p:commandButton value="#{moedaBean.accion}" actionListener="#{moedaBean.operar}" oncomplete="tratarRequisicao(xhr, status, args)" update="frmDialogoCadastroMoeda :frmConsultaMoeda:dataTabela" />
+                                        <p:commandButton value="Excluir" />
+                                        <p:commandButton value="Limpar" />
+                                        <p:commandButton value="Sair" />
+                                    </h:panelGrid>
+                                </f:facet> 
+                            </h:panelGrid>
+                        </h:form>
+                    </p:dialog>
+
+                    <script type="text/javascript">
+                        function tratarRequisicao(xhr, status, args) {
+                            if (!args.fecharDialogo) {
+                                jQuery("#dialogoCadastroMoeda").effect("shake", {times: 10}, 100);
+                            } else {
+                                PF('wdialogoCadastroMoeda').hide();
+                            }
+                        }
+                        
+                        
+                        function TABEnter(pEvent, campo) {
+                            if (pEvent.keyCode === 13) {
+                                //return pEvent.keyCode = 9;  
+                                //document.getElementById('frmDialogoCadastroVenda:' + campo).focus();
+                                //document.getElementById('frmDialogoCadastroVenda:' + campo).value='';
+                                document.getElementById('frmDialogoCadastroMoeda:' + campo).select();
+                                return false;
+                            }
+                            return true;
+                        }
+                    </script>
+                </p:panel>
+            </ui:define>
+        </ui:composition>
+
+    </body>
+</html>

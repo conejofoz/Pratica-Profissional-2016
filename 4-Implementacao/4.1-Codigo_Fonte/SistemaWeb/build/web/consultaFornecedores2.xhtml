@@ -1,0 +1,387 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+    
+    <h:head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <h:outputStylesheet name="./css/default.css"/>
+        <h:outputStylesheet name="./css/cssLayout.css"/>
+        <title>Consulta fornecedores auxiliar</title>
+        
+        <script type="text/javascript">
+            PrimeFaces.locales['pt'] = {
+                closeText: 'Fechar',
+                prevText: 'Anterior',
+                nextText: 'Próximo',
+                //currentText: 'Começo',  
+                monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
+                monthNamesShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+                dayNames: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'],
+                dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],
+                dayNamesMin: ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'],
+                weekHeader: 'Semana',
+                firstDay: 1,
+                isRTL: false,
+                showMonthAfterYear: false,
+                yearSuffix: '',
+                timeOnlyTitle: 'Só Horas',
+                timeText: 'Tempo',
+                hourText: 'Hora',
+                minuteText: 'Minuto',
+                secondText: 'Segundo',
+                currentText: 'Data Atual',
+                ampm: false,
+                month: 'Mês',
+                week: 'Semana',
+                day: 'Dia',
+                allDayText: 'Todo Dia'
+            };
+        </script>
+       
+        
+    </h:head>
+
+
+    <h:body>
+        
+                <p:panel id="painelPrincipal" footer="SistemaWeb">
+                    <!--pra funcionar a consulta tem que tirar o prerender view-->
+                    <!--<f:event type="preRenderView" listener="" />-->
+                    <p:growl id="msj" showDetail="true" />
+                    <h:form id="frmConsultaFornecedor" style="height: 380px" >
+                        <p:growl id="msgConsultaFornecedor" showDetail="true" />
+                        
+                        <h:panelGrid columns="3" >
+                            <h:panelGroup >
+                                <p:outputLabel id="lblConsultaNome" value="Nome" /><br />
+                                <p:inputText id="edtConsultaNome" value="#{fornecedorBean.consultaNome}" />
+                                <p:commandButton id="btnConsultar" value="Consultar" actionListener="#{fornecedorBean.consultar()}" update="dataTabela msgConsultaFornecedor" />
+                            </h:panelGroup>
+                        </h:panelGrid>
+                        <p:commandButton id="btnAcao" value="Novo" oncomplete="PF('wdialogoCadastroFornecedor').show();" actionListener="#{fornecedorBean.setAccion('Registrar')}" action="#{fornecedorBean.zerarFornecedor}" update=":dialogoCadastroFornecedor" />
+                        <p:dataTable id="dataTabela" value="#{fornecedorBean.listaFornecedor}" var="var_fornecedor"
+                                     paginator="true"
+                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="5,10,15" rows="10">
+
+                            <p:column headerText="Código" style="width: 50px">
+                                <p:outputLabel value="#{var_fornecedor.id}"/>
+                            </p:column>
+
+                            <p:column headerText="Nome do fornecedor">
+                                <p:outputLabel value="#{var_fornecedor.nomeFornecedor}"/>
+                            </p:column>
+
+                            <p:column headerText="Telefone" >
+                                <p:outputLabel value="#{var_fornecedor.telefone}">
+                                    <f:convertNumber type="currency" currencySymbol="R$ " minFractionDigits="2"/>
+                                </p:outputLabel>
+                            </p:column>
+
+                            <p:column headerText="E-mail">
+                                <p:outputLabel value="#{var_fornecedor.email}" >
+                                    <f:convertNumber type="number" minFractionDigits="2" />
+                                </p:outputLabel> 
+                            </p:column>
+
+
+                            <p:column width="30" >
+                                <p:commandButton id="btnEditar" icon="ui-icon-pencil" actionListener="#{fornecedorBean.buscaPorID(var_fornecedor)}" oncomplete="PF('wdialogoCadastroFornecedor').show();" update=":dialogoCadastroFornecedor :frmDialogoCadastroFornecedor:edtTipoPessoa"  >
+                                    <f:setPropertyActionListener target="#{fornecedorBean.fornecedorSelecionado}" value="#{var_fornecedor}"/>
+                                </p:commandButton>
+                            </p:column>
+
+                            <p:column width="30" >
+                                <p:commandButton id="btnLixeira" icon="ui-icon-trash" oncomplete="PF('wdialogoConfirmacaoExclusaoFornecedor').show();">
+                                    <f:setPropertyActionListener target="#{fornecedorBean.fornecedorSelecionado}" value="#{var_fornecedor}"/>
+                                </p:commandButton>
+                            </p:column>
+                            <p:column width="30">
+                                <p:commandButton icon="ui-icon-check" title="Selecionar"
+                                                 action="#{fornecedorBean.selecionar(var_fornecedor)}"
+                                                 process="@this" >
+                                    
+                                </p:commandButton>
+                            </p:column>
+                        </p:dataTable>
+
+                        <!--DIALOGO DE CONFIRMAÇÃO DE EXCLUSÃO**********************************************************************-->
+                        <p:confirmDialog id="dialogoConfirmacaoExclusaoFornecedor" header="Exclusão"
+                                         message="Tem certeza que deseja excluir? #{fornecedorBean.fornecedor.nomeFornecedor}"
+                                         widgetVar="wdialogoConfirmacaoExclusaoFornecedor" >
+
+                            <p:commandButton id="btnApagar" value="Sim" update="dataTabela :frmConsultaFornecedor:msgConsultaFornecedor" oncomplete="PF('wdialogoConfirmacaoExclusaoFornecedor').hide();" action="#{fornecedorBean.apagar()}"/>
+                            <p:commandButton value="Não" oncomplete="PF('wdialogoConfirmacaoExclusaoFornecedor').hide();" />
+                        </p:confirmDialog>
+                    </h:form>
+
+
+
+
+
+
+
+
+
+                    <!--DIALOGO DE CADASTRO-->
+                    <p:dialog header="Cadastro de fornecedors" widgetVar="wdialogoCadastroFornecedor" id="dialogoCadastroFornecedor" position="center" showEffect="slide" width="1200" height="600">
+                        <h:form id="frmDialogoCadastroFornecedor" >
+                            <p:messages closable="true"/>
+                            <p:growl id="msjCadastroFornecedor" showDetail="true" />
+                            <h:panelGrid columns="3" id="painelGridDialogoCadastroFornecedor" >
+
+                                <h:panelGroup>
+                                    <p:outputLabel id="lblFornecedor" value="#{fornecedorBean.nomeCampoNome}" styleClass="negrito" /><br />
+                                    <p:inputText id="edtFornecedor" value="#{fornecedorBean.fornecedor.nomeFornecedor}" maxlength="100" required="true" style="width: 300px"
+                                                 onkeypress="return TABEnter(event, 'edtCep');">
+                                        <p:ajax event="blur" update="@this" listener="#{fornecedorBean.handleKeyEvent}" />
+                                    </p:inputText>
+                                </h:panelGroup>
+
+                                <h:panelGroup >
+                                    <h:outputText value="Tipo de pessoa:" /><br />
+                                    <p:selectOneButton id="edtTipoPessoa" value="#{fornecedorBean.fornecedor.tipoPessoa}" required="true" requiredMessage="É nescessário escolher o tipo de pessoa">
+                                        <f:selectItem itemLabel="Fisica" itemValue="F" />
+                                        <f:selectItem itemLabel="Juridica" itemValue="J" />
+                                        <p:ajax event="change" listener="#{fornecedorBean.mostraCampoSexo}" update="painelGroupSexo painelGroupCpf painelGroupIdentidade painelGroupNascimento lblFornecedor painelGroupCnpj edtCpf edtSite painelGroupSite" />
+                                    </p:selectOneButton>
+                                </h:panelGroup>
+
+                                <h:panelGroup id="painelGroupSexo" >
+                                    <p:outputLabel id="lblSexo"  rendered="#{fornecedorBean.exibeCampoSexo}" styleClass="negrito" /><br />
+                                    <p:selectOneMenu id="edtSexo" value="#{fornecedorBean.fornecedor.sexo}" rendered="#{fornecedorBean.exibeCampoSexo}" required="#{fornecedorBean.requerSexo}" requiredMessage="Escolha o sexo" >
+                                        <f:selectItem itemLabel="Selecione" itemValue="#{null}" />
+                                        <f:selectItem itemLabel="Feminino" itemValue="F" />
+                                        <f:selectItem itemLabel="Masculino" itemValue="M" />
+                                    </p:selectOneMenu>
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel value="CEP: " styleClass="negrito" /><br />
+                                    <p:inputMask id="edtCep" size="10" style="padding-top: 5px" mask="99999-999" value="#{fornecedorBean.fornecedor.cep}" onkeypress="return TABEnter(event, 'edtNumero');" >
+                                        <p:ajax event="change" process="@this" listener="#{fornecedorBean.encontraCEP}" update="edtIdCidade edtEstado edtLogradouro edtNomeCidade edtBairro :msj" />
+                                    </p:inputMask>
+                                    <p:commandButton id="btnCep" value="+" icon="ui-icon-search" process="@this" action="#{fornecedorBean.encontraCEP}" update="edtIdCidade edtEstado edtLogradouro edtNomeCidade edtBairro :msj" />
+                                </h:panelGroup>
+
+                                
+                                <h:panelGroup>
+                                    <p:outputLabel value="Id. Cidade" styleClass="negrito" /><br />
+                                    <p:inputText id="edtIdCidade" value="#{fornecedorBean.fornecedor.cidade.id}" style="width: 50px"
+                                                 onkeypress="return TABEnter(event, 'edtNomeCidade');">
+                                        <p:ajax listener="#{fornecedorBean.buscaPorID2(fornecedorBean.fornecedor.cidade)}" event="change" process="edtIdCidade" update="edtNomeCidade msjCadastroFornecedor edtIdCidade" />
+                                    </p:inputText>
+                                    <p:inputText id="edtNomeCidade" value="#{fornecedorBean.fornecedor.cidade.nomeCidade}" readonly="true" size="30"
+                                                 onkeypress="return TABEnter(event, 'edtFornecedor');">
+                                    </p:inputText>
+                                    <p:commandButton icon="ui-icon-search" title="Consultar ou cadastrar Cidades" value="..."
+                                                     action="#{cidadeBean.abrirDialogoCidade}" 
+                                                     process="@this" update="@none">
+                                        <p:ajax event="dialogReturn" listener="#{fornecedorBean.setarCidadeSelecionada}"
+                                                process="@this" update="edtIdCidade edtNomeCidade edtEstado" />    
+                                    </p:commandButton>
+                                </h:panelGroup>
+
+
+                                <h:panelGroup id="painelEstado">
+                                    <h:outputLabel value="UF: " /><br />
+                                    <p:inputText id="edtEstado" size="5" value="#{fornecedorBean.fornecedor.cidade.estado.siglaEstado}" maxlength="2" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel value="Logradouro: "  /><br />
+                                    <p:inputText id="edtLogradouro" size="50" value="#{fornecedorBean.fornecedor.endereco}" maxlength="100" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel value="Número: "  /><br />
+                                    <p:inputText id="edtNumero" size="10" value="#{fornecedorBean.fornecedor.numero}" maxlength="15" onkeypress="return TABEnter(event, 'edtComplemento');" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel value="Complemento: "  /><br />
+                                    <p:inputText id="edtComplemento" size="50" value="#{fornecedorBean.fornecedor.complemento}" maxlength="50" onkeypress="return TABEnter(event, 'edtTelefone');" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel value="Bairro: " style="font-weight:bold; padding-right: 5px; " /><br />
+                                    <p:inputText id="edtBairro" size="50" value="#{fornecedorBean.fornecedor.bairro}" maxlength="50" />
+                                </h:panelGroup>
+
+                                <p:outputLabel value="" /><p:outputLabel value="" />
+
+
+                                <h:panelGrid columns="4">
+                                    <h:panelGroup>
+                                        <p:outputLabel id="lblTelefone" value="Tel. residencial:" styleClass="negrito" /><br />
+                                        <p:inputMask mask="(99)99999999" id="edtTelefone" value="#{fornecedorBean.fornecedor.telefone}" required="#{fornecedorBean.requererTelefone}" style="width: 100px"
+                                                     onkeypress="return TABEnter(event, 'edtTelefoneComercial');">
+                                        </p:inputMask>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <p:outputLabel id="lblTelefoneComercial" value="Tel. comercial:" styleClass="negrito" /><br />
+                                        <p:inputMask mask="(99)99999999" id="edtTelefoneComercial" value="#{fornecedorBean.fornecedor.telefoneComercial}" required="#{fornecedorBean.requererTelefone}" style="width: 100px"
+                                                     onkeypress="return TABEnter(event, 'edtCelular');">
+                                        </p:inputMask>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <p:outputLabel id="lblCelular" value="Celular:" styleClass="negrito" /><br />
+                                        <p:inputMask mask="(99)99999999" id="edtCelular" value="#{fornecedorBean.fornecedor.celular}" required="#{fornecedorBean.requererTelefone}" style="width: 100px"
+                                                     onkeypress="return TABEnter(event, 'edtFax');">
+                                        </p:inputMask>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <p:outputLabel id="lblFax" value="Fax:" styleClass="negrito" /><br />
+                                        <p:inputMask mask="(99)99999999" id="edtFax" value="#{fornecedorBean.fornecedor.fax}" required="#{fornecedorBean.requererTelefone}" style="width: 100px"
+                                                     onkeypress="return TABEnter(event, 'edtEmail');">
+                                        </p:inputMask>
+                                    </h:panelGroup>
+
+                                </h:panelGrid>
+
+
+                                <h:panelGroup>
+                                    <p:outputLabel id="lblEmail" value="E-mail" styleClass="negrito" /><br />
+                                    <p:inputText id="edtEmail" value="#{fornecedorBean.fornecedor.email}" maxlength="100" required="#{fornecedorBean.requerEmail}" size="50" 
+                                                 onkeypress="return TABEnter(event, 'edtSite');"
+                                                 requiredMessage="Por favor digite um e-mail"
+                                                 validatorMessage="Formato de e-mail inválido">
+                                        <p:ajax event="blur" update="@this msjCadastroFornecedor" listener="#{fornecedorBean.handleKeyEventEmail}" >  
+                                            <f:validateRegex pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" /> <!--COM AJAX PRA PEGAR IMEDIATAMENTE-->
+                                        </p:ajax>
+                                        <f:validateRegex pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" /> <!--FORA DO AJAX PRA PEGAR QUANDO MANDAR SALVAR-->
+                                    </p:inputText>
+                                </h:panelGroup>
+
+                                <h:panelGroup id="painelGroupSite">
+                                    <h:outputLabel value="Site" style="font-weight:bold; padding-right: 5px; " /><br />
+                                    <p:inputText id="edtSite" value="#{fornecedorBean.fornecedor.site}" maxlength="100" size="50"
+                                                 onkeypress="return TABEnter(event, '#{fornecedorBean.enterSite}');"/>
+                                </h:panelGroup>
+
+                                <h:panelGrid columns="3">
+                                    <h:panelGroup id="painelGroupIdentidade">
+                                        <h:outputLabel value="Documento " style="font-weight:bold; padding-right: 5px; " rendered="#{fornecedorBean.fornecedor.tipoPessoa == 'F'}" /><br />
+                                        <p:inputText id="edtDocumento" value="#{fornecedorBean.fornecedor.documento}" maxlength="15" size="10" rendered="#{fornecedorBean.fornecedor.tipoPessoa == 'F'}" onkeypress="return TABEnter(event, 'edtCpf');" />
+                                    </h:panelGroup>
+
+                                    <h:panelGroup id="painelGroupCpf" >
+                                        <p:outputLabel id="lblCpf" value="CPF:" rendered="#{fornecedorBean.fornecedor.tipoPessoa == 'F'}" styleClass="negrito" /><br />
+                                        <p:inputText id="edtCpf" value="#{fornecedorBean.fornecedor.cpf}" maxlength="15" required="true" rendered="#{fornecedorBean.fornecedor.tipoPessoa == 'F'}"
+                                                     requiredMessage="Por favor digite o CPF"
+                                                     onkeypress="return TABEnter(event, 'edtNascimento');">
+                                            <p:ajax event="blur" update="@this msjCadastroFornecedor" listener="#{fornecedorBean.validacpf}" />
+                                        </p:inputText>
+                                    </h:panelGroup>
+
+
+                                    <h:panelGroup id="painelGroupNascimento">
+                                        <h:outputLabel value="Data nascimento " style="font-weight:bold; padding-right: 5px; " rendered="#{fornecedorBean.fornecedor.tipoPessoa == 'F'}" /><br />
+                                        <p:calendar id="edtNascimento" value="#{fornecedorBean.fornecedor.dataNascimento}" pattern="dd/MM/yyyy" locale="pt" size="10" rendered="#{fornecedorBean.fornecedor.tipoPessoa == 'F'}"
+                                                    onkeypress="return TABEnter(event, 'edtFornecedor');"/>
+                                    </h:panelGroup>    
+                                </h:panelGrid>
+                                
+                                
+                                <p:outputLabel />
+                                <p:outputLabel />
+                                <h:panelGroup id="painelGroupCnpj" >
+                                    <p:outputLabel id="lblCnpj" value="CNPJ" styleClass="negrito" rendered="#{fornecedorBean.fornecedor.tipoPessoa =='J'}" /><br />
+                                    <p:inputMask mask="99.999.999/9999-99" id="edtCnpj" value="#{fornecedorBean.fornecedor.cnpj}" rendered="#{fornecedorBean.fornecedor.tipoPessoa == 'J'}" onkeypress="return TABEnter(event, 'edtFornecedor');"  />
+                                </h:panelGroup>
+
+
+
+                                <!--fim busca cep-->
+
+
+
+                                <f:facet name="footer">
+                                    <h:panelGrid id="painelGridRodapeCadastroFornecedor" columns="5">
+                                        <p:commandButton value="#{fornecedorBean.accion}" actionListener="#{fornecedorBean.operar}" oncomplete="tratarRequisicao(xhr, status, args)" update="frmDialogoCadastroFornecedor :frmConsultaFornecedor:dataTabela" />
+                                        <p:commandButton value="Excluir" />
+                                        <p:commandButton value="Limpar" />
+                                        <p:commandButton value="Sair" />
+
+                                    </h:panelGrid>
+                                </f:facet> 
+                            </h:panelGrid>
+
+
+                        </h:form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    </p:dialog>
+
+                    <script type="text/javascript">
+                        function tratarRequisicao(xhr, status, args) {
+                            if (!args.fecharDialogo) {
+                                jQuery("#dialogoCadastroFornecedor").effect("shake", {times: 10}, 100);
+                            } else {
+                                PF('wdialogoCadastroFornecedor').hide();
+                            }
+                        }
+
+
+                        function TABEnter(pEvent, campo) {
+                            if (pEvent.keyCode === 13) {
+                                //return pEvent.keyCode = 9;  
+                                //document.getElementById('frmDialogoCadastroVenda:' + campo).focus();
+                                //document.getElementById('frmDialogoCadastroVenda:' + campo).value='';
+                                document.getElementById('frmDialogoCadastroFornecedor:' + campo).select();
+                                return false;
+                            }
+                            return true;
+                        }
+
+
+
+
+
+
+
+
+
+
+                    </script>
+                </p:panel>
+            
+
+    </h:body>
+</html>
