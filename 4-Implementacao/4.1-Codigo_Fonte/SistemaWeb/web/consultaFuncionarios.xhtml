@@ -9,15 +9,14 @@
     <body>
         <ui:composition template="./WEB-INF/templates/telaPadrao.xhtml">
             <ui:define name="content">
-                <!--pagana de funcionarios-->
-                <p:dialog id="dialogoConsultaFuncionarios" widgetVar="wdialogoConsultaFuncionarios" width="750" height="350" visible="true">
+                <p:panel header="Consulta de funcionarios" footer="SistemaWeb">
                     <f:event type="preRenderView" listener="#{funcionarioBean.listar()}" />
-                    <p:growl id="msjConsultaFuncionarios" showDetail="true" />
-                    <h:form id="frmConsultaFuncionarios" >
+                    <p:growl id="msj" showDetail="true" />
+                    <h:form id="frmConsultaFuncionario" style="height: 600px" >
                         <p:growl id="msgConsultaFuncionario" showDetail="true" />
                         <p:commandButton id="btnAcao" value="Novo" oncomplete="PF('wdialogoCadastroFuncionario').show();" actionListener="#{funcionarioBean.setAccion('Registrar')}" action="#{funcionarioBean.zerarFuncionario}" update=":dialogoCadastroFuncionario" />
                         <p:dataTable id="dataTabela" value="#{funcionarioBean.listaFuncionario}" var="var_funcionario"
-                                     paginator="true" paginatorPosition="bottom"
+                                     paginator="true"
                                      paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                                      rowsPerPageTemplate="5,10,15">
 
@@ -60,23 +59,18 @@
                             </p:column>
                         </p:dataTable>
                         
-                        
-                        
                         <!--DIALOGO DE CONFIRMAÇÃO DE EXCLUSÃO**********************************************************************-->
                         <p:confirmDialog id="dialogoConfirmacaoExclusaoFuncionario" header="Exclusão"
                                          message="Tem certeza que deseja excluir? #{funcionarioBean.funcionario.nomeFuncionario}"
                                          widgetVar="wdialogoConfirmacaoExclusaoFuncionario">
 
-                            <p:commandButton id="btnApagar" value="Sim" update=":frmConsultaFuncionarios:dataTabela :frmConsultaFuncionarios:msgConsultaFuncionario" oncomplete="PF('wdialogoConfirmacaoExclusaoFuncionario').hide();" action="#{funcionarioBean.apagar()}"/>
+                            <p:commandButton id="btnApagar" value="Sim" update="dataTabela :frmConsultaFuncionario:msgConsultaFuncionario" oncomplete="PF('wdialogoConfirmacaoExclusaoFuncionario').hide();" action="#{funcionarioBean.apagar()}"/>
                             <p:commandButton value="Não" oncomplete="PF('wdialogoConfirmacaoExclusaoFuncionario').hide();" />
                         </p:confirmDialog>
                     </h:form>
-                    
-                    
-                </p:dialog>
 
                     <!--DIALOGO DE CADASTRO-->
-                    <p:dialog header="Cadastro de funcionarios" widgetVar="wdialogoCadastroFuncionario" id="dialogoCadastroFuncionario" width="600" height="200">
+                    <p:dialog header="Cadastro de funcionarios" widgetVar="wdialogoCadastroFuncionario" id="dialogoCadastroFuncionario" width="600" height="300">
                         <h:form id="frmDialogoCadastroFuncionario" >
                             <p:messages/>
                             <p:growl id="msjCadastroFuncionario" showDetail="true" />
@@ -85,7 +79,6 @@
                                 <h:panelGrid columns="2">
                                     <p:outputLabel id="lblFuncionario" value="Nome..........:"  />
                                 <p:inputText id="edtFuncionario" value="#{funcionarioBean.funcionario.nomeFuncionario}" maxlength="100" required="true" style="width: 300px"
-                                             onkeyup="maiuscula(this);"
                                             onkeypress="return TABEnter(event, 'edtCodigoCargo');">
                                             <p:ajax event="blur" update="@this" listener="#{funcionarioBean.handleKeyEvent}" />
                                 </p:inputText>
@@ -123,10 +116,10 @@
 
                                 <f:facet name="footer">
                                     <h:panelGrid id="painelGridRodapeCadastroFuncionario" columns="4">
-                                        <p:commandButton value="#{funcionarioBean.accion}" actionListener="#{funcionarioBean.operar}" oncomplete="tratarRequisicaoFuncionarios(xhr, status, args)" update="frmDialogoCadastroFuncionario :frmConsultaFuncionarios:dataTabela" />
+                                        <p:commandButton value="#{funcionarioBean.accion}" actionListener="#{funcionarioBean.operar}" oncomplete="tratarRequisicao(xhr, status, args)" update="frmDialogoCadastroFuncionario :frmConsultaFuncionario:dataTabela" />
                                         <p:commandButton value="Excluir" />
                                         <p:commandButton value="Limpar" />
-                                        <p:commandButton value="Sair" oncomplete="PF('wdialogoCadastroFuncionario').hide();" />
+                                        <p:commandButton value="Sair" />
                                     </h:panelGrid>
                                 </f:facet> 
                             </h:panelGrid>
@@ -134,7 +127,7 @@
                     </p:dialog>
 
                     <script type="text/javascript">
-                        function tratarRequisicaoFuncionarios(xhr, status, args) {
+                        function tratarRequisicao(xhr, status, args) {
                             if (!args.fecharDialogo) {
                                 jQuery("#dialogoCadastroFuncionario").effect("shake", {times: 10}, 100);
                             } else {
@@ -154,7 +147,7 @@
                             return true;
                         }
                     </script>
-                <!--fim pagana de funcionarios-->
+                </p:panel>
             </ui:define>
         </ui:composition>
 

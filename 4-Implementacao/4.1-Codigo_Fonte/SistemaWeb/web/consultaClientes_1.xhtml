@@ -1,0 +1,247 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+
+    <body>
+        <ui:composition template="./WEB-INF/templates/telaPadrao.xhtml">
+            <ui:define name="content">
+                <p:panel id="painelPrincipal" header="Consulta de clientes" footer="SistemaWeb">
+                    <f:event type="preRenderView" listener="#{clienteBean.listar()}" />
+                    <p:growl id="msj" showDetail="true" />
+                    <h:form id="frmConsultaCliente" style="height: 600px" >
+                        <p:growl id="msgConsultaCliente" showDetail="true" />
+                        <p:commandButton id="btnAcao" value="Novo" oncomplete="PF('wdialogoCadastroCliente').show();" actionListener="#{clienteBean.setAccion('Registrar')}" action="#{clienteBean.zerarCliente}" update=":dialogoCadastroCliente" />
+                        <p:dataTable id="dataTabela" value="#{clienteBean.listaCliente}" var="var_cliente"
+                                     paginator="true"
+                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="5,10,15" rows="10">
+
+                            <p:column headerText="Código" style="width: 50px">
+                                <p:outputLabel value="#{var_cliente.id}"/>
+                            </p:column>
+
+                            <p:column headerText="Nome do cliente">
+                                <p:outputLabel value="#{var_cliente.nomeCliente}"/>
+                            </p:column>
+
+                            <p:column headerText="Telefone" >
+                                <p:outputLabel value="#{var_cliente.telefone}">
+                                    <f:convertNumber type="currency" currencySymbol="R$ " minFractionDigits="2"/>
+                                </p:outputLabel>
+                            </p:column>
+
+                            <p:column headerText="E-mail">
+                                <p:outputLabel value="#{var_cliente.email}" >
+                                    <f:convertNumber type="number" minFractionDigits="2" />
+                                </p:outputLabel> 
+                            </p:column>
+
+
+                            <p:column width="30" >
+                                <p:commandButton id="btnEditar" icon="ui-icon-pencil" actionListener="#{clienteBean.buscaPorID(var_cliente)}" oncomplete="PF('wdialogoCadastroCliente').show();" update=":dialogoCadastroCliente"  >
+                                    <f:setPropertyActionListener target="#{clienteBean.clienteSelecionado}" value="#{var_cliente}"/>
+                                </p:commandButton>
+                            </p:column>
+
+                            <p:column width="30" >
+                                <p:commandButton id="btnLixeira" icon="ui-icon-trash" oncomplete="PF('wdialogoConfirmacaoExclusaoCliente').show();">
+                                    <f:setPropertyActionListener target="#{clienteBean.clienteSelecionado}" value="#{var_cliente}"/>
+                                </p:commandButton>
+                            </p:column>
+                            <p:column width="30">
+                                <p:commandButton icon="ui-icon-check" title="Selecionar"
+                                                 action="#{clienteBean.selecionar(var_cliente)}"
+                                                 process="@this" />
+                            </p:column>
+                        </p:dataTable>
+
+                        <!--DIALOGO DE CONFIRMAÇÃO DE EXCLUSÃO**********************************************************************-->
+                        <p:confirmDialog id="dialogoConfirmacaoExclusaoCliente" header="Exclusão"
+                                         message="Tem certeza que deseja excluir? #{clienteBean.cliente.nomeCliente}"
+                                         widgetVar="wdialogoConfirmacaoExclusaoCliente">
+
+                            <p:commandButton id="btnApagar" value="Sim" update="dataTabela :frmConsultaCliente:msgConsultaCliente" oncomplete="PF('wdialogoConfirmacaoExclusaoCliente').hide();" action="#{clienteBean.apagar()}"/>
+                            <p:commandButton value="Não" oncomplete="PF('wdialogoConfirmacaoExclusaoCliente').hide();" />
+                        </p:confirmDialog>
+                    </h:form>
+
+                    <!--DIALOGO DE CADASTRO-->
+                    <p:dialog header="Cadastro de clientes" widgetVar="wdialogoCadastroCliente" id="dialogoCadastroCliente" width="600" height="300">
+                        <h:form id="frmDialogoCadastroCliente" >
+                            <p:messages/>
+                            <p:growl id="msjCadastroCliente" showDetail="true" />
+                            <h:panelGrid columns="2" id="painelGridDialogoCadastroCliente" >
+
+                                <p:outputLabel id="lblCliente" value="Descrição:" />
+                                <p:inputText id="edtCliente" value="#{clienteBean.cliente.nomeCliente}" maxlength="100" required="true" style="width: 300px"
+                                             onkeypress="return TABEnter(event, 'edtTelefone');">
+                                    <p:ajax event="blur" update="@this" listener="#{clienteBean.handleKeyEvent}" />
+                                </p:inputText>
+                                <p:outputLabel id="lblTelefone" value="Telefone:" />
+                                <p:inputMask mask="(999)9999-9999" id="edtTelefone" value="#{clienteBean.cliente.telefone}" required="true" style="width: 100px"
+                                             onkeypress="return TABEnter(event, 'edtCpf');">
+                                </p:inputMask>
+
+                                <p:outputLabel id="lblCpf" value="CPF:" />
+                                <p:inputText id="edtCpf" value="#{clienteBean.cliente.documento}" required="true"
+                                             requiredMessage="Por favor digite o CPF"
+                                             onkeypress="return TABEnter(event, 'edtEmail');">
+                                    <p:ajax event="blur" update="@this msjCadastroCliente" listener="#{clienteBean.validacpf}" />
+                                </p:inputText>
+
+                                <p:outputLabel id="lblEmail" value="E-mail" />
+                                <p:inputText id="edtEmail" value="#{clienteBean.cliente.email}" maxlength="100" required="true" style="width: 300px" 
+                                             onkeypress="return TABEnter(event, 'edtRua');"
+                                             requiredMessage="Por favor digite um e-mail"
+                                             validatorMessage="Formato de e-mail inválido">
+                                    <p:ajax event="blur" update="@this msjCadastroCliente" listener="#{clienteBean.handleKeyEventEmail}" >  
+                                        <f:validateRegex pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" /> <!--COM AJAX PRA PEGAR IMEDIATAMENTE-->
+                                    </p:ajax>
+                                    <f:validateRegex pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" /> <!--FORA DO AJAX PRA PEGAR QUANDO MANDAR SALVAR-->
+                                </p:inputText>
+
+                                <p:outputLabel value="Rua" />
+                                <p:inputText id="edtRua" value="#{clienteBean.cliente.rua}" maxlength="100" style="width: 300px"
+                                             onkeypress="return TABEnter(event, 'edtIdCidade');">
+                                </p:inputText>
+
+                                <p:outputLabel value="Id. Cidade" />
+                                <p:inputText id="edtIdCidade" value="#{clienteBean.cliente.cidade.id}" style="width: 50px"
+                                             onkeypress="return TABEnter(event, 'edtNomeCidade');">
+                                    <p:ajax listener="#{clienteBean.buscaPorID2(clienteBean.cliente.cidade)}" event="change" process="edtIdCidade" update="edtNomeCidade msjCadastroCliente edtIdCidade" />
+                                </p:inputText>
+                                <p:commandButton icon="ui-icon-search" title="Consultar ou cadastrar Cidades" value="Cidades"
+                                                 action="#{cidadeBean.abrirDialogoCidade}" 
+                                                 process="@this" update="@none">
+                                    <p:ajax event="dialogReturn" listener="#{clienteBean.setarCidadeSelecionada}"
+                                            process="@this" update="edtIdCidade edtNomeCidade" />    
+                                </p:commandButton>
+
+                                <p:outputLabel value="Cidade" />
+                                <p:inputText id="edtNomeCidade" value="#{clienteBean.cliente.cidade.nomeCidade}" readonly="true" style="width: 300px"
+                                             onkeypress="return TABEnter(event, 'edtCliente');">
+                                </p:inputText>
+
+
+<!--busca cep correios-->
+                        <h:form id="frmBusca2">
+                            <h:panelGrid id="pnCEP" columns="3">
+                                <h:outputText value="CEP: " />
+                                <p:inputMask mask="99999-999" value="#{mbService.cep}" />
+
+                                <p:commandButton value="Pesquisar" icon="ui-icon-search"
+                                                 action="#{mbService.encontraCEP}" update=":frmDialogoCadastroCliente:frmResultado :msj" />
+                            </h:panelGrid>
+                        </h:form>
+
+                        <h:form id="frmResultado">
+                            <h:panelGrid id="pnResultado" columns="2">
+                                <h:outputLabel value="UF: "
+                                               style="font-weight:bold; padding-right: 5px; float: right;" />
+                                <p:inputText size="5" value="#{mbService.estado}" />
+
+                                <h:outputLabel value="Logradouro: "
+                                               style="font-weight:bold; padding-right: 5px; float: right;" />
+                                <p:inputText size="50"
+                                             value="#{mbService.tipoLogradouro} #{mbService.logradouro}" />
+
+                                <h:outputLabel value="Cidade: "
+                                               style="font-weight:bold; padding-right: 5px; float: right;" />
+                                <p:inputText size="50" value="#{mbService.cidade}" />
+
+                                <h:outputLabel value="Bairro: "
+                                               style="font-weight:bold; padding-right: 5px; float: right;" />
+                                <p:inputText size="50" value="#{mbService.bairro}" />
+                            </h:panelGrid>
+                        </h:form>
+                        <!--fim busca cep-->
+
+
+
+                                <f:facet name="footer">
+                                    <h:panelGrid id="painelGridRodapeCadastroCliente" columns="5">
+                                        <p:commandButton value="#{clienteBean.accion}" actionListener="#{clienteBean.operar}" oncomplete="tratarRequisicao(xhr, status, args)" update="frmDialogoCadastroCliente :frmConsultaCliente:dataTabela" />
+                                        <p:commandButton value="Excluir" />
+                                        <p:commandButton value="Limpar" />
+                                        <p:commandButton value="Sair" />
+
+                                    </h:panelGrid>
+                                </f:facet> 
+                            </h:panelGrid>
+
+
+                        </h:form>
+
+
+
+
+                        
+                        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    </p:dialog>
+
+                    <script type="text/javascript">
+                        function tratarRequisicao(xhr, status, args) {
+                            if (!args.fecharDialogo) {
+                                jQuery("#dialogoCadastroCliente").effect("shake", {times: 10}, 100);
+                            } else {
+                                PF('wdialogoCadastroCliente').hide();
+                            }
+                        }
+
+
+                        function TABEnter(pEvent, campo) {
+                            if (pEvent.keyCode === 13) {
+                                //return pEvent.keyCode = 9;  
+                                //document.getElementById('frmDialogoCadastroVenda:' + campo).focus();
+                                //document.getElementById('frmDialogoCadastroVenda:' + campo).value='';
+                                document.getElementById('frmDialogoCadastroCliente:' + campo).select();
+                                return false;
+                            }
+                            return true;
+                        }
+
+
+
+
+
+
+
+
+
+
+                    </script>
+                </p:panel>
+            </ui:define>
+        </ui:composition>
+
+    </body>
+</html>

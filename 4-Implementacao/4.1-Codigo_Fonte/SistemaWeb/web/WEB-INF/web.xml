@@ -4,7 +4,7 @@
         <param-name>javax.faces.PROJECT_STAGE</param-name>
         <param-value>Development</param-value>
     </context-param>
-   <context-param>
+    <context-param>  
         <param-name>primefaces.THEME</param-name>  
         <!--
         <param-value>swanky-purse</param-value>
@@ -16,14 +16,11 @@
         <param-value>blitzer</param-value>
         <param-value>trontastic</param-value>
         <param-value>eggplant</param-value>
-        <param-value>vader</param-value>
-        <param-value>flick</param-value>
         -->
-         <param-value>hot-sneaks</param-value>
+        <param-value>hot-sneaks</param-value>
         
         
-        
-   </context-param>
+    </context-param>  
     <servlet>
         <servlet-name>Faces Servlet</servlet-name>
         <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>

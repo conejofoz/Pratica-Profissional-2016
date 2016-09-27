@@ -1,0 +1,186 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+
+    <body>
+        <ui:composition template="./WEB-INF/templates/telaPadrao.xhtml">
+            <ui:define name="content">
+                <p:panel id="painelPrincipal" header="Consulta de usuarios" footer="SistemaWeb">
+                    <!--pra funcionar a consulta tem que tirar o prerender view-->
+                    <!--<f:event type="preRenderView" listener="" />-->
+                    <p:growl id="msj" showDetail="true" />
+                    <h:form id="frmConsultaUsuario" style="height: 600px" >
+                        <p:growl id="msgConsultaUsuario" showDetail="true" />
+                        
+                        <p:panelGrid columns="3" >
+                            <h:panelGroup >
+                                <p:outputLabel id="lblConsultaNome" value="Nome" /><br />
+                                <p:inputText id="edtConsultaNome" value="#{usuarioBean.consultaNome}" />
+                                <p:commandButton id="btnConsultar" value="Consultar" actionListener="#{usuarioBean.consultar}" update="dataTabela msgConsultaUsuario" />
+                            </h:panelGroup>
+                        </p:panelGrid>
+                        <p:commandButton id="btnAcao" value="Novo" oncomplete="PF('wdialogoCadastroUsuario').show();" actionListener="#{usuarioBean.setAccion('Registrar')}" action="#{usuarioBean.zerarUsuario}" update=":dialogoCadastroUsuario" />
+                        <p:dataTable id="dataTabela" value="#{usuarioBean.listaUsuario}" var="var_usuario"
+                                     paginator="true"
+                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="5,10,15" rows="10">
+
+                            <p:column headerText="Código" width="100">
+                                <p:outputLabel value="#{var_usuario.id}"/>
+                            </p:column>
+
+                            <p:column headerText="Nome do usuario">
+                                <p:outputLabel value="#{var_usuario.nomeUsuario}"/>
+                            </p:column>
+
+
+                            <p:column width="30" >
+                                <p:commandButton id="btnEditar" icon="ui-icon-pencil" actionListener="#{usuarioBean.buscaPorID(var_usuario)}" oncomplete="PF('wdialogoCadastroUsuario').show();" update=":dialogoCadastroUsuario"  >
+                                    <f:setPropertyActionListener target="#{usuarioBean.usuarioSelecionado}" value="#{var_usuario}"/>
+                                </p:commandButton>
+                            </p:column>
+
+                            <p:column width="30" >
+                                <p:commandButton id="btnLixeira" icon="ui-icon-trash" oncomplete="PF('wdialogoConfirmacaoExclusaoUsuario').show();">
+                                    <f:setPropertyActionListener target="#{usuarioBean.usuarioSelecionado}" value="#{var_usuario}"/>
+                                </p:commandButton>
+                            </p:column>
+                            <p:column width="30">
+                                <p:commandButton icon="ui-icon-check" title="Selecionar"
+                                                 action="#{usuarioBean.selecionar(var_usuario)}"
+                                                 process="@this" />
+                            </p:column>
+                        </p:dataTable>
+
+                        <!--DIALOGO DE CONFIRMAÇÃO DE EXCLUSÃO**********************************************************************-->
+                        <p:confirmDialog id="dialogoConfirmacaoExclusaoUsuario" header="Exclusão"
+                                         message="Tem certeza que deseja excluir? #{usuarioBean.usuario.nomeUsuario}"
+                                         widgetVar="wdialogoConfirmacaoExclusaoUsuario">
+
+                            <p:commandButton id="btnApagar" value="Sim" update="dataTabela :frmConsultaUsuario:msgConsultaUsuario" oncomplete="PF('wdialogoConfirmacaoExclusaoUsuario').hide();" action="#{usuarioBean.apagar()}"/>
+                            <p:commandButton value="Não" oncomplete="PF('wdialogoConfirmacaoExclusaoUsuario').hide();" />
+                        </p:confirmDialog>
+                    </h:form>
+
+
+
+
+
+
+
+
+
+                    <!--DIALOGO DE CADASTRO-->
+                    <p:dialog header="Cadastro de usuarios" widgetVar="wdialogoCadastroUsuario" id="dialogoCadastroUsuario" position="center" showEffect="slide" width="600" height="100">
+                        <h:form id="frmDialogoCadastroUsuario" >
+                            <p:messages closable="true"/>
+                            <p:growl id="msjCadastroUsuario" showDetail="true" />
+                            <h:panelGrid columns="3" id="painelGridDialogoCadastroUsuario" >
+
+                                
+                               
+                                
+                                
+                                <h:panelGroup>
+                                    <p:outputLabel id="lblUsuario" value="Usuario" styleClass="negrito" /><br />
+                                    <p:inputText id="edtUsuario" value="#{usuarioBean.usuario.nomeUsuario}" maxlength="100" required="true" size="50"
+                                                 onkeypress="return TABEnter(event, 'edtCep');">
+                                        <p:ajax event="blur" update="@this" listener="#{usuarioBean.handleKeyEvent}" />
+                                    </p:inputText>
+                                    <p:inputText id="edtSenha" value="#{usuarioBean.usuario.senha}" required="true" />
+                                </h:panelGroup>
+
+
+
+
+                                <!--fim busca cep-->
+
+
+
+                                <f:facet name="footer">
+                                    <h:panelGrid id="painelGridRodapeCadastroUsuario" columns="5">
+                                        <p:commandButton value="#{usuarioBean.accion}" actionListener="#{usuarioBean.operar}" oncomplete="tratarRequisicao(xhr, status, args)" update="frmDialogoCadastroUsuario :frmConsultaUsuario:dataTabela" />
+                                        <p:commandButton value="Excluir" />
+                                        <p:commandButton value="Limpar" />
+                                        <p:commandButton value="Sair" />
+
+                                    </h:panelGrid>
+                                </f:facet> 
+                            </h:panelGrid>
+
+
+                        </h:form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    </p:dialog>
+
+                    <script type="text/javascript">
+                        function tratarRequisicao(xhr, status, args) {
+                            if (!args.fecharDialogo) {
+                                jQuery("#dialogoCadastroUsuario").effect("shake", {times: 10}, 100);
+                            } else {
+                                PF('wdialogoCadastroUsuario').hide();
+                            }
+                        }
+
+
+                        function TABEnter(pEvent, campo) {
+                            if (pEvent.keyCode === 13) {
+                                //return pEvent.keyCode = 9;  
+                                //document.getElementById('frmDialogoCadastroVenda:' + campo).focus();
+                                //document.getElementById('frmDialogoCadastroVenda:' + campo).value='';
+                                document.getElementById('frmDialogoCadastroUsuario:' + campo).select();
+                                return false;
+                            }
+                            return true;
+                        }
+
+
+
+
+
+
+
+
+
+
+                    </script>
+                </p:panel>
+            </ui:define>
+        </ui:composition>
+
+    </body>
+</html>

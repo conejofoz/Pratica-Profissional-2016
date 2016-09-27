@@ -429,8 +429,7 @@ public class ClienteBean implements Serializable {
     public void handleKeyEvent() {
         cliente.setNomeCliente(cliente.getNomeCliente().toUpperCase());
     }
-    
-   
+
     public void handleKeyEventEmail() {
         cliente.setEmail(cliente.getEmail().toLowerCase());
     }

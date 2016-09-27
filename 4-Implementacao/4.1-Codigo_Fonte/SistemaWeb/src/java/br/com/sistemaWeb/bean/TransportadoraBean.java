@@ -321,7 +321,7 @@ public class TransportadoraBean implements Serializable {
         TransportadoraDao dao;
         try {
             dao = new TransportadoraDao();
-            listaTransportadora = dao.todosTransportadoras();
+            listaTransportadora = dao.todosTransportadoraes();
         } catch (Exception e) {
             throw e;
         }
@@ -331,7 +331,7 @@ public class TransportadoraBean implements Serializable {
         TransportadoraDao dao;
         dao = new TransportadoraDao();
         try {
-            listaTransportadora = dao.consultaTransportadoras(this.consultaNome);
+            listaTransportadora = dao.consultaTransportadoraes(this.consultaNome);
         } catch (Exception ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro ao consultar ", "Erro: " + ex.getMessage()));
             throw ex;

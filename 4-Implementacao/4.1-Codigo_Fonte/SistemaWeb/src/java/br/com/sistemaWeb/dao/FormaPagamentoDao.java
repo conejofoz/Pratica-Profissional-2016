@@ -75,7 +75,6 @@ public class FormaPagamentoDao {
 
             listaFormaPagamento.add(tempFormaPagamento);
         }
-        conexao.close();
         return listaFormaPagamento;
     }
 

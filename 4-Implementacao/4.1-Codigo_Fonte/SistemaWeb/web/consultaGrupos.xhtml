@@ -9,17 +9,17 @@
     <body>
         <ui:composition template="./WEB-INF/templates/telaPadrao.xhtml">
             <ui:define name="content">
-                <!--pagina de grupos-->
-                <p:dialog header="Consulta de grupos de produtos" id="dialogoConsultaGrupos" widgetVar="wdialogoConsultaGrupos" width="700" height="300" visible="true" >
+                <p:panel header="Consulta de grupos" footer="SistemaWeb">
                     <f:event type="preRenderView" listener="#{grupoBean.listar()}" />
-                        
-                    <h:form id="frmConsultaGrupos" >
+                    <p:growl id="msj" showDetail="true" />
+                    <h:form id="frmConsultaGrupo" style="height: 600px" >
                         <p:growl id="msgConsultaGrupo" showDetail="true" />
                         <p:commandButton id="btnAcao" value="Novo" oncomplete="PF('wdialogoCadastroGrupo').show();" actionListener="#{grupoBean.setAccion('Registrar')}" action="#{grupoBean.zerarGrupo}" update=":dialogoCadastroGrupo" />
+
                         <p:dataTable id="dataTabela" value="#{grupoBean.listaGrupo}" var="var_grupo"
-                                     paginator="true" paginatorPosition="bottom"
+                                     paginator="true"
                                      paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-                                     rowsPerPageTemplate="5,10,15">
+                                     rowsPerPageTemplate="5,10,15" rows="10">
 
                             <p:column headerText="Código" style="width: 50px">
                                 <p:outputLabel value="#{var_grupo.id}"/>
@@ -49,29 +49,26 @@
                                 </p:commandButton>
                             </p:column>
                         </p:dataTable>
-                        </h:form>
-                </p:dialog>
 
                         <!--DIALOGO DE CONFIRMAÇÃO DE EXCLUSÃO**********************************************************************-->
                         <p:confirmDialog id="dialogoConfirmacaoExclusaoGrupo" header="Exclusão"
                                          message="Tem certeza que deseja excluir? #{grupoBean.grupo.nomeGrupo}"
                                          widgetVar="wdialogoConfirmacaoExclusaoGrupo">
-                            <h:form id="frmExclusaoGrupo" >
-                            <p:commandButton id="btnApagar" value="Sim" update=":frmConsultaGrupos:dataTabela :frmConsultaGrupos:msgConsultaGrupo" oncomplete="PF('wdialogoConfirmacaoExclusaoGrupo').hide();" action="#{grupoBean.apagar()}"/>
+
+                            <p:commandButton id="btnApagar" value="Sim" update="dataTabela :frmConsultaGrupo:msgConsultaGrupo" oncomplete="PF('wdialogoConfirmacaoExclusaoGrupo').hide();" action="#{grupoBean.apagar()}"/>
                             <p:commandButton value="Não" oncomplete="PF('wdialogoConfirmacaoExclusaoGrupo').hide();" />
-                            </h:form>
                         </p:confirmDialog>
-                    
+                    </h:form>
 
                     <!--DIALOGO DE CADASTRO-->
-                    <p:dialog header="Cadastro de grupos" widgetVar="wdialogoCadastroGrupo" id="dialogoCadastroGrupo" width="600" height="100">
+                    <p:dialog header="Cadastro de grupos" widgetVar="wdialogoCadastroGrupo" id="dialogoCadastroGrupo" width="600" height="300">
                         <h:form id="frmDialogoCadastroGrupo" >
-                            
-                            <p:growl id="msjCadastroGrupo" showDetail="true" />
+                            <p:messages autoUpdate="true" closable="true" />
+                            <p:growl id="msjCadastroGrupo" showDetail="true"  />
                             <h:panelGrid columns="2" id="painelGridDialogoCadastroGrupo" >
 
-                                <p:outputLabel id="lblGrupo" value="Grupo" />
-                                <p:inputText id="edtGrupo" value="#{grupoBean.grupo.nomeGrupo}" maxlength="100" required="true" style="width: 300px"
+                                <p:outputLabel id="lblGrupo" value="Grupo *" />
+                                <p:inputText id="edtGrupo" value="#{grupoBean.grupo.nomeGrupo}" maxlength="100" style="width: 300px"
                                              onkeypress="return TABEnterGrupo(event, 'edtTelefone');">
                                     <p:ajax event="blur" update="@this" listener="#{grupoBean.handleKeyEvent}" />
                                 </p:inputText>
@@ -82,10 +79,10 @@
 
                                 <f:facet name="footer">
                                     <h:panelGrid id="painelGridRodapeCadastroGrupo" columns="4">
-                                        <p:commandButton value="#{grupoBean.accion}" actionListener="#{grupoBean.operar}" oncomplete="tratarRequisicaoGrupo(xhr, status, args)" update="frmDialogoCadastroGrupo :frmConsultaGrupos:dataTabela" />
+                                        <p:commandButton value="#{grupoBean.accion}" actionListener="#{grupoBean.operar}" oncomplete="tratarRequisicaoGrupo(xhr, status, args)" update="frmDialogoCadastroGrupo :frmConsultaGrupo:dataTabela" />
                                         <p:commandButton value="Excluir" />
                                         <p:commandButton value="Limpar" />
-                                        <p:commandButton value="Sair" oncomplete="PF('wdialogoCadastroGrupo').hide();" />
+                                        <p:commandButton value="Sair" />
                                     </h:panelGrid>
                                 </f:facet> 
                             </h:panelGrid>
@@ -111,7 +108,7 @@
                         }
                         
                     </script>
-               <!--fim pagina de grupos-->
+                </p:panel>
             </ui:define>
         </ui:composition>
 

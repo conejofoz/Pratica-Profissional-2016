@@ -49,11 +49,11 @@ public class UnidadeDao implements Serializable{
         conexao = FabricaConexao.conectar();
         pstm = conexao.prepareStatement(sql);
         pstm.setString(1, unidade.getNomeUnidade());
-        pstm.setString(2, unidade.getSiglaUnidade());
+        pstm.setString(4, unidade.getSiglaUnidade());
         pstm.executeUpdate();
     }
 
-    public List<Unidade> todosUnidades() throws SQLException {
+    public List<Unidade> todosUnidadees() throws SQLException {
         List<Unidade> listaUnidade = new ArrayList<Unidade>();
         String sql = "SELECT * FROM unidades order by nomeunidade";
         conexao = FabricaConexao.conectar();
@@ -65,12 +65,11 @@ public class UnidadeDao implements Serializable{
             tempUnidade.setNomeUnidade(rs.getString("nomeUnidade"));
             listaUnidade.add(tempUnidade);
         }
-        conexao.close();
         return listaUnidade;
     }
 
     
-    public List<Unidade> consultaUnidades(String nome) throws SQLException {
+    public List<Unidade> consultaUnidadees(String nome) throws SQLException {
         List<Unidade> listaUnidade = new ArrayList<Unidade>();
 
         String sql = "SELECT * FROM unidades WHERE nomeunidade LIKE ?";
@@ -88,7 +87,6 @@ public class UnidadeDao implements Serializable{
             System.out.println(tempUnidade.getNomeUnidade());
         }
         System.out.println("aaa");
-        conexao.close();
         return listaUnidade;
     }
     

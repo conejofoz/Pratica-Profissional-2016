@@ -72,7 +72,6 @@ public class CidadeDao {
             tempCidade.getEstado().setSiglaEstado(rs.getString("siglaestado"));
             listaCidade.add(tempCidade);
         }
-        conexao.close();
         return listaCidade;
     }
 

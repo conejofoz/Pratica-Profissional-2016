@@ -116,7 +116,6 @@ public class CompraDao {
             tempCompra.getFornecedor().setNomeFornecedor(rs.getString("nomefornecedor"));
             listaCompra.add(tempCompra);
         }
-        conexao.close();
         return listaCompra;
     }
     
@@ -142,7 +141,6 @@ public class CompraDao {
             tempItensCompra.setPreco(rs.getDouble("preco"));
             listaItensCompra.add(tempItensCompra);
         }
-        conexao.close();
         return listaItensCompra;
     }
 

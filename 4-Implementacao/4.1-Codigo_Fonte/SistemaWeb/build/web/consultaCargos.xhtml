@@ -9,14 +9,14 @@
     <body>
         <ui:composition template="./WEB-INF/templates/telaPadrao.xhtml">
             <ui:define name="content">
-                <p:dialog id="dialogoConsultaCargos" widgetVar="wdialogoConsultaCargos" width="750" height="350" visible="true" >
+                <p:panel header="Consulta de cargos" footer="SistemaWeb">
                     <f:event type="preRenderView" listener="#{cargoBean.listar()}" />
-                    <p:growl id="msjCargos" showDetail="true" />
-                    <h:form id="frmConsultaCargos" >
+                    <p:growl id="msj" showDetail="true" />
+                    <h:form id="frmConsultaCargo" style="height: 600px" >
                         <p:growl id="msgConsultaCargo" showDetail="true" />
                         <p:commandButton id="btnAcao" value="Novo" oncomplete="PF('wdialogoCadastroCargo').show();" actionListener="#{cargoBean.setAccion('Registrar')}" action="#{cargoBean.zerarCargo}" update=":dialogoCadastroCargo" />
                         <p:dataTable id="dataTabela" value="#{cargoBean.listaCargo}" var="var_cargo"
-                                     paginator="true" paginatorPosition="bottom"
+                                     paginator="true"
                                      paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                                      rowsPerPageTemplate="5,10,15">
 
@@ -54,16 +54,13 @@
                                          message="Tem certeza que deseja excluir? #{cargoBean.cargo.nomeCargo}"
                                          widgetVar="wdialogoConfirmacaoExclusaoCargo">
 
-                            <p:commandButton id="btnApagar" value="Sim" update=":frmConsultaCargos:dataTabela :frmConsultaCargos:msgConsultaCargo" oncomplete="PF('wdialogoConfirmacaoExclusaoCargo').hide();" action="#{cargoBean.apagar()}"/>
+                            <p:commandButton id="btnApagar" value="Sim" update="dataTabela :frmConsultaCargo:msgConsultaCargo" oncomplete="PF('wdialogoConfirmacaoExclusaoCargo').hide();" action="#{cargoBean.apagar()}"/>
                             <p:commandButton value="Não" oncomplete="PF('wdialogoConfirmacaoExclusaoCargo').hide();" />
                         </p:confirmDialog>
                     </h:form>
-                    
-                    
-                </p:dialog>
 
                     <!--DIALOGO DE CADASTRO-->
-                    <p:dialog header="Cadastro de cargos" widgetVar="wdialogoCadastroCargo" id="dialogoCadastroCargo" width="600" height="200">
+                    <p:dialog header="Cadastro de cargos" widgetVar="wdialogoCadastroCargo" id="dialogoCadastroCargo" width="600" height="300">
                         <h:form id="frmDialogoCadastroCargo" >
                             <p:messages/>
                             <p:growl id="msjCadastroCargo" showDetail="true" />
@@ -71,7 +68,6 @@
                                 
                                 <p:outputLabel id="lblCargo" value="Cargo" />
                                 <p:inputText id="edtCargo" value="#{cargoBean.cargo.nomeCargo}" maxlength="100" required="true" style="width: 300px"
-                                             onkeyup="maiuscula(this);"
                                             onkeypress="return TABEnter(event, 'edtTelefone');">
                                             <p:ajax event="blur" update="@this" listener="#{cargoBean.handleKeyEvent}" />
                                 </p:inputText>
@@ -82,10 +78,10 @@
 
                                 <f:facet name="footer">
                                     <h:panelGrid id="painelGridRodapeCadastroCargo" columns="4">
-                                        <p:commandButton value="#{cargoBean.accion}" actionListener="#{cargoBean.operar}" oncomplete="tratarRequisicao(xhr, status, args)" update="frmDialogoCadastroCargo :frmConsultaCargos:dataTabela" />
+                                        <p:commandButton value="#{cargoBean.accion}" actionListener="#{cargoBean.operar}" oncomplete="tratarRequisicao(xhr, status, args)" update="frmDialogoCadastroCargo :frmConsultaCargo:dataTabela" />
                                         <p:commandButton value="Excluir" />
                                         <p:commandButton value="Limpar" />
-                                        <p:commandButton value="Sair" oncomplete="PF('wdialogoCadastroCargo').hide();" />
+                                        <p:commandButton value="Sair" />
                                     </h:panelGrid>
                                 </f:facet> 
                             </h:panelGrid>
@@ -113,7 +109,7 @@
                             return true;
                         }
                     </script>
-                
+                </p:panel>
             </ui:define>
         </ui:composition>
 

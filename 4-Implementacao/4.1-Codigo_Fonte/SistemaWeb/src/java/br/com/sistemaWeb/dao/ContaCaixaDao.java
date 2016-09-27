@@ -73,7 +73,6 @@ public class ContaCaixaDao {
 
             listaContaCaixa.add(tempContaCaixa);
         }
-        conexao.close();
         return listaContaCaixa;
     }
 

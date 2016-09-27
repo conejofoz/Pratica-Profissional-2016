@@ -72,7 +72,6 @@ public class EstadoDao {
             tempEstado.getPais().setNomePais(rs.getString("nomepais"));
             listaEstado.add(tempEstado);
         }
-        conexao.close();
         return listaEstado;
     }
 

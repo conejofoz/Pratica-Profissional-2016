@@ -10,8 +10,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <h:outputStylesheet name="./css/default.css"/>
         <h:outputStylesheet name="./css/cssLayout.css"/>
-        <h:outputScript name="./js/funcoes.js" />
-        <title>Infinity Group S.A.</title>
+        <title>Facelets Template</title>
 
         <script type="text/javascript">
             function Enter(idinput) {
@@ -66,9 +65,10 @@
                 <h:form >
                     <p:menubar  autoDisplay="false" style="text-decoration:  #000000">
                         <p:submenu label="Cadastros" style="color: #AFAFAF; text-decoration-color: #D20005" >
-                            <p:submenu label="Produtos" style="color: #AFAFAF; text-decoration-color: #D20005" >
-                                <p:menuitem value="Velas" url="/faces/consultaEstoqueVelas.xhtml" style="color: #AFAFAF"/>
-                                
+                            <p:submenu label="Básico" style="color: #AFAFAF; text-decoration-color: #D20005" >
+                                <p:menuitem value="País" url="/faces/consultaPaises.xhtml" style="color: #AFAFAF"/>
+                                <p:menuitem value="Estado" url="/faces/consultaEstados.xhtml" style="color: #AFAFAF"/>
+                                <p:menuitem value="Cidade" url="/faces/consultaCidades.xhtml" style="color: #AFAFAF"/>
                             </p:submenu>
 
 
@@ -77,41 +77,42 @@
 
 
                             <p:submenu label="Produto" style="color: #AFAFAF; text-decoration-color: #D20005" >
-                                <p:menuitem value="NCM"  style="color: #AFAFAF"/>
-                                <p:menuitem value="CST"  style="color: #AFAFAF"/>
-                                <p:menuitem value="CFOP"  style="color: #AFAFAF"/>
-                                <p:menuitem value="Produto"  style="color: #AFAFAF"/>
-                                <p:menuitem value="Grupos"  style="color: #AFAFAF"/>
-                                <p:menuitem value="Marcas"  style="color: #AFAFAF"/>
-                                <p:menuitem value="Unidade medida"  style="color: #AFAFAF"/>
+                                <p:menuitem value="NCM" url="/faces/consultaNcm.xhtml" style="color: #AFAFAF"/>
+                                <p:menuitem value="CST" url="/faces/consultaCst.xhtml" style="color: #AFAFAF"/>
+                                <p:menuitem value="CFOP" url="/faces/consultaCfop.xhtml" style="color: #AFAFAF"/>
+                                <p:menuitem value="Produto" url="/faces/consultaProdutos.xhtml" style="color: #AFAFAF"/>
+                                <p:menuitem value="Grupos" url="/faces/consultaGrupos.xhtml" style="color: #AFAFAF"/>
+                                <p:menuitem value="Marcas" url="/faces/consultaMarcas.xhtml" style="color: #AFAFAF"/>
+                                <p:menuitem value="Unidade medida" url="/faces/consultaUnidade.xhtml" style="color: #AFAFAF"/>
 
                             </p:submenu>
 
                             <p:submenu label="Pessoas" style="color: #AFAFAF; text-decoration-color: #D20005" >
-                                <p:menuitem value="Cliente"  style="color: #AFAFAF"/>
-                                <p:menuitem value="Fornecedor"  style="color: #AFAFAF"/>
-                                <p:menuitem value="Cargo"  style="color: #AFAFAF"/>
-                                <p:menuitem value="Funcionário"  style="color: #AFAFAF"/>
-                                <p:menuitem value="Transportadoras"  style="color: #AFAFAF"/>
+                                <p:menuitem value="Cliente" url="/faces/consultaClientes.xhtml" style="color: #AFAFAF"/>
+                                <p:menuitem value="Fornecedor" url="/faces/consultaFornecedores.xhtml" style="color: #AFAFAF"/>
+                                <p:menuitem value="Cargo" url="/faces/consultaCargos.xhtml" style="color: #AFAFAF"/>
+                                <p:menuitem value="Funcionário" url="/faces/consultaFuncionarios.xhtml" style="color: #AFAFAF"/>
+                                <p:menuitem value="Transportadoras" url="/faces/consultaTransportadoras.xhtml" style="color: #AFAFAF"/>
+                                <p:menuitem value="Usuários" url="/faces/consultaUsuarios.xhtml" style="color: #AFAFAF"/>
 
                             </p:submenu>
 
                             <p:submenu label="Financeiro" style="color: #AFAFAF; text-decoration-color: #D20005" >
-                                <p:menuitem value="Contas do caixa"  style="color: #AFAFAF"/>
-                                <p:menuitem value="Moedas"  style="color: #AFAFAF"/>
-                                <p:menuitem value="Formas de pagamento"  style="color: #AFAFAF"/>
-                                <p:menuitem value="Condições de pagamento"  style="color: #AFAFAF"/>
+                                <p:menuitem value="Contas do caixa" url="/faces/consultaContasCaixa.xhtml" style="color: #AFAFAF"/>
+                                <p:menuitem value="Moedas" url="/faces/consultaMoedas.xhtml" style="color: #AFAFAF"/>
+                                <p:menuitem value="Formas de pagamento" url="/faces/consultaFormaPagamento.xhtml" style="color: #AFAFAF"/>
+                                <p:menuitem value="Condições de pagamento" url="/faces/consultaCondicaoPagamento.xhtml" style="color: #AFAFAF"/>
                             </p:submenu>
                             
                             </p:submenu>
 
 
                             <p:submenu label="Saídas">
-                                <p:menuitem value="Venda"  style="color: #AFAFAF"/>
+                                <p:menuitem value="Venda" url="/faces/consultaVendas.xhtml" style="color: #AFAFAF"/>
                             </p:submenu>
 
                             <p:submenu label="Entradas">
-                                <p:menuitem value="Compra"  style="color: #AFAFAF"/>
+                                <p:menuitem value="Compra" url="/faces/consultaCompras.xhtml" style="color: #AFAFAF"/>
                             </p:submenu>
 
                             <p:submenu label="Financeiro">

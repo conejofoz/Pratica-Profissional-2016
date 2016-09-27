@@ -17,7 +17,6 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
-import org.apache.jasper.tagplugins.jstl.core.Catch;
 import org.primefaces.context.RequestContext;
 
 /**
@@ -219,14 +218,9 @@ public class CstBean implements Serializable {
 
                 break;
             case "Modificar":
-                try{
                 this.atualizar();
                 this.limpiar();
-                fecharDialogo = true;
                 break;
-                } catch(Exception e1) {
-                   System.out.println("Erro ao atualizar cst");
-                }
         }
         context.addCallbackParam("fecharDialogo", fecharDialogo);
     }

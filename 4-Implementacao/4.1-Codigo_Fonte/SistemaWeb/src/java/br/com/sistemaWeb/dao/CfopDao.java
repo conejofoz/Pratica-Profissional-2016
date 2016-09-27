@@ -49,7 +49,7 @@ public class CfopDao implements Serializable{
         conexao = FabricaConexao.conectar();
         pstm = conexao.prepareStatement(sql);
         pstm.setString(1, cfop.getNomeCfop());
-        pstm.setString(2, cfop.getId());
+        pstm.setString(4, cfop.getId());
         pstm.executeUpdate();
     }
 

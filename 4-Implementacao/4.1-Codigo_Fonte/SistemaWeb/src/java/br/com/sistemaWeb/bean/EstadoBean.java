@@ -32,8 +32,7 @@ import org.primefaces.event.SelectEvent;
  */
 @ManagedBean
 @ViewScoped
-public class EstadoBean implements Serializable {
-
+public class EstadoBean implements Serializable{
     private static final long serialVersionUID = 1L;
     private Estado estado = new Estado();
     private List<Estado> listaEstado;
@@ -42,9 +41,12 @@ public class EstadoBean implements Serializable {
     private String accion;
     private Estado estadoSelecionado;
   //  private LogEvento logEvento = new LogEvento();
-
+    
     //paga o log
-    // private UsuarioBean usuarioBean = new UsuarioBean();
+   // private UsuarioBean usuarioBean = new UsuarioBean();
+
+
+    
     private Pais pais = new Pais();
 
     public Pais getPais() {
@@ -54,6 +56,8 @@ public class EstadoBean implements Serializable {
     public void setPais(Pais pais) {
         this.pais = pais;
     }
+    
+    
 
     public Estado getEstadoSelecionado() {
         return estadoSelecionado;
@@ -62,6 +66,10 @@ public class EstadoBean implements Serializable {
     public void setEstadoSelecionado(Estado estadoSelecionado) {
         this.estadoSelecionado = estadoSelecionado;
     }
+
+     
+    
+    
 
     public String getAccion() {
         return accion;
@@ -99,20 +107,25 @@ public class EstadoBean implements Serializable {
         return serialVersionUID;
     }
 
-    public void apagar() {
-        eDao = new EstadoDao();
-        try {
-            eDao.apagar(estadoSelecionado);
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Aviso:", "Eliminado com sucesso"));
-        } catch (SQLException ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Aviso:", "Erro ao eliminar"));
-        }
-    }
+  
 
+    
+    public void apagar() {
+            eDao = new EstadoDao();
+            try {
+                eDao.apagar(estadoSelecionado);
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Aviso:", "Eliminado com sucesso"));
+            } catch (SQLException ex) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Aviso:", "Erro ao eliminar"));
+            }
+    }
+    
+    
+   
     public void salvar() {
         if (estado != null) {
             eDao = new EstadoDao();
-
+            
             try {
                 try {
                     if (!eDao.buscaPorNome(estado)) {
@@ -134,11 +147,12 @@ public class EstadoBean implements Serializable {
         }
     }
 
+    
     public void salvarAntigo() throws Exception {
         if (estado != null) {
             eDao = new EstadoDao();
             try {
-
+                
                 eDao.salvar(estado);
                 System.out.println("passou no salvar");
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Aviso:", "Salvo com sucesso "));
@@ -148,7 +162,8 @@ public class EstadoBean implements Serializable {
             estado = new Estado();
         }
     }
-
+    
+    
     public void atualizar() {
         eDao = new EstadoDao();
         try {
@@ -193,23 +208,20 @@ public class EstadoBean implements Serializable {
         boolean fecharDialogo = false;
         switch (accion) {
             case "Registrar":
-                try {
-                    this.salvar();
-                    this.limpiar();
-                    fecharDialogo = true;
-                    System.out.println(fecharDialogo);
-                } catch (Exception e) {
-                    System.out.println("passou no erro do operar");
-                }
+                try{
+                   this.salvar();
+                   this.limpiar();
+                   fecharDialogo = true;
+                   System.out.println(fecharDialogo);
+                }catch(Exception e){
+                   System.out.println("passou no erro do operar");
+                 
+            }
+                
                 break;
             case "Modificar":
-                try {
-                    this.atualizar();
-                    this.limpiar();
-                    fecharDialogo = true;
-                } catch (Exception e2) {
-
-                }
+                this.atualizar();
+                this.limpiar();
                 break;
         }
         context.addCallbackParam("fecharDialogo", fecharDialogo);
@@ -220,26 +232,26 @@ public class EstadoBean implements Serializable {
         this.estado.setSiglaEstado("");
         this.estado.setNomeEstado("");
     }
-
-    public void obterEstado(Estado xEstado) {
+    
+    public void obterEstado(Estado xEstado){
         this.accion = "Modificar";
         this.estado = xEstado;
     }
     /*  
-     public void carregarLog() {
-     eDaoLog = new LogEventoDAO();
-     try {
-     logEvento.setNomeUsuario(usuarioBean.verificarUsuarioLogado().getNome().trim());
-     } catch (IOException ex) {
-     FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro ao ao buscar o nome do estado para o log", "Erro: " + ex.getMessage()));
-     }
-     logEvento.setDescricao(logEvento.getNomeUsuario() + " inseriu um estado no sistema");
-     logEvento.setData(new Date());
-     logEvento.setHora(new Date());
+    public void carregarLog() {
+        eDaoLog = new LogEventoDAO();
+        try {
+            logEvento.setNomeUsuario(usuarioBean.verificarUsuarioLogado().getNome().trim());
+        } catch (IOException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro ao ao buscar o nome do estado para o log", "Erro: " + ex.getMessage()));
+        }
+        logEvento.setDescricao(logEvento.getNomeUsuario() + " inseriu um estado no sistema");
+        logEvento.setData(new Date());
+        logEvento.setHora(new Date());
         
-     }*/
-
-    public void buscaPaisBySigla() {
+    }*/
+    
+    public void buscaPaisBySigla(){
         System.out.println("entrou no busca pais por sigla do estadobean");
         PaisDao xdaoPais;
         Pais temp;
@@ -251,54 +263,46 @@ public class EstadoBean implements Serializable {
             if (temp != null) {
                 this.estado.setPais(temp);
                 System.out.println("achou o pais " + this.estado.getPais().getNomePais());
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "ACHOU O PAIS", "Erro: "));
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "ACHOU O PAIS", "Erro: " ));
             } else {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro ao PROCURAR PAIS", "Erro: "));
-                System.out.println(" nao achou o pais ");
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro ao PROCURAR PAIS", "Erro: " ));
+               System.out.println(" nao achou o pais " ); 
             }
         } catch (Exception e) {
             //throw e;
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "ERRO NO TRY BUSCA PAIS", "Erro: "));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "ERRO NO TRY BUSCA PAIS", "Erro: " ));
         }
 
     }
+    
 
-    public void setarPaisSelecionado(SelectEvent event) {
-        Pais paisNovo = (Pais) event.getObject();
-        paisNovo.getClass().getName(); //esta linha maldida me fez patiar 2 dias
-        estado.setPais(paisNovo);
-        setPais(paisNovo);
-    }
 
-    public void listavalor() {
-        System.out.println(" valor do id do pais: " + estado.getPais().getId());
-        System.out.println(" valor do id nome pais:" + estado.getPais().getNomePais());
-    }
-
-    public void selecionar(Estado estado) {
-        RequestContext.getCurrentInstance().closeDialog(estado);
-    }
-
-    public void abrirDialogoEstado() {
-        Map<String, Object> opcoes = new HashMap<>();
-        opcoes.put("modal", true);
-        opcoes.put("resizable", false);
-        opcoes.put("contentHeight", 470);
-        opcoes.put("contentWidth", 1000);
-        //opcoes.put("dynamic", true);
-        RequestContext.getCurrentInstance().openDialog("consultaEstados", opcoes, null);
-        System.out.println("passou no abrir dialogo estados");
-    }
-
-    public void abrirDialogoEstado2() {
-        Map<String, Object> opcoes = new HashMap<>();
-        opcoes.put("modal", true);
-        opcoes.put("resizable", false);
-        opcoes.put("contentHeight", 470);
-        opcoes.put("contentWidth", 1000);
-        //opcoes.put("dynamic", true);
-        RequestContext.getCurrentInstance().openDialog("consultaEstados2", opcoes, null);
-        System.out.println("passou no abrir dialogo estados");
-    }
-
+   public void setarPaisSelecionado(SelectEvent event){
+      Pais paisNovo = (Pais) event.getObject();
+      paisNovo.getClass().getName(); //esta linha maldida me fez patiar 2 dias
+      estado.setPais(paisNovo);
+      setPais(paisNovo);
+   }
+   
+   public void listavalor(){
+       System.out.println(" valor do id do pais: " + estado.getPais().getId());
+       System.out.println(" valor do id nome pais:" + estado.getPais().getNomePais());
+   }
+   
+   
+   public void selecionar(Estado estado){
+    RequestContext.getCurrentInstance().closeDialog(estado);
+}   
+   
+     public void abrirDialogoEstado(){
+       Map<String, Object> opcoes = new HashMap<>();
+       opcoes.put("modal", true);
+       opcoes.put("resizable", false);
+       opcoes.put("contentHeight", 470);
+       opcoes.put("contentWidth", 1000);
+       //opcoes.put("dynamic", true);
+       RequestContext.getCurrentInstance().openDialog("consultaEstados", opcoes, null);
+       System.out.println("passou no abrir dialogo estados");
+   } 
+   
 }

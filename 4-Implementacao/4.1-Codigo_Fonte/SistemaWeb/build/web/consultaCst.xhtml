@@ -9,11 +9,11 @@
     <body>
         <ui:composition template="./WEB-INF/templates/telaPadrao.xhtml">
             <ui:define name="content">
-                <p:dialog id="dialogoConsultaCsts" widgetVar="wdialogoConsultaCsts" width="600" height="300" visible="true">
+                <p:panel id="painelPrincipal" header="Consulta de csts" footer="SistemaWeb">
                     <!--pra funcionar a consulta tem que tirar o prerender view-->
-                    <f:event type="preRenderView" listener="#{cstBean.listar()}" />
-                    <p:growl id="msjConsultaCsts" showDetail="true" />
-                    <h:form id="frmConsultaCsts" >
+                    <!--<f:event type="preRenderView" listener="" />-->
+                    <p:growl id="msj" showDetail="true" />
+                    <h:form id="frmConsultaCst" style="height: 600px" >
                         <p:growl id="msgConsultaCst" showDetail="true" />
                         
                         <p:panelGrid columns="3" >
@@ -25,7 +25,7 @@
                         </p:panelGrid>
                         <p:commandButton id="btnAcao" value="Novo" oncomplete="PF('wdialogoCadastroCst').show();" actionListener="#{cstBean.setAccion('Registrar')}" action="#{cstBean.zerarCst}" update=":dialogoCadastroCst" />
                         <p:dataTable id="dataTabela" value="#{cstBean.listaCst}" var="var_cst"
-                                     paginator="true" paginatorPosition="bottom"
+                                     paginator="true"
                                      paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                                      rowsPerPageTemplate="5,10,15" rows="10">
 
@@ -55,19 +55,16 @@
                                                  process="@this" />
                             </p:column>
                         </p:dataTable>
-                         </h:form>
-                </p:dialog>
 
                         <!--DIALOGO DE CONFIRMAÇÃO DE EXCLUSÃO**********************************************************************-->
                         <p:confirmDialog id="dialogoConfirmacaoExclusaoCst" header="Exclusão"
                                          message="Tem certeza que deseja excluir? #{cstBean.cst.nomeCst}"
                                          widgetVar="wdialogoConfirmacaoExclusaoCst">
-                            <h:form id="frmExclusaoCst" >
-                            <p:commandButton id="btnApagar" value="Sim" update=":frmConsultaCsts:dataTabela :frmConsultaCsts:msgConsultaCst" oncomplete="PF('wdialogoConfirmacaoExclusaoCst').hide();" action="#{cstBean.apagar()}"/>
+
+                            <p:commandButton id="btnApagar" value="Sim" update="dataTabela :frmConsultaCst:msgConsultaCst" oncomplete="PF('wdialogoConfirmacaoExclusaoCst').hide();" action="#{cstBean.apagar()}"/>
                             <p:commandButton value="Não" oncomplete="PF('wdialogoConfirmacaoExclusaoCst').hide();" />
-                            </h:form>
                         </p:confirmDialog>
-                   
+                    </h:form>
 
 
 
@@ -111,16 +108,44 @@
 
                                 <f:facet name="footer">
                                     <h:panelGrid id="painelGridRodapeCadastroCst" columns="5">
-                                        <p:commandButton value="#{cstBean.accion}" actionListener="#{cstBean.operar}" oncomplete="tratarRequisicao(xhr, status, args)" update="frmDialogoCadastroCst :frmConsultaCsts:dataTabela" />
+                                        <p:commandButton value="#{cstBean.accion}" actionListener="#{cstBean.operar}" oncomplete="tratarRequisicao(xhr, status, args)" update="frmDialogoCadastroCst :frmConsultaCst:dataTabela" />
                                         <p:commandButton value="Excluir" />
                                         <p:commandButton value="Limpar" />
-                                        <p:commandButton value="Sair" oncomplete="PF('wdialogoCadastroCst').hide();" />
+                                        <p:commandButton value="Sair" />
+
                                     </h:panelGrid>
                                 </f:facet> 
                             </h:panelGrid>
 
 
                         </h:form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -158,7 +183,7 @@
 
 
                     </script>
-               
+                </p:panel>
             </ui:define>
         </ui:composition>
 

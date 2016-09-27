@@ -49,7 +49,7 @@ public class NcmDao implements Serializable{
         conexao = FabricaConexao.conectar();
         pstm = conexao.prepareStatement(sql);
         pstm.setString(1, ncm.getNomeNcm());
-        pstm.setString(2, ncm.getId());
+        pstm.setString(4, ncm.getId());
         pstm.executeUpdate();
     }
 
@@ -65,7 +65,6 @@ public class NcmDao implements Serializable{
             tempNcm.setNomeNcm(rs.getString("nomeNcm"));
             listaNcm.add(tempNcm);
         }
-        conexao.close();
         return listaNcm;
     }
 
@@ -88,7 +87,6 @@ public class NcmDao implements Serializable{
             System.out.println(tempNcm.getNomeNcm());
         }
         System.out.println("aaa");
-        conexao.close();
         return listaNcm;
     }
     

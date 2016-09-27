@@ -109,7 +109,6 @@ public class VendaDao {
             tempVenda.setTotal(rs.getDouble("total"));
             listaVenda.add(tempVenda);
         }
-        conexao.close();
         return listaVenda;
     }
 

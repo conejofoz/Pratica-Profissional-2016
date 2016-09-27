@@ -1,8 +1,6 @@
 package br.com.sistemaWeb.classes;
 
-import java.sql.Time;
 import java.util.Date;
-import java.util.Objects;
 
 /**
  *
@@ -38,42 +36,9 @@ public class Produto {
     private Fornecedor fornecedor = new Fornecedor();
     private Marca marca = new Marca();
     private Date dataCadastro;
-    private Time horaCadastro;
     private Ncm ncm = new Ncm();
     private Cst cst = new Cst();
     private Cfop cfop = new Cfop();
-
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 13 * hash + this.id;
-        hash = 13 * hash + Objects.hashCode(this.nomeProduto);
-        hash = 13 * hash + Objects.hashCode(this.codigoBarras);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final Produto other = (Produto) obj;
-        if (this.id != other.id) {
-            return false;
-        }
-        if (!Objects.equals(this.nomeProduto, other.nomeProduto)) {
-            return false;
-        }
-        if (!Objects.equals(this.codigoBarras, other.codigoBarras)) {
-            return false;
-        }
-        return true;
-    }
-    
-    
 
     public int getId() {
         return id;
@@ -336,16 +301,6 @@ public class Produto {
     public void setDataCadastro(Date dataCadastro) {
         this.dataCadastro = dataCadastro;
     }
-
-    public Time getHoraCadastro() {
-        return horaCadastro;
-    }
-
-    public void setHoraCadastro(Time horaCadastro) {
-        this.horaCadastro = horaCadastro;
-    }
-    
-    
     
     
 

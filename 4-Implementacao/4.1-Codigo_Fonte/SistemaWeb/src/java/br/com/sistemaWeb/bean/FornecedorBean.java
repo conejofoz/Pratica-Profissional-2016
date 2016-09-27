@@ -23,7 +23,6 @@ import javax.faces.bean.SessionScoped;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
-import org.apache.jasper.tagplugins.jstl.core.Catch;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
 
@@ -278,15 +277,15 @@ public class FornecedorBean implements Serializable {
                         retorno = false;
                     }
                 } catch (SQLException ex1) {
-                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro ao salvar evento", "Erro: " + ex1.getMessage()));
+                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro de SQL", "Erro: " + ex1.getMessage()));
                     retorno = false;
                 }
             } catch (Exception ex2) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro ao salvar fornecedor*", "Erro: " + ex2.getMessage()));
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro:", "" + ex2.getMessage()));
                 retorno = false;
                 throw ex2;
             }
-            fornecedor = new Fornecedor();
+            //fornecedor = new Fornecedor();
         }
         return retorno;
     }
@@ -370,7 +369,7 @@ public class FornecedorBean implements Serializable {
             case "Registrar":
                 try {
                     if(this.salvar()){
-                       //this.limpiar();
+                       this.limpiar();
                        fecharDialogo = true;
                     } else{
                         System.out.println("erro booooooo");
@@ -383,13 +382,8 @@ public class FornecedorBean implements Serializable {
 
                 break;
             case "Modificar":
-                try{
                 this.atualizar();
                 this.limpiar();
-                fecharDialogo = true;
-                } catch(Exception e2){
-                  System.out.println("passou no erro do operar alterar"); 
-                }
                 break;
         }
         context.addCallbackParam("fecharDialogo", fecharDialogo);

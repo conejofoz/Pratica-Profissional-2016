@@ -24,7 +24,6 @@ import br.com.sistemaWeb.dao.TransportadoraDao;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -75,7 +74,6 @@ public class CompraBean implements Serializable {
         this.produto = new Produto();
         this.listaItens = new ArrayList();
         this.compra.setEmissao(new Date());
-        this.compra.setDataEnvio(new Date());
         this.listaParcelas = new ArrayList();
     }
 
@@ -243,42 +241,6 @@ public class CompraBean implements Serializable {
     }
 
     public boolean salvar() throws Exception {
-        //validar numero da nota
-        if (this.compra.getNota() == 0) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "", "Informe o número da nota"));
-            return false;
-        }
-
-        //validar fornecedor
-        if (this.compra.getFornecedor().getId() == 0) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "", "Preencha o fornecedor "));
-            return false;
-        }
-
-        //validar data de emissão
-        if (this.compra.getEmissao().after(new Date())) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "", "Data de emissão não pode ser posterior a data atual "));
-            return false;
-        }
-
-        //validar data de envio
-        if (this.compra.getDataEnvio().before(this.compra.getEmissao())) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "", "Data de envio não pode ser anterior a data de emissão"));
-            return false;
-        }
-
-        //validar desconto maior que total da nota
-        if (this.compra.getTotalDescontoNota() > this.compra.getTotalNota()) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "", "Valor do desconto não pode ser maior que o valor total"));
-            return false;
-        }
-
-        //validar total da nota
-        if (this.compra.getTotalNota() == 0) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "", "Valor total não pode ser zero"));
-            return false;
-        }
-
         boolean retorno = false;
         Compra compraAux;
         if (compra != null) {
@@ -290,7 +252,6 @@ public class CompraBean implements Serializable {
                     if (compraAux == null) {
                         //carregarLog();
                         eDao.salvar(compra, listaItens);
-                        compra = new Compra();
                         retorno = true;
                         //eDaoLog.salvar(logEvento);
                         //*      System.out.println("passou no salvar");
@@ -317,7 +278,7 @@ public class CompraBean implements Serializable {
             }
 
         }
-        //compra = new Compra();
+        compra = new Compra();
         return retorno;
     }
 
@@ -397,19 +358,14 @@ public class CompraBean implements Serializable {
     public CondicaoPagamento buscaCondicaoByCodigo(CondicaoPagamento condicaoPagamento) throws Exception {
         CondicaoPagamentoDao dao;
         CondicaoPagamento temp;
-
         try {
             dao = new CondicaoPagamentoDao();
             temp = dao.buscaPorID(condicaoPagamento);
             if (temp != null) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Aviso:", "Condicao encontrado "));
                 this.compra.setCondicaoPagamento(temp);
-                if (compra.getNota() > 0) {
-                    this.listarParcelas();
-                    this.calculaTotalParcelas();
-                } else{
-                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "", "Não foi preenchido um número de nota, as parcelas não serão geradas!"));
-                }
+                this.listarParcelas();
+                this.calculaTotalParcelas();
             } else {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Aviso:", "CondicaoPagamento não encontrado "));
             }
@@ -471,7 +427,6 @@ public class CompraBean implements Serializable {
     public void limpiar() {
         this.compra.setNota(0);
         this.compra.setTotalProdutos(0);
-        this.precoTotal = 0.00;
 
     }
 
@@ -517,13 +472,11 @@ public class CompraBean implements Serializable {
         //System.out.println(sigla);
         try {
             xdaoProduto = new ProdutoDao();
-            //temp = xdaoProduto.buscaPorCodigo(produto.getId());
-            temp = xdaoProduto.buscaPorID(this.produto);
+            temp = xdaoProduto.buscaPorCodigo(codigo);
             if (temp != null) {
                 this.liberaBotaoInserirProduto = true;
                 this.produto = temp;
                 this.precoUnitario = this.produto.getPrecoCusto();
-
                 //RequestContext.getCurrentInstance().execute("setaQuantidadeProduto();");
                 //FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_FATAL, "Produto encontrado....", ""));
             } else {
@@ -574,10 +527,6 @@ public class CompraBean implements Serializable {
         detalhe.setProduto(produto);
         detalhe.setPreco(precoUnitario);
         detalhe.setDesconto(desconto);
-        detalhe.setBaseCalculoIcms(precoUnitario * quantidade - desconto);
-        detalhe.setBaseCalculoIpi(precoUnitario * quantidade - desconto);
-        detalhe.setValorIcms(detalhe.getBaseCalculoIcms() * produto.getIcms() / 100);
-        detalhe.setValorIpi(detalhe.getBaseCalculoIpi() * produto.getIpi() / 100);
         this.listaItens.add(detalhe);
         calcularTotalLinha();
         produto = new Produto();//acabei sem querer resolvendo o problema dos codigos repetidos na grid com esse comando
@@ -590,23 +539,12 @@ public class CompraBean implements Serializable {
         compra.setTotalProdutos(0);
         compra.setTotalNota(0);
         compra.setTotalDescontoNota(0);
-        compra.setTotalBaseCalculoIcmsNota(0);
-        compra.setTotalBaseCalculoIpiNota(0);
-        compra.setTotalValorIcmsNota(0);
-        compra.setTotalValorIpiNota(0);
         for (ItensCompra det : listaItens) {
-            this.compra.setTotalProdutos(this.compra.getTotalProdutos() + det.getSubTotal() - det.getDesconto());
+            this.compra.setTotalProdutos(this.compra.getTotalProdutos() + det.getSubTotal());
+            //this.compra.setTotalNota(this.compra.getTotalNota() + det.getSubTotalComDesconto());
             this.compra.setTotalDescontoNota(this.compra.getTotalDescontoNota() + det.getDesconto());
-            this.compra.setTotalBaseCalculoIcmsNota(this.compra.getTotalBaseCalculoIcmsNota() + det.getBaseCalculoIcms());
-            this.compra.setTotalBaseCalculoIpiNota(this.compra.getTotalBaseCalculoIpiNota() + det.getBaseCalculoIpi());
-            this.compra.setTotalValorIcmsNota(this.compra.getTotalValorIcmsNota() + det.getValorIcms());
-            this.compra.setTotalValorIpiNota(this.compra.getTotalValorIpiNota() + det.getValorIpi());
         }
-        //this.compra.setTotalNota(this.compra.getTotalProdutos()
-            //    + this.compra.getTotalValorIcmsNota()
-            //    + this.compra.getTotalValorIpiNota());
-        this.compra.setTotalNota(this.compra.getTotalProdutos()
-                               + this.compra.getTotalValorIpiNota());
+        this.compra.setTotalNota(this.compra.getTotalProdutos() - this.compra.getTotalDescontoNota());
     }
 
     public void calculaTotalParcelas() {
@@ -692,7 +630,7 @@ public class CompraBean implements Serializable {
             System.out.println("erro no selecionar cst");
         }
     }
-
+    
     public void setarCfopSelecionado(SelectEvent event) {
         if (event != null) {
             Cfop cfopNovo = (Cfop) event.getObject();
@@ -734,17 +672,6 @@ public class CompraBean implements Serializable {
         }
         if (dataInformada.before(compra.getEmissao())) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Atenção", "Foi informado uma data menor que a data de emissão!!!"));
-        }
-    }
-
-    public void verificaDataEnvioNormal() {
-        compra.setDataEnvio(compra.getDataEnvio());
-        System.out.println("===================================");
-        System.out.println("data emissao atual-> " + compra.getEmissao());
-        System.out.println("data envio   atual-> " + compra.getDataEnvio());
-        if (compra.getEmissao().after(compra.getDataEnvio())) {
-            System.out.println("data de envio não pode ser menor que data de emissão->");
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Atenção", "data de envio não pode ser menor que data de emissãol!!!"));
         }
     }
 

@@ -72,7 +72,6 @@ public class FuncionarioDao {
             tempFuncionario.getCargo().setNomeCargo(rs.getString("nomecargo"));
             listaFuncionario.add(tempFuncionario);
         }
-        conexao.close();
         return listaFuncionario;
     }
 

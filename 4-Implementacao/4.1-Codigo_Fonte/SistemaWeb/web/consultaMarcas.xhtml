@@ -9,14 +9,13 @@
     <body>
         <ui:composition template="./WEB-INF/templates/telaPadrao.xhtml">
             <ui:define name="content">
-                <!--pagina marcas-->
-                <p:dialog header="Consulta de marcas" id="dialogoConsultaMarcas" widgetVar="wdialogoConsultaMarcas" width="600" height="300" visible="true" >
+                <p:panel id="painelPrincipal" header="Consulta de marcas" footer="SistemaWeb">
                     <!--pra funcionar a consulta tem que tirar o prerender view-->
-                    <f:event type="preRenderView" listener="#{marcaBean.listar()}" />
-
-                    <h:form id="frmConsultaMarcas" >
+                    <!--<f:event type="preRenderView" listener="" />-->
+                    <p:growl id="msj" showDetail="true" />
+                    <h:form id="frmConsultaMarca" style="height: 600px" >
                         <p:growl id="msgConsultaMarca" showDetail="true" />
-
+                        
                         <p:panelGrid columns="3" >
                             <h:panelGroup >
                                 <p:outputLabel id="lblConsultaNome" value="Nome" /><br />
@@ -26,7 +25,7 @@
                         </p:panelGrid>
                         <p:commandButton id="btnAcao" value="Novo" oncomplete="PF('wdialogoCadastroMarca').show();" actionListener="#{marcaBean.setAccion('Registrar')}" action="#{marcaBean.zerarMarca}" update=":dialogoCadastroMarca" />
                         <p:dataTable id="dataTabela" value="#{marcaBean.listaMarca}" var="var_marca"
-                                     paginator="true" paginatorPosition="bottom"
+                                     paginator="true"
                                      paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                                      rowsPerPageTemplate="5,10,15" rows="10">
 
@@ -57,95 +56,116 @@
                             </p:column>
                         </p:dataTable>
 
-                    </h:form>
-                </p:dialog>
+                        <!--DIALOGO DE CONFIRMAÇÃO DE EXCLUSÃO**********************************************************************-->
+                        <p:confirmDialog id="dialogoConfirmacaoExclusaoMarca" header="Exclusão"
+                                         message="Tem certeza que deseja excluir? #{marcaBean.marca.nomeMarca}"
+                                         widgetVar="wdialogoConfirmacaoExclusaoMarca">
 
-
-
-
-
-                <!--DIALOGO DE CONFIRMAÇÃO DE EXCLUSÃO**********************************************************************-->
-                <p:confirmDialog id="dialogoConfirmacaoExclusaoMarca" header="Exclusão"
-                                 message="Tem certeza que deseja excluir? #{marcaBean.marca.nomeMarca}"
-                                 widgetVar="wdialogoConfirmacaoExclusaoMarca">
-                    <h:form id="frmExclusaoMarca" >
-                        <p:commandButton id="btnApagar" value="Sim" update=":frmConsultaMarcas:dataTabela :frmConsultaMarcas:msgConsultaMarca" oncomplete="PF('wdialogoConfirmacaoExclusaoMarca').hide();" action="#{marcaBean.apagar()}"/>
-                        <p:commandButton value="Não" oncomplete="PF('wdialogoConfirmacaoExclusaoMarca').hide();" />
-                    </h:form>
-                </p:confirmDialog>
-
-
-
-
-
-
-
-
-
-
-                <!--DIALOGO DE CADASTRO-->
-                <p:dialog header="Cadastro de marcas" widgetVar="wdialogoCadastroMarca" id="dialogoCadastroMarca" position="center" showEffect="slide" width="500" height="100">
-                    <h:form id="frmDialogoCadastroMarca" >
-                        
-                        <p:growl id="msjCadastroMarca" showDetail="true" />
-                        <h:panelGrid columns="3" id="painelGridDialogoCadastroMarca" >
-
-
-
-
-
-                            <h:panelGroup>
-                                <p:outputLabel id="lblMarca" value="Marca" styleClass="negrito" /><br />
-                                <p:inputText id="edtMarca" value="#{marcaBean.marca.nomeMarca}" maxlength="100" required="true" size="50"
-                                             onkeypress="return TABEnter(event, 'edtCep');">
-                                    <p:ajax event="blur" update="@this" listener="#{marcaBean.handleKeyEvent}" />
-                                </p:inputText>
-                            </h:panelGroup>
-
-
-
-
-                            <!--fim busca cep-->
-
-
-
-                            <f:facet name="footer">
-                                <h:panelGrid id="painelGridRodapeCadastroMarca" columns="5">
-                                    <p:commandButton value="#{marcaBean.accion}" actionListener="#{marcaBean.operar}" oncomplete="tratarRequisicaoMarcas(xhr, status, args)" update="frmDialogoCadastroMarca :frmConsultaMarcas:dataTabela" />
-                                    <p:commandButton value="Excluir" />
-                                    <p:commandButton value="Limpar" />
-                                    <p:commandButton value="Sair" oncomplete="PF('wdialogoCadastroMarca').hide();" />
-
-                                </h:panelGrid>
-                            </f:facet> 
-                        </h:panelGrid>
+                            <p:commandButton id="btnApagar" value="Sim" update="dataTabela :frmConsultaMarca:msgConsultaMarca" oncomplete="PF('wdialogoConfirmacaoExclusaoMarca').hide();" action="#{marcaBean.apagar()}"/>
+                            <p:commandButton value="Não" oncomplete="PF('wdialogoConfirmacaoExclusaoMarca').hide();" />
+                        </p:confirmDialog>
                     </h:form>
 
 
 
 
-                </p:dialog>
 
-                <script type="text/javascript">
-                    function tratarRequisicaoMarcas(xhr, status, args) {
-                        if (!args.fecharDialogo) {
-                            jQuery("#dialogoCadastroMarca").effect("shake", {times: 10}, 100);
-                        } else {
-                            PF('wdialogoCadastroMarca').hide();
+
+
+
+
+                    <!--DIALOGO DE CADASTRO-->
+                    <p:dialog header="Cadastro de marcas" widgetVar="wdialogoCadastroMarca" id="dialogoCadastroMarca" position="center" showEffect="slide" width="600" height="100">
+                        <h:form id="frmDialogoCadastroMarca" >
+                            <p:messages closable="true"/>
+                            <p:growl id="msjCadastroMarca" showDetail="true" />
+                            <h:panelGrid columns="3" id="painelGridDialogoCadastroMarca" >
+
+                                
+                               
+                                
+                                
+                                <h:panelGroup>
+                                    <p:outputLabel id="lblMarca" value="Marca" styleClass="negrito" /><br />
+                                    <p:inputText id="edtMarca" value="#{marcaBean.marca.nomeMarca}" maxlength="100" required="true" size="50"
+                                                 onkeypress="return TABEnter(event, 'edtCep');">
+                                        <p:ajax event="blur" update="@this" listener="#{marcaBean.handleKeyEvent}" />
+                                    </p:inputText>
+                                </h:panelGroup>
+
+
+
+
+                                <!--fim busca cep-->
+
+
+
+                                <f:facet name="footer">
+                                    <h:panelGrid id="painelGridRodapeCadastroMarca" columns="5">
+                                        <p:commandButton value="#{marcaBean.accion}" actionListener="#{marcaBean.operar}" oncomplete="tratarRequisicao(xhr, status, args)" update="frmDialogoCadastroMarca :frmConsultaMarca:dataTabela" />
+                                        <p:commandButton value="Excluir" />
+                                        <p:commandButton value="Limpar" />
+                                        <p:commandButton value="Sair" />
+
+                                    </h:panelGrid>
+                                </f:facet> 
+                            </h:panelGrid>
+
+
+                        </h:form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    </p:dialog>
+
+                    <script type="text/javascript">
+                        function tratarRequisicao(xhr, status, args) {
+                            if (!args.fecharDialogo) {
+                                jQuery("#dialogoCadastroMarca").effect("shake", {times: 10}, 100);
+                            } else {
+                                PF('wdialogoCadastroMarca').hide();
+                            }
                         }
-                    }
 
 
-                    function TABEnter(pEvent, campo) {
-                        if (pEvent.keyCode === 13) {
-                            //return pEvent.keyCode = 9;  
-                            //document.getElementById('frmDialogoCadastroVenda:' + campo).focus();
-                            //document.getElementById('frmDialogoCadastroVenda:' + campo).value='';
-                            document.getElementById('frmDialogoCadastroMarca:' + campo).select();
-                            return false;
+                        function TABEnter(pEvent, campo) {
+                            if (pEvent.keyCode === 13) {
+                                //return pEvent.keyCode = 9;  
+                                //document.getElementById('frmDialogoCadastroVenda:' + campo).focus();
+                                //document.getElementById('frmDialogoCadastroVenda:' + campo).value='';
+                                document.getElementById('frmDialogoCadastroMarca:' + campo).select();
+                                return false;
+                            }
+                            return true;
                         }
-                        return true;
-                    }
 
 
 
@@ -156,8 +176,8 @@
 
 
 
-                </script>
-                <!--fim pagina marcas-->
+                    </script>
+                </p:panel>
             </ui:define>
         </ui:composition>
 

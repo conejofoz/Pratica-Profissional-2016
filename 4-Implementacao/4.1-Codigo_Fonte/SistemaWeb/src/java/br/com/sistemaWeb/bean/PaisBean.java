@@ -29,8 +29,7 @@ import org.primefaces.context.RequestContext;
  */
 @ManagedBean
 @ViewScoped
-public class PaisBean implements Serializable {
-
+public class PaisBean implements Serializable{
     private static final long serialVersionUID = 1L;
     private Pais pais = new Pais();
     private List<Pais> listaPais;
@@ -39,9 +38,10 @@ public class PaisBean implements Serializable {
     private String accion;
     private Pais paisSelecionado;
   //  private LogEvento logEvento = new LogEvento();
-
+    
     //paga o log
-    // private UsuarioBean usuarioBean = new UsuarioBean();
+   // private UsuarioBean usuarioBean = new UsuarioBean();
+
     public Pais getPaisSelecionado() {
         return paisSelecionado;
     }
@@ -49,6 +49,10 @@ public class PaisBean implements Serializable {
     public void setPaisSelecionado(Pais paisSelecionado) {
         this.paisSelecionado = paisSelecionado;
     }
+
+     
+    
+    
 
     public String getAccion() {
         return accion;
@@ -86,51 +90,25 @@ public class PaisBean implements Serializable {
         return serialVersionUID;
     }
 
-    public void apagar() {
-        eDao = new PaisDao();
-        try {
-            eDao.apagar(paisSelecionado);
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Aviso:", "Eliminado com sucesso"));
-        } catch (SQLException ex) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Aviso:", "Erro ao eliminar"));
-        }
-    }
+  
 
-    public boolean salvar() throws Exception {
-        boolean retorno = false;
-        if (pais != null) {
+    
+    public void apagar() {
             eDao = new PaisDao();
             try {
-                try {
-                    if (!eDao.buscaPorNome(pais)) {
-                        //carregarLog();
-                        eDao.salvar(pais);
-                        //eDaoLog.salvar(logEvento);
-                        System.out.println("passou no salvar pais");
-                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Aviso:", "Salvo com sucesso "));
-                        retorno = true;
-                    } else {
-                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Aviso:", "Pais ja existe "));
-                        retorno = false;
-                    }
-                } catch (SQLException ex1) {
-                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "", "Erro ao salvar pais " + ex1.getMessage()));
-                    retorno = false;
-                }
-            } catch (Exception ex2) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "", "Erro ao salvar pais " + ex2.getMessage()));
-                retorno = false;
-                throw ex2;
+                eDao.apagar(paisSelecionado);
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Aviso:", "Eliminado com sucesso"));
+            } catch (SQLException ex) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Aviso:", "Erro ao eliminar"));
             }
-            //pais = new Pais();
-        }
-        return retorno;
     }
-
-    public void salvarold() {
+    
+    
+   
+    public void salvar() {
         if (pais != null) {
             eDao = new PaisDao();
-
+            
             try {
                 try {
                     if (!eDao.buscaPorNome(pais)) {
@@ -152,11 +130,12 @@ public class PaisBean implements Serializable {
         }
     }
 
+    
     public void salvarAntigo() throws Exception {
         if (pais != null) {
             eDao = new PaisDao();
             try {
-
+                
                 eDao.salvar(pais);
                 System.out.println("passou no salvar");
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Aviso:", "Salvo com sucesso "));
@@ -166,19 +145,18 @@ public class PaisBean implements Serializable {
             pais = new Pais();
         }
     }
-
-    public boolean atualizar() {
-        boolean retorno=false;
+    
+    
+    public void atualizar() {
         eDao = new PaisDao();
         try {
             eDao.atualizar(pais);
-            retorno = true;
             System.out.println("passou no atualizar");
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Aviso:", "Alterado com sucesso "));
         } catch (SQLException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro ao salvar evento", "Erro: " + ex.getMessage()));
         }
-        return retorno;
+
     }
 
     public void listar() throws Exception {
@@ -213,48 +191,16 @@ public class PaisBean implements Serializable {
         boolean fecharDialogo = false;
         switch (accion) {
             case "Registrar":
-                try {
-                    if (this.salvar()) {
-                        this.limpiar();
-                        fecharDialogo = true;
-                    } else {
-                        System.out.println("erro booooooo");
-                    };
-                    System.out.println("valor do fechardialogo" + fecharDialogo);
-                } catch (Exception e) {
-                    System.out.println("passou no erro do operar");
-                }
-                break;
-            case "Modificar":
-                if (this.atualizar()){
-                    this.limpiar();
-                    fecharDialogo = true;
-                } else {
-                    fecharDialogo = false;
-                }
+                try{
+                   this.salvar();
+                   this.limpiar();
+                   fecharDialogo = true;
+                   System.out.println(fecharDialogo);
+                }catch(Exception e){
+                   System.out.println("passou no erro do operar");
+                 
+            }
                 
-                break;
-        }
-        context.addCallbackParam("fecharDialogo", fecharDialogo);
-    }
-
-    public void operarold(ActionEvent actionEvent) throws Exception {
-        System.out.println("entrou no operar");
-        System.out.println("valor do accion" + this.accion);
-        RequestContext context = RequestContext.getCurrentInstance();
-        boolean fecharDialogo = false;
-        switch (accion) {
-            case "Registrar":
-                try {
-                    this.salvar();
-                    this.limpiar();
-                    fecharDialogo = true;
-                    System.out.println(fecharDialogo);
-                } catch (Exception e) {
-                    System.out.println("passou no erro do operar");
-
-                }
-
                 break;
             case "Modificar":
                 this.atualizar();
@@ -269,43 +215,48 @@ public class PaisBean implements Serializable {
         this.pais.setSiglaPais("");
         this.pais.setNomePais("");
     }
-
-    public void obterPais(Pais xPais) {
+    
+    public void obterPais(Pais xPais){
         this.accion = "Modificar";
         this.pais = xPais;
     }
     /*  
-     public void carregarLog() {
-     eDaoLog = new LogEventoDAO();
-     try {
-     logEvento.setNomeUsuario(usuarioBean.verificarUsuarioLogado().getNome().trim());
-     } catch (IOException ex) {
-     FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro ao ao buscar o nome do pais para o log", "Erro: " + ex.getMessage()));
-     }
-     logEvento.setDescricao(logEvento.getNomeUsuario() + " inseriu um pais no sistema");
-     logEvento.setData(new Date());
-     logEvento.setHora(new Date());
+    public void carregarLog() {
+        eDaoLog = new LogEventoDAO();
+        try {
+            logEvento.setNomeUsuario(usuarioBean.verificarUsuarioLogado().getNome().trim());
+        } catch (IOException ex) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro ao ao buscar o nome do pais para o log", "Erro: " + ex.getMessage()));
+        }
+        logEvento.setDescricao(logEvento.getNomeUsuario() + " inseriu um pais no sistema");
+        logEvento.setData(new Date());
+        logEvento.setHora(new Date());
         
-     }*/
+    }*/
+    
+    
+public void selecionar(Pais var_pais){
+    Pais paisAux = new Pais();
+    //RequestContext.getCurrentInstance().closeDialog(var_pais);
+    RequestContext.getCurrentInstance().release();
+    RequestContext.getCurrentInstance().closeDialog(0);
+    System.out.println("passou no selecionar pais");
+}    
+    
 
-    public void selecionar(Pais var_pais) {
-        //RequestContext.getCurrentInstance().closeDialog(var_pais);
-        System.out.println("pais selecionado: " + var_pais.getNomePais());
-    }
-
-    public void abrirDialogoPais() {
-        Map<String, Object> opcoes = new HashMap<>();
-        opcoes.put("modal", true);
-        opcoes.put("resizable", false);
-        opcoes.put("contentHeight", 470);
-        opcoes.put("contentWidth", 1000);
-        //opcoes.put("dynamic", true);
-        RequestContext.getCurrentInstance().openDialog("consultaPaises", opcoes, null);
-        System.out.println("passou");
-    }
-
-    public void iniciarObjeto() {
-        pais = new Pais();
-    }
-
+   public void abrirDialogoPais(){
+       Map<String, Object> opcoes = new HashMap<>();
+       opcoes.put("modal", true);
+       opcoes.put("resizable", false);
+       opcoes.put("contentHeight", 470);
+       opcoes.put("contentWidth", 1000);
+       //opcoes.put("dynamic", true);
+       RequestContext.getCurrentInstance().openDialog("consultaPaises", opcoes, null);
+       System.out.println("passou");
+   } 
+   
+   public void iniciarObjeto(){
+       pais = new Pais();
+   }
+    
 }

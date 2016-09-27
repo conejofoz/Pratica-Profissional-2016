@@ -76,7 +76,6 @@ public class MoedaDao {
 
             listaMoeda.add(tempMoeda);
         }
-        conexao.close();
         return listaMoeda;
     }
 

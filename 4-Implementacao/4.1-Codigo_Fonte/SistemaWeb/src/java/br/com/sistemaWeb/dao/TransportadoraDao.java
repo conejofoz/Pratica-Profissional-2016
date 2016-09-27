@@ -1,5 +1,6 @@
 package br.com.sistemaWeb.dao;
 
+import br.com.sistemaWeb.classes.Cidade;
 import br.com.sistemaWeb.classes.FabricaConexao;
 import br.com.sistemaWeb.classes.Transportadora;
 import java.sql.Connection;
@@ -75,7 +76,7 @@ public class TransportadoraDao {
     }
 
     public void atualizar(Transportadora transportadora) throws SQLException {
-        String sql = "UPDATE transportadoras SET nometransportadora=?, telefone=?, email=? WHERE id =?";
+        String sql = "UPDATE transportadora SET nometransportadora=?, telefone=?, email=? WHERE id =?";
         conexao = FabricaConexao.conectar();
         pstm = conexao.prepareStatement(sql);
         pstm.setString(1, transportadora.getNomeTransportadora());
@@ -85,10 +86,10 @@ public class TransportadoraDao {
         pstm.executeUpdate();
     }
 
-    public List<Transportadora> todosTransportadoras() throws SQLException {
+    public List<Transportadora> todosTransportadoraes() throws SQLException {
         List<Transportadora> listaTransportadora = new ArrayList<Transportadora>();
 
-        String sql = "SELECT id, nometransportadora, telefone, email FROM transportadoras order by nomeTransportadora";
+        String sql = "SELECT id, nometransportadora, telefone, email FROM transportadora order by nomeTransportadora";
 
         conexao = FabricaConexao.conectar();
         pstm = conexao.prepareStatement(sql);
@@ -105,12 +106,12 @@ public class TransportadoraDao {
             
         }
         
-        conexao.close();
+        
         return listaTransportadora;
     }
 
     
-    public List<Transportadora> consultaTransportadoras(String nome) throws SQLException {
+    public List<Transportadora> consultaTransportadoraes(String nome) throws SQLException {
         List<Transportadora> listaTransportadora = new ArrayList<Transportadora>();
 
         String sql = "SELECT id, nometransportadora, telefone, email FROM transportadoras WHERE nometransportadora LIKE ? order by nomeTransportadora";
@@ -130,7 +131,6 @@ public class TransportadoraDao {
             System.out.println(tempTransportadora.getNomeTransportadora());
         }
         System.out.println("aaa");
-        conexao.close();
         return listaTransportadora;
     }
     

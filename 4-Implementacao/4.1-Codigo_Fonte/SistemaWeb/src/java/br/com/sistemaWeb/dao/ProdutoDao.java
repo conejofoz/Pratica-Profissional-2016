@@ -23,7 +23,7 @@ public class ProdutoDao {
     private Connection conexao;
 
     public void salvar(Produto produto) throws Exception {
-        // produto.setEstoqueAtual(0); //não tava salvando estoque atual com zero
+       // produto.setEstoqueAtual(0); //não tava salvando estoque atual com zero
         try {
             String sql = "INSERT INTO produtos("
                     + "nomeproduto, "
@@ -50,13 +50,10 @@ public class ProdutoDao {
                     + "idgrupo, "
                     + "idfornecedor, "
                     + "idmarca, "
-                    + "idncm, "
-                    + "idcst, "
-                    + "idcfop, "
                     + "datacadastro, "
                     + "horacadastro, "
                     + "estoqueatual)"
-                    + " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ";
+                    + " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) "; 
             System.out.println(sql);
             conexao = FabricaConexao.conectar();
             pstm = conexao.prepareStatement(sql);
@@ -84,13 +81,10 @@ public class ProdutoDao {
             pstm.setInt(22, produto.getGrupo().getId());
             pstm.setInt(23, produto.getFornecedor().getId());
             pstm.setInt(24, produto.getMarca().getId());
-            pstm.setString(25, produto.getNcm().getId());
-            pstm.setString(26, produto.getCst().getId());
-            pstm.setString(27, produto.getCfop().getId());
             Date dataAtual = new Date();
-            pstm.setDate(28, new java.sql.Date(dataAtual.getTime()));
-            pstm.setTime(29, new java.sql.Time(dataAtual.getTime()));
-            pstm.setDouble(30, produto.getEstoqueAtual());
+            pstm.setDate(25, new java.sql.Date(dataAtual.getTime()));
+            pstm.setTime(26, new java.sql.Time(dataAtual.getTime()));
+            pstm.setDouble(27, produto.getEstoqueAtual());
             pstm.executeUpdate();
         } catch (Exception e) {
             throw e;
@@ -136,7 +130,6 @@ public class ProdutoDao {
             tempProduto.getGrupo().setId(rs.getInt("idgrupo"));
             listaProduto.add(tempProduto);
         }
-        conexao.close();
         return listaProduto;
     }
 
@@ -144,11 +137,10 @@ public class ProdutoDao {
         Produto tempProduto = null;
         //ResultSet rs;
         try {
-            //String sql = "select P.id, P.nomeproduto, P.precovarejo, P.estoqueatual, P.idgrupo, G.id, G.nomegrupo from produtos P, grupos G where P.id=? and P.idgrupo=G.id";
-            ////String sql = "SELECT F.id, F.nomefuncionario, F.idcargo, F.email, C.nomecargo FROM funcionarios F, cargos C WHERE F.id=? and F.idcargo=C.id";
-            String sqlProduto = "select * from produtos where id=?";
+            String sql = "select P.id, P.nomeproduto, P.precovarejo, P.estoqueatual, P.idgrupo, G.id, G.nomegrupo from produtos P, grupos G where P.id=? and P.idgrupo=G.id";
+            //String sql = "SELECT F.id, F.nomefuncionario, F.idcargo, F.email, C.nomecargo FROM funcionarios F, cargos C WHERE F.id=? and F.idcargo=C.id";
             conexao = FabricaConexao.conectar();
-            pstm = conexao.prepareStatement(sqlProduto);
+            pstm = conexao.prepareStatement(sql);
             pstm.setInt(1, per.getId());
             rs = pstm.executeQuery();
 
@@ -156,95 +148,11 @@ public class ProdutoDao {
                 tempProduto = new Produto();
                 tempProduto.setId(rs.getInt("id"));
                 tempProduto.setNomeProduto(rs.getString("nomeProduto"));
-                tempProduto.setCodigoBarras(rs.getString("codigobarras"));
-                tempProduto.setCodigoDoFornecedor(rs.getString("codigodofornecedor"));
-                tempProduto.setQuantidadePorCaixa(rs.getDouble("quantidadeporcaixa"));
-                tempProduto.setEstoqueMinimo(rs.getDouble("estoqueminimo"));
-                tempProduto.setEstoqueMaximo(rs.getDouble("estoquemaximo"));
-                tempProduto.setPesoNeto(rs.getDouble("pesoneto"));
-                tempProduto.setPesoBruto(rs.getDouble("pesobruto"));
-                tempProduto.setTamanho(rs.getString("tamanho"));
-                tempProduto.setValorCompra(rs.getDouble("valorcompra"));
-                tempProduto.setIcms(rs.getDouble("icms"));
-                tempProduto.setIss(rs.getDouble("iss"));
-                tempProduto.setIpi(rs.getDouble("ipi"));
-                tempProduto.setPrecoCusto(rs.getDouble("precocusto"));
-                tempProduto.setValorIcms(rs.getDouble("valoricms"));
-                tempProduto.setValorIss(rs.getDouble("valoriss"));
-                tempProduto.setValorIpi(rs.getDouble("valoripi"));
-                tempProduto.setPrecoMedio(rs.getDouble("precomedio"));
-                tempProduto.setPrecoVarejo(rs.getDouble("precovarejo"));
-                tempProduto.setPrecoAtacado(rs.getDouble("precoatacado"));
                 tempProduto.setPrecoVarejo(rs.getDouble("precovarejo"));
                 tempProduto.setEstoqueAtual(rs.getDouble("estoqueatual"));
-                tempProduto.getMarca().setId(rs.getInt("idmarca"));
-                tempProduto.getFornecedor().setId(rs.getInt("idfornecedor"));
                 tempProduto.getGrupo().setId(rs.getInt("idgrupo"));
-                tempProduto.getUnidade().setSiglaUnidade(rs.getString("siglaunidade"));
-                tempProduto.getNcm().setId(rs.getString("idncm"));
-                tempProduto.getCst().setId(rs.getString("idcst"));
-                tempProduto.getCfop().setId(rs.getString("idcfop"));
-                tempProduto.setDataCadastro(rs.getDate("datacadastro"));
-                tempProduto.setHoraCadastro(rs.getTime("horacadastro"));
-            }
-            
-            String sqlMarca = "select * from marcas where id=?";
-            pstm = conexao.prepareStatement(sqlMarca);
-            pstm.setInt(1, tempProduto.getMarca().getId());
-            rs = pstm.executeQuery();
-            while (rs.next()) {
-                tempProduto.getMarca().setNomeMarca(rs.getString("nomemarca"));
-            }
-            
-            String sqlFornecedor = "select * from fornecedores where id=?";
-            pstm = conexao.prepareStatement(sqlFornecedor);
-            pstm.setInt(1, tempProduto.getFornecedor().getId());
-            rs = pstm.executeQuery();
-            while (rs.next()) {
-                tempProduto.getFornecedor().setNomeFornecedor(rs.getString("nomefornecedor"));
-            }
-
-            String sqlGrupo = "select * from grupos where id=?";
-            pstm = conexao.prepareStatement(sqlGrupo);
-            pstm.setInt(1, tempProduto.getGrupo().getId());
-            rs = pstm.executeQuery();
-            while (rs.next()) {
                 tempProduto.getGrupo().setNomeGrupo(rs.getString("nomegrupo"));
             }
-            
-            String sqlUnidade = "select * from unidades where siglaunidade=?";
-            pstm = conexao.prepareStatement(sqlUnidade);
-            pstm.setString(1, tempProduto.getUnidade().getSiglaUnidade());
-            rs = pstm.executeQuery();
-            while (rs.next()) {
-                tempProduto.getUnidade().setNomeUnidade(rs.getString("nomeunidade"));
-            }
-            
-            String sqlNcm = "select * from ncm where id=?";
-            pstm = conexao.prepareStatement(sqlNcm);
-            pstm.setString(1, tempProduto.getNcm().getId());
-            rs = pstm.executeQuery();
-            while (rs.next()) {
-                tempProduto.getNcm().setNomeNcm(rs.getString("nomencm"));
-            }
-            
-            String sqlCst = "select * from cst where id=?";
-            pstm = conexao.prepareStatement(sqlCst);
-            pstm.setString(1, tempProduto.getCst().getId());
-            rs = pstm.executeQuery();
-            while (rs.next()) {
-                tempProduto.getCst().setNomeCst(rs.getString("nomecst"));
-            }
-            
-            String sqlCfop = "select * from cfop where id=?";
-            pstm = conexao.prepareStatement(sqlCfop);
-            pstm.setString(1, tempProduto.getCfop().getId());
-            rs = pstm.executeQuery();
-            while (rs.next()) {
-                tempProduto.getCfop().setNomeCfop(rs.getString("nomecfop"));
-            }
-            
-
         } catch (Exception e) {
             throw e;
         } finally {
@@ -320,12 +228,10 @@ public class ProdutoDao {
             tempProduto.setNomeProduto(rs.getString("nomeproduto"));
             tempProduto.setPrecoVarejo(rs.getDouble("precovarejo"));
             tempProduto.setEstoqueAtual(rs.getDouble("estoqueatual"));
-            tempProduto.setCodigoBarras(rs.getString("codigobarras"));
             listaProduto.add(tempProduto);
             System.out.println(tempProduto.getNomeProduto());
         }
         System.out.println("aaa");
-        conexao.close();
         return listaProduto;
     }
 

@@ -9,30 +9,27 @@
     <body>
         <ui:composition template="./WEB-INF/templates/telaPadrao.xhtml">
             <ui:define name="content">
-                <p:dialog id="dialogoConsultaCidades" widgetVar="wdialogoConsultaCidades" header="Cidades" visible="true" width="850" height="700">
-                    <!--<p:panel id="painelConsultaCidades" header="Consulta de cidades" footer="SistemaWeb">-->
+                <p:panel header="Consulta de cidades" footer="SistemaWeb">
                     <f:event type="preRenderView" listener="#{cidadeBean.listar()}" />
-                    <p:growl id="msjCidades" showDetail="true" />
-                    <h:form id="frmConsultaCidade" >
+                    <p:growl id="msj" showDetail="true" />
+                    <h:form id="frmConsultaCidade" style="height: 600px" >
                         <p:growl id="msgConsultaCidade" showDetail="true" />
-                        <p:commandButton id="btnAcao" value="Novo" oncomplete="PF('wdialogoCadastroCidade').show();" actionListener="#{cidadeBean.setAccion('Registrar')}" action="#{cidadeBean.iniciarObjeto()}" update=":dialogoCadastroCidade" >
-
-                        </p:commandButton>
+                        <p:commandButton id="btnAcao" value="Novo" oncomplete="PF('wdialogoCadastroCidade').show();" actionListener="#{cidadeBean.setAccion('Registrar')}" action="#{cidadeBean.iniciarObjeto()}" update=":dialogoCadastroCidade" />
                         <p:dataTable id="dataTabela" value="#{cidadeBean.listaCidade}" var="cidade"
                                      paginator="true"
                                      paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                                      rowsPerPageTemplate="5,10,15">
 
-
+                            
 
                             <p:column headerText="Nome do cidade">
                                 <p:outputLabel value="#{cidade.nomeCidade}"/>
                             </p:column>
-
+                            
                             <p:column headerText="Estado">
                                 <p:outputLabel value="#{cidade.estado.nomeEstado}"/>
                             </p:column>
-
+                            
                             <p:column headerText="UF">
                                 <p:outputLabel value="#{cidade.estado.siglaEstado}"/>
                             </p:column>
@@ -48,94 +45,70 @@
                                     <f:setPropertyActionListener target="#{cidadeBean.cidadeSelecionado}" value="#{cidade}"/>
                                 </p:commandButton>
                             </p:column>
-
+                            
                             <p:column width="30">
                                 <p:commandButton icon="ui-icon-check" title="Selecionar"
                                                  action="#{cidadeBean.selecionar(cidade)}"
                                                  process="@this" />
                             </p:column>
-
+                            
                         </p:dataTable>
-
+                        
                         <!--DIALOGO DE CONFIRMAÇÃO DE EXCLUSÃO**********************************************************************-->
+                        <p:confirmDialog id="dialogoConfirmacaoExclusaoCidade" header="Exclusão"
+                                         message="Tem certeza que deseja excluir? #{cidadeBean.cidade.nomeCidade}"
+                                         widgetVar="wdialogoConfirmacaoExclusaoCidade">
+
+                            <p:commandButton id="btnApagar" value="Sim" update="dataTabela :frmConsultaCidade:msgConsultaCidade" oncomplete="PF('wdialogoConfirmacaoExclusaoCidade').hide();" action="#{cidadeBean.apagar()}"/>
+                            <p:commandButton value="Não" oncomplete="PF('wdialogoConfirmacaoExclusaoCidade').hide();" />
+                        </p:confirmDialog>
                     </h:form>
-                </p:dialog>
 
-                
-                <p:confirmDialog id="dialogoConfirmacaoExclusaoCidade" header="Exclusão"
-                                 message="Tem certeza que deseja excluir? #{cidadeBean.cidade.nomeCidade}"
-                                 widgetVar="wdialogoConfirmacaoExclusaoCidade">
-                    <h:form id="frmExclusaoCidades" >
-                        <p:commandButton id="btnApagar" value="Sim" update=":frmConsultaCidade:dataTabela :frmConsultaCidade:msgConsultaCidade" oncomplete="PF('wdialogoConfirmacaoExclusaoCidade').hide();" action="#{cidadeBean.apagar()}"/>
-                        <p:commandButton value="Não" oncomplete="PF('wdialogoConfirmacaoExclusaoCidade').hide();" />
-                    </h:form>
-                </p:confirmDialog>
+                    <!--DIALOGO DE CADASTRO-->
+                    <p:dialog header="Cadastro de cidades" widgetVar="wdialogoCadastroCidade" id="dialogoCadastroCidade" width="600" height="300">
+                        <h:form id="frmDialogoCadastroCidade" >
+                            <p:messages/>
+                            <p:growl id="msjCadastroCidade" showDetail="true" />
+                            <p:panelGrid columns="2" id="painelGridDialogoCadastroCidade" >
+                                <p:outputLabel id="lblCidade" value="Cidade" />
+                                <p:inputText id="edtCidade" value="#{cidadeBean.cidade.nomeCidade}" maxlength="100" required="true" style="width: 300px" />
+                                <p:outputLabel id="lblEstado" value="Sigla estado" />
+                                <p:inputText id="edtSiglaEstado" value="#{cidadeBean.cidade.estado.siglaEstado}" maxlength="2" required="true" style="width: 20px" >
+                                    <p:ajax listener="#{cidadeBean.buscaEstadoBySigla}" event="change" process="edtSiglaEstado" update="edtNomeEstado msjCadastroCidade" />
+                                </p:inputText>    
+                                <p:outputLabel id="lblNomeEstado" value="Nome do estado" />
+                                <p:inputText id="edtNomeEstado" value="#{cidadeBean.cidade.estado.nomeEstado}" maxlength="100" required="true" style="width: 300px" />
+                                
+                                
 
-                
-                
-
-                <!--DIALOGO DE CADASTRO-->
-                <p:dialog header="Manutenção do cadastro de cidades" widgetVar="wdialogoCadastroCidade" id="dialogoCadastroCidade" width="600" height="300" modal="true">
-                    <h:form id="frmDialogoCadastroCidade" >
-                        <p:messages/>
-                        <p:growl id="msjCadastroCidade" showDetail="true" />
-                        <p:panelGrid columns="2" id="painelGridDialogoCadastroCidade" >
-                            <p:outputLabel id="lblCidade" value="Cidade" />
-                            <p:inputText id="edtCidade" value="#{cidadeBean.cidade.nomeCidade}" maxlength="100" required="true" style="width: 300px" />
-                            <p:outputLabel id="lblEstado" value="Sigla estado" />
-                            <p:inputText id="edtSiglaEstado" value="#{cidadeBean.cidade.estado.siglaEstado}" maxlength="2" required="true" style="width: 20px" >
-                                <p:ajax listener="#{cidadeBean.buscaEstadoBySigla}" event="change" process="edtSiglaEstado" update="edtNomeEstado msjCadastroCidade" />
-                            </p:inputText>    
-                            <p:outputLabel id="lblNomeEstado" value="Nome do estado" />
-                            <p:inputText id="edtNomeEstado" value="#{cidadeBean.cidade.estado.nomeEstado}" maxlength="100" required="true" style="width: 300px" />
-
-
-
-                            <f:facet name="footer">
-                                <h:panelGrid id="painelGridRodapeCadastroCidade" columns="6">
-                                    <p:commandButton value="#{cidadeBean.accion}" actionListener="#{cidadeBean.operar}" oncomplete="tratarRequisicao(xhr, status, args)" update="frmDialogoCadastroCidade :frmConsultaCidade:dataTabela" />
-                                    <p:commandButton value="Excluir" />
-                                    <p:commandButton value="Limpar" />
-                                    <p:commandButton value="Sair" actionListener="#{cidadeBean.listavalor}" process="@this" update="@none" />
-                                    <p:commandButton value="Estado" icon="ui-icon-search" title="Pesquisa" 
-                                                     action="#{estadoBean.abrirDialogoEstado2}" 
-                                                     process="@this" update="@none">
-                                        <p:ajax event="dialogReturn" listener="#{cidadeBean.setarEstadoSelecionado}"
+                                <f:facet name="footer">
+                                    <h:panelGrid id="painelGridRodapeCadastroCidade" columns="5">
+                                        <p:commandButton value="#{cidadeBean.accion}" actionListener="#{cidadeBean.operar}" oncomplete="tratarRequisicao(xhr, status, args)" update="frmDialogoCadastroCidade :frmConsultaCidade:dataTabela" />
+                                        <p:commandButton value="Excluir" />
+                                        <p:commandButton value="Limpar" />
+                                        <p:commandButton value="Sair" actionListener="#{cidadeBean.listavalor}" process="@this" update="@none" />
+                                        <p:commandButton value="Estado" icon="ui-icon-search" title="Pesquisa" 
+                                                         action="#{estadoBean.abrirDialogoEstado}" 
+                                                         process="@this" update="@none">
+                                            <p:ajax event="dialogReturn" listener="#{cidadeBean.setarEstadoSelecionado}"
                                                 process="@this" update="edtSiglaEstado edtNomeEstado" />
-                                    </p:commandButton>
+                                        </p:commandButton>
+                                    </h:panelGrid>
+                                </f:facet> 
+                            </p:panelGrid>
+                        </h:form>
+                    </p:dialog>
 
-
-                                    <p:commandButton id="btnConsultarEstados" process="@this" value="teste estados" oncomplete="PF('wdialogoConsultaEstados').show();"/>
-                                    <!--
-                                    atenção: o process desse botao é muito importante pq eu tinha esquecido dele e dava erro de validação de formulario e por isso
-                                    não funcionar o seleção de estado quando voltava da consulta do estado
-                                    -->
-                                </h:panelGrid>
-                            </f:facet> 
-                        </p:panelGrid>
-                    </h:form>
-                </p:dialog>
-
-                <script type="text/javascript">
-                    function tratarRequisicao(xhr, status, args) {
-                        if (!args.fecharDialogo) {
-                            jQuery("#dialogoCadastroCidade").effect("shake", {times: 10}, 100);
-                        } else {
-                            PF('wdialogoCadastroCidade').hide();
+                    <script type="text/javascript">
+                        function tratarRequisicao(xhr, status, args) {
+                            if (!args.fecharDialogo) {
+                                jQuery("#dialogoCadastroCidade").effect("shake", {times: 10}, 100);
+                            } else {
+                                PF('wdialogoCadastroCidade').hide();
+                            }
                         }
-                    }
-                </script>
-                <!--</p:panel>-->
-
-
-
-
-                <!--pagina estados-->
-                <ui:include src="/consultaEstados_1.xhtml" />
-                <!--fim pagina estados-->
-
-
-
+                    </script>
+                </p:panel>
             </ui:define>
         </ui:composition>
 

@@ -49,7 +49,7 @@ public class MarcaDao implements Serializable{
         conexao = FabricaConexao.conectar();
         pstm = conexao.prepareStatement(sql);
         pstm.setString(1, marca.getNomeMarca());
-        pstm.setInt(2, marca.getId());
+        pstm.setInt(4, marca.getId());
         pstm.executeUpdate();
     }
 
@@ -65,7 +65,6 @@ public class MarcaDao implements Serializable{
             tempMarca.setNomeMarca(rs.getString("nomeMarca"));
             listaMarca.add(tempMarca);
         }
-        conexao.close();
         return listaMarca;
     }
 
@@ -88,7 +87,6 @@ public class MarcaDao implements Serializable{
             System.out.println(tempMarca.getNomeMarca());
         }
         System.out.println("aaa");
-        conexao.close();
         return listaMarca;
     }
     

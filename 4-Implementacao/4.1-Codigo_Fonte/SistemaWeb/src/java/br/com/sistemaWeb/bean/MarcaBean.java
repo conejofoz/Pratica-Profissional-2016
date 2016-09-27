@@ -218,14 +218,9 @@ public class MarcaBean implements Serializable {
 
                 break;
             case "Modificar":
-                try{
                 this.atualizar();
                 this.limpiar();
-                fecharDialogo = true;
                 break;
-                }catch(Exception ex1){
-                    System.out.println("Erro ao atualizar marca");
-                }
         }
         context.addCallbackParam("fecharDialogo", fecharDialogo);
     }
@@ -272,10 +267,10 @@ public class MarcaBean implements Serializable {
         Map<String, Object> opcoes = new HashMap<>();
         opcoes.put("modal", false);
         opcoes.put("resizable", false);
-        opcoes.put("contentHeight", 300);
-        opcoes.put("contentWidth", 400);
+        opcoes.put("contentHeight", 400);
+        opcoes.put("contentWidth", 700);
         //opcoes.put("widgetVar", "wconsultaMarcas");
-        RequestContext.getCurrentInstance().openDialog("consultaMarcas", opcoes, null);
+        RequestContext.getCurrentInstance().openDialog("consultaMarcas2", opcoes, null);
         System.out.println("passou no dialogo do marca");
     }
     

@@ -70,7 +70,6 @@ public class PaisDao {
             tempPais.setNomePais(rs.getString("nomePais"));
             listaPais.add(tempPais);
         }
-        conexao.close();
         return listaPais;
     }
 

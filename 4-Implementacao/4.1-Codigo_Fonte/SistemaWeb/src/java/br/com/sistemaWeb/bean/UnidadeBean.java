@@ -160,7 +160,7 @@ public class UnidadeBean implements Serializable {
         UnidadeDao dao;
         try {
             dao = new UnidadeDao();
-            listaUnidade = dao.todosUnidades();
+            listaUnidade = dao.todosUnidadees();
         } catch (Exception e) {
             throw e;
         }
@@ -171,7 +171,7 @@ public class UnidadeBean implements Serializable {
         UnidadeDao dao;
         dao = new UnidadeDao();
         try {
-            listaUnidade = dao.consultaUnidades(this.consultaNome);
+            listaUnidade = dao.consultaUnidadees(this.consultaNome);
         } catch (Exception ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro ao consultar ", "Erro: " + ex.getMessage()));
             throw ex;
@@ -218,14 +218,9 @@ public class UnidadeBean implements Serializable {
 
                 break;
             case "Modificar":
-                try{
                 this.atualizar();
                 this.limpiar();
-                fecharDialogo = true;
                 break;
-                }catch(Exception e1){
-                   System.out.println("Erro ao atualizar a unidade"); 
-                }
         }
         context.addCallbackParam("fecharDialogo", fecharDialogo);
     }
@@ -272,10 +267,10 @@ public class UnidadeBean implements Serializable {
         Map<String, Object> opcoes = new HashMap<>();
         opcoes.put("modal", false);
         opcoes.put("resizable", false);
-        opcoes.put("contentHeight", 300);
-        opcoes.put("contentWidth", 400);
+        opcoes.put("contentHeight", 400);
+        opcoes.put("contentWidth", 700);
         //opcoes.put("widgetVar", "wconsultaUnidades");
-        RequestContext.getCurrentInstance().openDialog("consultaUnidade", opcoes, null);
+        RequestContext.getCurrentInstance().openDialog("consultaUnidade2", opcoes, null);
         System.out.println("passou no dialogo do unidade");
     }
     

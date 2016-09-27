@@ -9,22 +9,21 @@
     <body>
         <ui:composition template="./WEB-INF/templates/telaPadrao.xhtml">
             <ui:define name="content">
-                <!--pagina de clientes-->
-                <p:dialog id="dialogoConsultaClientes" widgetVar="wdialogoConsultaClientes" width="900" height="600" visible="true" >
+                <p:panel id="painelPrincipal" header="Consulta de clientes" footer="SistemaWeb">
                     <!--pra funcionar a consulta tem que tirar o prerender view-->
                     <!--<f:event type="preRenderView" listener="" />-->
-                    <p:growl id="msjConsultaCliente" showDetail="true" />
-                    <h:form id="frmConsultaClientes" style="height: 600px" >
+                    <p:growl id="msj" showDetail="true" />
+                    <h:form id="frmConsultaCliente" style="height: 600px" >
                         <p:growl id="msgConsultaCliente" showDetail="true" />
-
+                        
                         <p:fieldset >
-                            <h:panelGrid id="painelConsulta" columns="3" >
-                                <h:panelGroup >
-                                    <p:outputLabel id="lblConsultaNome" value="Nome" /><br />
-                                    <p:inputText id="edtConsultaNome" value="#{clienteBean.edtConsultaNome}" size="50" placeholder="Digite o nome do cliente para consultar" />
-                                    <p:commandButton id="btnConsultar" value="Consultar" actionListener="#{clienteBean.consultar()}" update="dataTabela msgConsultaCliente frmConsultaClientes" />
-                                </h:panelGroup>
-                            </h:panelGrid>
+                        <h:panelGrid id="painelConsulta" columns="3" >
+                            <h:panelGroup >
+                                <p:outputLabel id="lblConsultaNome" value="Nome" /><br />
+                                <p:inputText id="edtConsultaNome" value="#{clienteBean.edtConsultaNome}" size="50" placeholder="Digite o nome do cliente para consultar" />
+                                <p:commandButton id="btnConsultar" value="Consultar" actionListener="#{clienteBean.consultar()}" update="dataTabela msgConsultaCliente frmConsultaCliente" />
+                            </h:panelGroup>
+                        </h:panelGrid>
                         </p:fieldset>
                         <h:panelGrid />
                         <p:commandButton id="btnAcao" value="Novo" oncomplete="PF('wdialogoCadastroCliente').show();" actionListener="#{clienteBean.setAccion('Registrar')}" action="#{clienteBean.zerarCliente}" update=":dialogoCadastroCliente" />
@@ -71,241 +70,268 @@
                                                  process="@this" />
                             </p:column>
                         </p:dataTable>
-                        </h:form>
-                </p:dialog>
 
                         <!--DIALOGO DE CONFIRMAÇÃO DE EXCLUSÃO**********************************************************************-->
                         <p:confirmDialog id="dialogoConfirmacaoExclusaoCliente" header="Exclusão"
                                          message="Tem certeza que deseja excluir? #{clienteBean.cliente.nomeCliente}"
                                          widgetVar="wdialogoConfirmacaoExclusaoCliente">
-                            <h:form id="frmExclusaoClientes" >
-                            <p:commandButton id="btnApagar" value="Sim" update=":frmConsultaClientes:dataTabela :frmConsultaClientes:msgConsultaCliente" oncomplete="PF('wdialogoConfirmacaoExclusaoCliente').hide();" action="#{clienteBean.apagar()}"/>
+
+                            <p:commandButton id="btnApagar" value="Sim" update="dataTabela :frmConsultaCliente:msgConsultaCliente" oncomplete="PF('wdialogoConfirmacaoExclusaoCliente').hide();" action="#{clienteBean.apagar()}"/>
                             <p:commandButton value="Não" oncomplete="PF('wdialogoConfirmacaoExclusaoCliente').hide();" />
-                            </h:form>
                         </p:confirmDialog>
-                    
-
-
-
-
-
-
-
-
-
-                <!--DIALOGO DE CADASTRO-->
-                <p:dialog header="Cadastro de clientes" widgetVar="wdialogoCadastroCliente" id="dialogoCadastroCliente" position="center" showEffect="slide" width="1200" height="600">
-                    <h:form id="frmDialogoCadastroCliente" >
-                        <p:messages closable="true"/>
-                        <p:growl id="msjCadastroCliente" showDetail="true" />
-                        <h:panelGrid columns="3" id="painelGridDialogoCadastroCliente" >
-
-                            <h:panelGroup>
-                                <p:outputLabel id="lblCliente" value="#{clienteBean.nomeCampoNome}" styleClass="negrito" /><br />
-                                <p:inputText id="edtCliente" value="#{clienteBean.cliente.nomeCliente}" maxlength="100" required="true" style="width: 300px" 
-                                             onkeyup="maiuscula(this);"
-                                             onkeypress="return TABEnter(event, 'edtCep');">
-
-                                </p:inputText>
-                            </h:panelGroup>
-
-                            <h:panelGroup >
-                                <h:outputText value="Tipo de pessoa:" /><br />
-                                <p:selectOneButton id="edtTipoPessoa" value="#{clienteBean.cliente.tipoPessoa}" required="true" requiredMessage="É nescessário escolher o tipo de pessoa">
-                                    <f:selectItem itemLabel="Fisica" itemValue="F" />
-                                    <f:selectItem itemLabel="Juridica" itemValue="J" />
-                                    <p:ajax event="change" listener="#{clienteBean.mostraCampoSexo}" update="painelGroupSexo painelGroupCpf painelGroupIdentidade painelGroupNascimento lblCliente painelGroupCnpj edtCpf edtSite" />
-                                </p:selectOneButton>
-                            </h:panelGroup>
-
-                            <h:panelGroup id="painelGroupSexo" >
-                                <p:outputLabel id="lblSexo"  rendered="#{clienteBean.exibeCampoSexo}" styleClass="negrito" /><br />
-                                <p:selectOneMenu id="edtSexo" value="#{clienteBean.cliente.sexo}" rendered="#{clienteBean.exibeCampoSexo}" required="#{clienteBean.requerSexo}" requiredMessage="Escolha o sexo" >
-                                    <f:selectItem itemLabel="Selecione" itemValue="#{null}" />
-                                    <f:selectItem itemLabel="Feminino" itemValue="F" />
-                                    <f:selectItem itemLabel="Masculino" itemValue="M" />
-                                </p:selectOneMenu>
-                            </h:panelGroup>
-
-                            <h:panelGroup>
-                                <h:outputLabel value="CEP: " styleClass="negrito" /><br />
-                                <p:inputMask id="edtCep" size="10" style="padding-top: 5px" mask="99999-999" value="#{clienteBean.cliente.cep}" onkeypress="return TABEnter(event, 'edtNumero');" >
-                                    <p:ajax event="change" process="@this" listener="#{clienteBean.encontraCEP}" update="edtIdCidade edtEstado edtLogradouro edtNomeCidade edtBairro :msj" />
-                                </p:inputMask>
-                                <p:commandButton id="btnCep" value="+" icon="ui-icon-search" process="@this" action="#{clienteBean.encontraCEP}" update="edtIdCidade edtEstado edtLogradouro edtNomeCidade edtBairro :msj" />
-                            </h:panelGroup>
-
-
-                            <h:panelGroup>
-                                <p:outputLabel value="Id. Cidade" styleClass="negrito" /><br />
-                                <p:inputText id="edtIdCidade" value="#{clienteBean.cliente.cidade.id}" style="width: 50px"
-                                             onkeypress="return TABEnter(event, 'edtNomeCidade');">
-                                    <p:ajax listener="#{clienteBean.buscaPorID2(clienteBean.cliente.cidade)}" event="change" process="edtIdCidade" update=" edtIdCidade edtNomeCidade edtEstado msjCadastroCliente" />
-                                </p:inputText>
-                                <p:inputText id="edtNomeCidade" value="#{clienteBean.cliente.cidade.nomeCidade}" readonly="true" size="30"
-                                             onkeypress="return TABEnter(event, 'edtCliente');">
-                                </p:inputText>
-                                <p:commandButton icon="ui-icon-search" title="Consultar ou cadastrar Cidades" value="..."
-                                                 process="@this edtIdCidade edtNomeCidade edtEstado" 
-                                                 oncomplete="PF('wdialogoConsultaCidades').show();" /> 
-                            </h:panelGroup>
-
-
-                            <h:panelGroup id="painelEstado">
-                                <h:outputLabel value="UF: " /><br />
-                                <p:inputText id="edtEstado" size="5" value="#{clienteBean.cliente.cidade.estado.siglaEstado}" maxlength="2" />
-                            </h:panelGroup>
-
-                            <h:panelGroup>
-                                <h:outputLabel value="Logradouro: "  /><br />
-                                <p:inputText id="edtLogradouro" size="50" value="#{clienteBean.cliente.endereco}" maxlength="100" />
-                            </h:panelGroup>
-
-                            <h:panelGroup>
-                                <h:outputLabel value="Número: "  /><br />
-                                <p:inputText id="edtNumero" size="10" value="#{clienteBean.cliente.numero}" maxlength="15" onkeypress="return TABEnter(event, 'edtComplemento');" />
-                            </h:panelGroup>
-
-                            <h:panelGroup>
-                                <h:outputLabel value="Complemento: "  /><br />
-                                <p:inputText id="edtComplemento" size="40" value="#{clienteBean.cliente.complemento}" maxlength="50" onkeypress="return TABEnter(event, 'edtTelefone');" />
-                            </h:panelGroup>
-
-                            <h:panelGroup>
-                                <h:outputLabel value="Bairro: " style="font-weight:bold; padding-right: 5px; " /><br />
-                                <p:inputText id="edtBairro" size="50" value="#{clienteBean.cliente.bairro}" maxlength="50" />
-                            </h:panelGroup>
-
-                            <p:outputLabel value="" /><p:outputLabel value="" />
-
-
-                            <h:panelGrid columns="4">
-                                <h:panelGroup>
-                                    <p:outputLabel id="lblTelefone" value="Tel. residencial:" styleClass="negrito" /><br />
-                                    <p:inputMask mask="(99)99999999" id="edtTelefone" value="#{clienteBean.cliente.telefone}" required="#{clienteBean.requererTelefone}" style="width: 100px"
-                                                 onkeypress="return TABEnter(event, 'edtTelefoneComercial');">
-                                    </p:inputMask>
-                                </h:panelGroup>
-
-                                <h:panelGroup>
-                                    <p:outputLabel id="lblTelefoneComercial" value="Tel. comercial:" styleClass="negrito" /><br />
-                                    <p:inputMask mask="(99)99999999" id="edtTelefoneComercial" value="#{clienteBean.cliente.telefoneComercial}" required="#{clienteBean.requererTelefone}" style="width: 100px"
-                                                 onkeypress="return TABEnter(event, 'edtCelular');">
-                                    </p:inputMask>
-                                </h:panelGroup>
-
-                                <h:panelGroup>
-                                    <p:outputLabel id="lblCelular" value="Celular:" styleClass="negrito" /><br />
-                                    <p:inputMask mask="(99)99999999" id="edtCelular" value="#{clienteBean.cliente.celular}" required="#{clienteBean.requererTelefone}" style="width: 100px"
-                                                 onkeypress="return TABEnter(event, 'edtFax');">
-                                    </p:inputMask>
-                                </h:panelGroup>
-
-                                <h:panelGroup>
-                                    <p:outputLabel id="lblFax" value="Fax:" styleClass="negrito" /><br />
-                                    <p:inputMask mask="(99)99999999" id="edtFax" value="#{clienteBean.cliente.fax}" required="#{clienteBean.requererTelefone}" style="width: 100px"
-                                                 onkeypress="return TABEnter(event, 'edtEmail');">
-                                    </p:inputMask>
-                                </h:panelGroup>
-
-                            </h:panelGrid>
-
-
-                            <h:panelGroup>
-                                <p:outputLabel id="lblEmail" value="E-mail" styleClass="negrito" /><br />
-                                <p:inputText id="edtEmail" value="#{clienteBean.cliente.email}" maxlength="100" required="#{clienteBean.requerEmail}" size="40" 
-                                             onkeypress="return TABEnter(event, 'edtSite');"
-                                             requiredMessage="Por favor digite um e-mail"
-                                             validatorMessage="Formato de e-mail inválido">
-                                    <p:ajax event="blur" update="@this msjCadastroCliente" listener="#{clienteBean.handleKeyEventEmail}" >  
-                                        <f:validateRegex pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" /> <!--COM AJAX PRA PEGAR IMEDIATAMENTE-->
-                                    </p:ajax>
-                                    <f:validateRegex pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" /> <!--FORA DO AJAX PRA PEGAR QUANDO MANDAR SALVAR-->
-                                </p:inputText>
-                            </h:panelGroup>
-
-                            <h:panelGroup id="painelGroupSite">
-                                <h:outputLabel value="Site" style="font-weight:bold; padding-right: 5px; " /><br />
-                                <p:inputText id="edtSite" value="#{clienteBean.cliente.site}" maxlength="100" size="40"
-                                             onkeypress="return TABEnter(event, '#{clienteBean.enterSite}');"/>
-                            </h:panelGroup>
-
-                            <h:panelGrid columns="3">
-                                <h:panelGroup id="painelGroupIdentidade">
-                                    <h:outputLabel value="Documento " style="font-weight:bold; padding-right: 5px; " rendered="#{clienteBean.cliente.tipoPessoa == 'F'}" /><br />
-                                    <p:inputText id="edtDocumento" value="#{clienteBean.cliente.documento}" maxlength="15" size="10" rendered="#{clienteBean.cliente.tipoPessoa == 'F'}" onkeypress="return TABEnter(event, 'edtCpf');" />
-                                </h:panelGroup>
-
-                                <h:panelGroup id="painelGroupCpf" >
-                                    <p:outputLabel id="lblCpf" value="CPF:" rendered="#{clienteBean.cliente.tipoPessoa == 'F'}" styleClass="negrito" /><br />
-                                    <p:inputText id="edtCpf" value="#{clienteBean.cliente.cpf}" maxlength="15" required="true" rendered="#{clienteBean.cliente.tipoPessoa == 'F'}"
-                                                 requiredMessage="Por favor digite o CPF"
-                                                 onkeypress="return TABEnter(event, 'edtNascimento_input');">
-                                        <p:ajax event="blur" update="@this msjCadastroCliente" listener="#{clienteBean.validacpf}" />
-                                    </p:inputText>
-                                </h:panelGroup>
-
-
-                                <h:panelGroup id="painelGroupNascimento">
-                                    <h:outputLabel value="Data nascimento " style="font-weight:bold; padding-right: 5px; " rendered="#{clienteBean.cliente.tipoPessoa == 'F'}" /><br />
-                                    <p:calendar id="edtNascimento" value="#{clienteBean.cliente.dataNascimento}" pattern="dd/MM/yyyy" locale="pt" size="10" rendered="#{clienteBean.cliente.tipoPessoa == 'F'}"
-                                                onkeypress="return TABEnter(event, 'edtCliente');"/>
-                                </h:panelGroup>    
-                            </h:panelGrid>
-
-
-                            <p:outputLabel />
-                            <p:outputLabel />
-                            <h:panelGroup id="painelGroupCnpj" >
-                                <p:outputLabel id="lblCnpj" value="CNPJ" styleClass="negrito" rendered="#{clienteBean.cliente.tipoPessoa =='J'}" /><br />
-                                <p:inputMask mask="99.999.999/9999-99" id="edtCnpj" value="#{clienteBean.cliente.cnpj}" rendered="#{clienteBean.cliente.tipoPessoa == 'J'}" onkeypress="return TABEnter(event, 'edtCliente');"  />
-                            </h:panelGroup>
-
-
-
-                            <!--fim busca cep-->
-
-
-
-                            <f:facet name="footer">
-                                <h:panelGrid id="painelGridRodapeCadastroCliente" columns="5">
-                                    <p:commandButton style="display: none" />
-                                    <p:commandButton value="#{clienteBean.accion}" actionListener="#{clienteBean.operar}" oncomplete="tratarRequisicaoCliente(xhr, status, args)" update="frmDialogoCadastroCliente :frmConsultaClientes:dataTabela" />
-                                    <p:commandButton value="Excluir" />
-                                    <p:commandButton value="Limpar" />
-                                    <p:commandButton value="Sair" oncomplete="PF('wdialogoCadastroCliente').hide();" />
-
-                                </h:panelGrid>
-                            </f:facet> 
-                        </h:panelGrid>
-
-
                     </h:form>
 
 
 
-                </p:dialog>
 
-                <script type="text/javascript">
-                    function tratarRequisicaoCliente(xhr, status, args) {
-                        if (!args.fecharDialogo) {
-                            jQuery("#dialogoCadastroCliente").effect("shake", {times: 10}, 100);
-                        } else {
-                            PF('wdialogoCadastroCliente').hide();
+
+
+
+
+
+                    <!--DIALOGO DE CADASTRO-->
+                    <p:dialog header="Cadastro de clientes" widgetVar="wdialogoCadastroCliente" id="dialogoCadastroCliente" position="center" showEffect="slide" width="1200" height="600">
+                        <h:form id="frmDialogoCadastroCliente" >
+                            <p:messages closable="true"/>
+                            <p:growl id="msjCadastroCliente" showDetail="true" />
+                            <h:panelGrid columns="3" id="painelGridDialogoCadastroCliente" >
+
+                                <h:panelGroup>
+                                    <p:outputLabel id="lblCliente" value="#{clienteBean.nomeCampoNome}" styleClass="negrito" /><br />
+                                    <p:inputText id="edtCliente" value="#{clienteBean.cliente.nomeCliente}" maxlength="100" required="true" style="width: 300px"
+                                                 onkeypress="return TABEnter(event, 'edtCep');">
+                                        <p:ajax event="blur" update="@this" listener="#{clienteBean.handleKeyEvent}" />
+                                    </p:inputText>
+                                </h:panelGroup>
+
+                                <h:panelGroup >
+                                    <h:outputText value="Tipo de pessoa:" /><br />
+                                    <p:selectOneButton id="edtTipoPessoa" value="#{clienteBean.cliente.tipoPessoa}" required="true" requiredMessage="É nescessário escolher o tipo de pessoa">
+                                        <f:selectItem itemLabel="Fisica" itemValue="F" />
+                                        <f:selectItem itemLabel="Juridica" itemValue="J" />
+                                        <p:ajax event="change" listener="#{clienteBean.mostraCampoSexo}" update="painelGroupSexo painelGroupCpf painelGroupIdentidade painelGroupNascimento lblCliente painelGroupCnpj edtCpf edtSite" />
+                                    </p:selectOneButton>
+                                </h:panelGroup>
+
+                                <h:panelGroup id="painelGroupSexo" >
+                                    <p:outputLabel id="lblSexo"  rendered="#{clienteBean.exibeCampoSexo}" styleClass="negrito" /><br />
+                                    <p:selectOneMenu id="edtSexo" value="#{clienteBean.cliente.sexo}" rendered="#{clienteBean.exibeCampoSexo}" required="#{clienteBean.requerSexo}" requiredMessage="Escolha o sexo" >
+                                        <f:selectItem itemLabel="Selecione" itemValue="#{null}" />
+                                        <f:selectItem itemLabel="Feminino" itemValue="F" />
+                                        <f:selectItem itemLabel="Masculino" itemValue="M" />
+                                    </p:selectOneMenu>
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel value="CEP: " styleClass="negrito" /><br />
+                                    <p:inputMask id="edtCep" size="10" style="padding-top: 5px" mask="99999-999" value="#{clienteBean.cliente.cep}" onkeypress="return TABEnter(event, 'edtNumero');" >
+                                        <p:ajax event="change" process="@this" listener="#{clienteBean.encontraCEP}" update="edtIdCidade edtEstado edtLogradouro edtNomeCidade edtBairro :msj" />
+                                    </p:inputMask>
+                                    <p:commandButton id="btnCep" value="+" icon="ui-icon-search" process="@this" action="#{clienteBean.encontraCEP}" update="edtIdCidade edtEstado edtLogradouro edtNomeCidade edtBairro :msj" />
+                                </h:panelGroup>
+
+                                
+                                <h:panelGroup>
+                                    <p:outputLabel value="Id. Cidade" styleClass="negrito" /><br />
+                                    <p:inputText id="edtIdCidade" value="#{clienteBean.cliente.cidade.id}" style="width: 50px"
+                                                 onkeypress="return TABEnter(event, 'edtNomeCidade');">
+                                        <p:ajax listener="#{clienteBean.buscaPorID2(clienteBean.cliente.cidade)}" event="change" process="edtIdCidade" update="edtNomeCidade msjCadastroCliente edtIdCidade" />
+                                    </p:inputText>
+                                    <p:inputText id="edtNomeCidade" value="#{clienteBean.cliente.cidade.nomeCidade}" readonly="true" size="30"
+                                                 onkeypress="return TABEnter(event, 'edtCliente');">
+                                    </p:inputText>
+                                    <p:commandButton icon="ui-icon-search" title="Consultar ou cadastrar Cidades" value="..."
+                                                     action="#{cidadeBean.abrirDialogoCidade}" 
+                                                     process="@this" update="@none">
+                                        <p:ajax event="dialogReturn" listener="#{clienteBean.setarCidadeSelecionada}"
+                                                process="@this" update="edtIdCidade edtNomeCidade edtEstado" />    
+                                    </p:commandButton>
+                                </h:panelGroup>
+
+
+                                <h:panelGroup id="painelEstado">
+                                    <h:outputLabel value="UF: " /><br />
+                                    <p:inputText id="edtEstado" size="5" value="#{clienteBean.cliente.cidade.estado.siglaEstado}" maxlength="2" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel value="Logradouro: "  /><br />
+                                    <p:inputText id="edtLogradouro" size="50" value="#{clienteBean.cliente.endereco}" maxlength="100" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel value="Número: "  /><br />
+                                    <p:inputText id="edtNumero" size="10" value="#{clienteBean.cliente.numero}" maxlength="15" onkeypress="return TABEnter(event, 'edtComplemento');" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel value="Complemento: "  /><br />
+                                    <p:inputText id="edtComplemento" size="50" value="#{clienteBean.cliente.complemento}" maxlength="50" onkeypress="return TABEnter(event, 'edtTelefone');" />
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <h:outputLabel value="Bairro: " style="font-weight:bold; padding-right: 5px; " /><br />
+                                    <p:inputText id="edtBairro" size="50" value="#{clienteBean.cliente.bairro}" maxlength="50" />
+                                </h:panelGroup>
+
+                                <p:outputLabel value="" /><p:outputLabel value="" />
+
+
+                                <h:panelGrid columns="4">
+                                    <h:panelGroup>
+                                        <p:outputLabel id="lblTelefone" value="Tel. residencial:" styleClass="negrito" /><br />
+                                        <p:inputMask mask="(99)99999999" id="edtTelefone" value="#{clienteBean.cliente.telefone}" required="#{clienteBean.requererTelefone}" style="width: 100px"
+                                                     onkeypress="return TABEnter(event, 'edtTelefoneComercial');">
+                                        </p:inputMask>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <p:outputLabel id="lblTelefoneComercial" value="Tel. comercial:" styleClass="negrito" /><br />
+                                        <p:inputMask mask="(99)99999999" id="edtTelefoneComercial" value="#{clienteBean.cliente.telefoneComercial}" required="#{clienteBean.requererTelefone}" style="width: 100px"
+                                                     onkeypress="return TABEnter(event, 'edtCelular');">
+                                        </p:inputMask>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <p:outputLabel id="lblCelular" value="Celular:" styleClass="negrito" /><br />
+                                        <p:inputMask mask="(99)99999999" id="edtCelular" value="#{clienteBean.cliente.celular}" required="#{clienteBean.requererTelefone}" style="width: 100px"
+                                                     onkeypress="return TABEnter(event, 'edtFax');">
+                                        </p:inputMask>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <p:outputLabel id="lblFax" value="Fax:" styleClass="negrito" /><br />
+                                        <p:inputMask mask="(99)99999999" id="edtFax" value="#{clienteBean.cliente.fax}" required="#{clienteBean.requererTelefone}" style="width: 100px"
+                                                     onkeypress="return TABEnter(event, 'edtEmail');">
+                                        </p:inputMask>
+                                    </h:panelGroup>
+
+                                </h:panelGrid>
+
+
+                                <h:panelGroup>
+                                    <p:outputLabel id="lblEmail" value="E-mail" styleClass="negrito" /><br />
+                                    <p:inputText id="edtEmail" value="#{clienteBean.cliente.email}" maxlength="100" required="#{clienteBean.requerEmail}" size="50" 
+                                                 onkeypress="return TABEnter(event, 'edtSite');"
+                                                 requiredMessage="Por favor digite um e-mail"
+                                                 validatorMessage="Formato de e-mail inválido">
+                                        <p:ajax event="blur" update="@this msjCadastroCliente" listener="#{clienteBean.handleKeyEventEmail}" >  
+                                            <f:validateRegex pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" /> <!--COM AJAX PRA PEGAR IMEDIATAMENTE-->
+                                        </p:ajax>
+                                        <f:validateRegex pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" /> <!--FORA DO AJAX PRA PEGAR QUANDO MANDAR SALVAR-->
+                                    </p:inputText>
+                                </h:panelGroup>
+
+                                <h:panelGroup id="painelGroupSite">
+                                    <h:outputLabel value="Site" style="font-weight:bold; padding-right: 5px; " /><br />
+                                    <p:inputText id="edtSite" value="#{clienteBean.cliente.site}" maxlength="100" size="50"
+                                                 onkeypress="return TABEnter(event, '#{clienteBean.enterSite}');"/>
+                                </h:panelGroup>
+
+                                <h:panelGrid columns="3">
+                                    <h:panelGroup id="painelGroupIdentidade">
+                                        <h:outputLabel value="Documento " style="font-weight:bold; padding-right: 5px; " rendered="#{clienteBean.cliente.tipoPessoa == 'F'}" /><br />
+                                        <p:inputText id="edtDocumento" value="#{clienteBean.cliente.documento}" maxlength="15" size="10" rendered="#{clienteBean.cliente.tipoPessoa == 'F'}" onkeypress="return TABEnter(event, 'edtCpf');" />
+                                    </h:panelGroup>
+
+                                    <h:panelGroup id="painelGroupCpf" >
+                                        <p:outputLabel id="lblCpf" value="CPF:" rendered="#{clienteBean.cliente.tipoPessoa == 'F'}" styleClass="negrito" /><br />
+                                        <p:inputText id="edtCpf" value="#{clienteBean.cliente.cpf}" maxlength="15" required="true" rendered="#{clienteBean.cliente.tipoPessoa == 'F'}"
+                                                     requiredMessage="Por favor digite o CPF"
+                                                     onkeypress="return TABEnter(event, 'edtNascimento_input');">
+                                            <p:ajax event="blur" update="@this msjCadastroCliente" listener="#{clienteBean.validacpf}" />
+                                        </p:inputText>
+                                    </h:panelGroup>
+
+
+                                    <h:panelGroup id="painelGroupNascimento">
+                                        <h:outputLabel value="Data nascimento " style="font-weight:bold; padding-right: 5px; " rendered="#{clienteBean.cliente.tipoPessoa == 'F'}" /><br />
+                                        <p:calendar id="edtNascimento" value="#{clienteBean.cliente.dataNascimento}" pattern="dd/MM/yyyy" locale="pt" size="10" rendered="#{clienteBean.cliente.tipoPessoa == 'F'}"
+                                                    onkeypress="return TABEnter(event, 'edtCliente');"/>
+                                    </h:panelGroup>    
+                                </h:panelGrid>
+                                
+                                
+                                <p:outputLabel />
+                                <p:outputLabel />
+                                <h:panelGroup id="painelGroupCnpj" >
+                                    <p:outputLabel id="lblCnpj" value="CNPJ" styleClass="negrito" rendered="#{clienteBean.cliente.tipoPessoa =='J'}" /><br />
+                                    <p:inputMask mask="99.999.999/9999-99" id="edtCnpj" value="#{clienteBean.cliente.cnpj}" rendered="#{clienteBean.cliente.tipoPessoa == 'J'}" onkeypress="return TABEnter(event, 'edtCliente');"  />
+                                </h:panelGroup>
+
+
+
+                                <!--fim busca cep-->
+
+
+
+                                <f:facet name="footer">
+                                    <h:panelGrid id="painelGridRodapeCadastroCliente" columns="5">
+                                        <p:commandButton style="display: none" />
+                                        <p:commandButton value="#{clienteBean.accion}" actionListener="#{clienteBean.operar}" oncomplete="tratarRequisicao(xhr, status, args)" update="frmDialogoCadastroCliente :frmConsultaCliente:dataTabela" />
+                                        <p:commandButton value="Excluir" />
+                                        <p:commandButton value="Limpar" />
+                                        <p:commandButton value="Sair" />
+
+                                    </h:panelGrid>
+                                </f:facet> 
+                            </h:panelGrid>
+
+
+                        </h:form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    </p:dialog>
+
+                    <script type="text/javascript">
+                        function tratarRequisicao(xhr, status, args) {
+                            if (!args.fecharDialogo) {
+                                jQuery("#dialogoCadastroCliente").effect("shake", {times: 10}, 100);
+                            } else {
+                                PF('wdialogoCadastroCliente').hide();
+                            }
                         }
-                    }
 
 
-                    function TABEnter(pEvent, campo) {
-                        if (pEvent.keyCode === 13) {
-                            //return pEvent.keyCode = 9;  
-                            //document.getElementById('frmDialogoCadastroVenda:' + campo).focus();
-                            //document.getElementById('frmDialogoCadastroVenda:' + campo).value='';
-                            document.getElementById('frmDialogoCadastroCliente:' + campo).select();
-                            return false;
+                        function TABEnter(pEvent, campo) {
+                            if (pEvent.keyCode === 13) {
+                                //return pEvent.keyCode = 9;  
+                                //document.getElementById('frmDialogoCadastroVenda:' + campo).focus();
+                                //document.getElementById('frmDialogoCadastroVenda:' + campo).value='';
+                                document.getElementById('frmDialogoCadastroCliente:' + campo).select();
+                                return false;
+                            }
+                            return true;
                         }
-                        return true;
-                    }
 
 
 
@@ -316,14 +342,8 @@
 
 
 
-
-
-                </script>
-                <!--pagina cidades-->
-                <ui:include src="/consultaCidades_2.xhtml" />
-                <!--fim pagina cidades-->
-
-                <!--fim da pagina de clientes-->
+                    </script>
+                </p:panel>
             </ui:define>
         </ui:composition>
 

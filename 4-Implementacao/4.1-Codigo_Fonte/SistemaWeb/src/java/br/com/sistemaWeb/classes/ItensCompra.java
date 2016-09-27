@@ -17,47 +17,11 @@ public class ItensCompra {
     private double subTotal;
     private double desconto;
     private double subTotalComDesconto;
-    private double valorIcms;
-    private double valorIpi;
-    private double baseCalculoIcms;
-    private double baseCalculoIpi;
     
 
     public ItensCompra() {
         this.produto = new Produto();
         this.compra = new Compra();
-    }
-
-    public double getValorIcms() {
-        return valorIcms;
-    }
-
-    public void setValorIcms(double valorIcms) {
-        this.valorIcms = valorIcms;
-    }
-
-    public double getValorIpi() {
-        return valorIpi;
-    }
-
-    public void setValorIpi(double valorIpi) {
-        this.valorIpi = valorIpi;
-    }
-
-    public double getBaseCalculoIcms() {
-        return baseCalculoIcms;
-    }
-
-    public void setBaseCalculoIcms(double baseCalculoIcms) {
-        this.baseCalculoIcms = baseCalculoIcms;
-    }
-
-    public double getBaseCalculoIpi() {
-        return baseCalculoIpi;
-    }
-
-    public void setBaseCalculoIpi(double baseCalculoIpi) {
-        this.baseCalculoIpi = baseCalculoIpi;
     }
     
     

@@ -6,16 +6,44 @@
 package br.com.sistemaWeb.classes;
 
 import java.io.Serializable;
-import java.util.Objects;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Size;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.br.CPF;
+
 
 /**
  *
  * @author conejo
  */
+@Entity
+//@Table(name = "grupos", uniqueConstraints = @UniqueConstraint(columnNames = {"id","nomegrupo"}))
+@Table(name = "grupos2")
 public class Grupo implements Serializable{
     private static final long serialVersionUID = 1L;
+    
+    @Id
+    @GenericGenerator(name = "grupo_id", strategy = "increment")
+    @GeneratedValue(generator = "grupo_id")
+    @Column(name = "id")
     private int id;
-    private String nomeGrupo;
+    
+    
+    @Column(name = "nomegrupo",unique = true)
+    @NotBlank(message = "Campo nome é obrigatório")
+    @Size(min = 3, max = 100, message = "Deve ter no mínimo 3 e no máximo 100 caracteres")
+    //@Email(regexp=".+@.+\\..+")
+    //@CPF
+    private String nomeGrupo = null;
 
     public int getId() {
         return id;
@@ -25,6 +53,7 @@ public class Grupo implements Serializable{
         this.id = id;
     }
 
+    
     public String getNomeGrupo() {
         return nomeGrupo;
     }
@@ -36,13 +65,15 @@ public class Grupo implements Serializable{
     @Override
     public int hashCode() {
         int hash = 3;
-        hash = 17 * hash + this.id;
-        hash = 17 * hash + Objects.hashCode(this.nomeGrupo);
+        hash = 61 * hash + this.id;
         return hash;
     }
 
     @Override
     public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
         if (obj == null) {
             return false;
         }
@@ -53,14 +84,13 @@ public class Grupo implements Serializable{
         if (this.id != other.id) {
             return false;
         }
-        if (!Objects.equals(this.nomeGrupo, other.nomeGrupo)) {
-            return false;
-        }
         return true;
     }
-    
-    
-    
-    
+
+    @Override
+    public String toString() {
+        return "Grupo{" + "id=" + id + ", nomeGrupo=" + nomeGrupo + '}';
+    }
+
     
 }

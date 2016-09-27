@@ -5,20 +5,14 @@
  */
 package br.com.sistemaWeb.bean;
 
-import br.com.sistemaWeb.classes.Cfop;
-import br.com.sistemaWeb.classes.Cst;
 import br.com.sistemaWeb.classes.Fornecedor;
 import br.com.sistemaWeb.classes.Grupo;
 import br.com.sistemaWeb.classes.Marca;
-import br.com.sistemaWeb.classes.Ncm;
 import br.com.sistemaWeb.classes.Produto;
 import br.com.sistemaWeb.classes.Unidade;
-import br.com.sistemaWeb.dao.CfopDao;
-import br.com.sistemaWeb.dao.CstDao;
 import br.com.sistemaWeb.dao.FornecedorDao;
 import br.com.sistemaWeb.dao.GrupoDao;
 import br.com.sistemaWeb.dao.MarcaDao;
-import br.com.sistemaWeb.dao.NcmDao;
 import br.com.sistemaWeb.dao.ProdutoDao;
 import br.com.sistemaWeb.dao.UnidadeDao;
 import java.io.Serializable;
@@ -26,8 +20,6 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -113,17 +105,12 @@ public class ProdutoBean implements Serializable {
         try {
             eDao.apagar(produtoSelecionado);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Aviso:", "Eliminado com sucesso"));
-            try {
-                this.listar();
-            } catch (Exception ex) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro:", "Problema ao listar depois de apagar"));
-            }
         } catch (SQLException ex) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Aviso:", "Erro ao eliminar"));
         }
     }
 
-    public boolean salvar() throws Exception {
+    public boolean salvar() throws Exception{
         boolean retorno = false;
         if (produto != null) {
             eDao = new ProdutoDao();
@@ -136,9 +123,7 @@ public class ProdutoBean implements Serializable {
                         //eDaoLog.salvar(logEvento);
                         System.out.println("passou no salvar");
                         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Aviso:", "Salvo com sucesso "));
-                        produto = new Produto();
                         retorno = true;
-
                     } else {
                         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Aviso:", "Produto ja existe "));
                         retorno = false;
@@ -148,10 +133,10 @@ public class ProdutoBean implements Serializable {
                     retorno = false;
                 }
             } catch (Exception ex2) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "", "Erro: " + ex2.getMessage()));
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro ao salvar evento", "Erro: " + ex2.getMessage()));
                 retorno = false;
             }
-
+            produto = new Produto();
         }
         return retorno;
     }
@@ -293,15 +278,15 @@ public class ProdutoBean implements Serializable {
         produto.setFornecedor(fornecedorNovo);
         //setGrupo(grupoNovo);
     }
-
-    public void setarMarcaSelecionada(SelectEvent event) {
+    
+     public void setarMarcaSelecionada(SelectEvent event) {
         Marca marcaNova = (Marca) event.getObject();
         marcaNova.getClass().getName(); //esta linha maldida me fez patiar 2 dias
         produto.setMarca(marcaNova);
         //setGrupo(grupoNovo);
     }
-
-    public void setarUnidadeSelecionada(SelectEvent event) {
+     
+      public void setarUnidadeSelecionada(SelectEvent event) {
         Unidade unidadeNova = (Unidade) event.getObject();
         unidadeNova.getClass().getName(); //esta linha maldida me fez patiar 2 dias
         produto.setUnidade(unidadeNova);
@@ -349,8 +334,10 @@ public class ProdutoBean implements Serializable {
         }
         return temp;
     }
-
-    public Marca buscaMarcaPorId(Marca marca) throws Exception {
+    
+    
+    
+     public Marca buscaMarcaPorId(Marca marca) throws Exception {
         MarcaDao dao;
         Marca temp;
         try {
@@ -367,8 +354,8 @@ public class ProdutoBean implements Serializable {
         }
         return temp;
     }
-
-    public Unidade buscaUnidadePorId(Unidade unidade) throws Exception {
+     
+        public Unidade buscaUnidadePorId(Unidade unidade) throws Exception {
         UnidadeDao dao;
         Unidade temp;
         try {
@@ -384,58 +371,7 @@ public class ProdutoBean implements Serializable {
             throw e;
         }
         return temp;
-    }
-    
-    public Ncm buscaNcmPorId(Ncm ncm) throws Exception{
-        NcmDao dao;
-        Ncm temp;
-        try {
-            dao = new NcmDao();
-            temp = dao.buscaPorID(ncm);
-            if (temp !=null){
-                this.produto.setNcm(temp);
-            } else {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Aviso:", "Ncm não encontrado"));
-            }
-        } catch (Exception e){
-            throw e;
-        }
-        return temp;
-    }
-    
-    public Cst buscaCstPorId(Cst cst) throws Exception{
-        CstDao dao;
-        Cst temp;
-        try {
-            dao = new CstDao();
-            temp = dao.buscaPorID(cst);
-            if (temp !=null){
-                this.produto.setCst(temp);
-            } else {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Aviso:", "Cst não encontrado"));
-            }
-        } catch (Exception e){
-            throw e;
-        }
-        return temp;
-    }
-    
-    public Cfop buscaCfopPorId(Cfop cfop) throws Exception{
-        CfopDao dao;
-        Cfop temp;
-        try {
-            dao = new CfopDao();
-            temp = dao.buscaPorID(cfop);
-            if (temp !=null){
-                this.produto.setCfop(temp);
-            } else {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Aviso:", "Cfop não encontrado"));
-            }
-        } catch (Exception e){
-            throw e;
-        }
-        return temp;
-    }
+    } 
     
 
     public void iniciarObjeto() {
@@ -451,9 +387,5 @@ public class ProdutoBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro ao consultar ", "Erro: " + ex.getMessage()));
             throw ex;
         }
-    }
-
-    public void limpar() {
-        this.produto = new Produto();
     }
 }

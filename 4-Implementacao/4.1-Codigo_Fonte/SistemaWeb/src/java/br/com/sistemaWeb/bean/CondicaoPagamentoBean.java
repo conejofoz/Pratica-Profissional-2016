@@ -10,8 +10,6 @@ import br.com.sistemaWeb.classes.FormaPagamento;
 import br.com.sistemaWeb.classes.Parcelas;
 import br.com.sistemaWeb.dao.CondicaoPagamentoDao;
 import java.io.Serializable;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -379,8 +377,6 @@ public class CondicaoPagamentoBean implements Serializable {
         System.out.println(this.mostrarFieldParcelas);
         System.out.println("saiu do mostra parcela");
     }
-    
-    
 
     public void calculaPorcentagemRestante() {
         this.porcentagemTotal = 0;
@@ -389,17 +385,9 @@ public class CondicaoPagamentoBean implements Serializable {
         }
 
         this.porcentagemRestante = 100 - this.porcentagemTotal - this.parcela.getPorcentagem();
-        BigDecimal bd = new BigDecimal(this.porcentagemRestante).setScale(2, RoundingMode.HALF_EVEN);
-        this.porcentagemRestante = bd.doubleValue();
 
         if (this.numeroParcela == this.condicaoPagamento.getQuantidadeParcelas()) {
             this.parcela.setPorcentagem(this.porcentagemRestante);
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "", 
-                    "Essa é a última parcela e foi setado o valor " + this.parcela.getPorcentagem()));
-            
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "", 
-                    "valor formatado " + bd));
-            
         }
 
         if (this.porcentagemRestante < 0) {
@@ -408,19 +396,12 @@ public class CondicaoPagamentoBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro!", "Porcentagem não pode ser maior que 100%"));
         }
     }
-    
-    
 
     public boolean verificarPorcentagem() {
         this.porcentagemTotal = 0;
         for (Parcelas pa : listaParcelas) {
             this.porcentagemTotal = this.porcentagemTotal + pa.getPorcentagem();
         }
-        //formatar porcentagem total com duas casas
-        BigDecimal bd = new BigDecimal(this.porcentagemTotal).setScale(2, RoundingMode.HALF_EVEN);
-        this.porcentagemTotal = bd.doubleValue();
-        
-        
         if (this.porcentagemTotal == 100.00) {
             return true;
         }

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.0" xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
+  <persistence-unit name="exemploPU" transaction-type="RESOURCE_LOCAL">
+    <properties>
+      <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/sistemaWeb"/>
+      <property name="javax.persistence.jdbc.user" value="postgres"/>
+      <property name="javax.persistence.jdbc.password" value="conejo74"/>
+      <property name="javax.persistence.jdbc.driver" value="org.hibernate.jpa.HibernatePersistenceProvider"/>
+      <!-- validate | update | create | create-drop -->
+      <property name="hibernate.hbm2ddl.auto" value="update"/>
+      <property name="hibernate.show_sql" value="true"/>
+      <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
+    </properties>
+  </persistence-unit>
+  <persistence-unit name="firebirdPU" transaction-type="RESOURCE_LOCAL">
+      <properties>
+          <property name="javax.persistence.jdbc.url" value="jdbc:firebirdsql:localhost/3050:C:\guri\dados\BANCO.FDB"/>
+          <property name="javax.persistence.jdbc.user" value="sysdba"/>
+          <property name="javax.persistence.jdbc.password" value="masterkey"/>
+          <property name="javax.persistence.jdbc.driver" value="org.firebirdsql.jdbc.FBDriver"/>
+          <!-- validate | update | create | create-drop -->
+          <property name="hibernate.hbm2ddl.auto" value="update"/>
+          <property name="hibernate.show_sql" value="true"/>
+          <property name="hibernate.dialect" value="org.hibernate.dialect.FirebirdDialect"/>
+      </properties>
+  </persistence-unit>
+</persistence>

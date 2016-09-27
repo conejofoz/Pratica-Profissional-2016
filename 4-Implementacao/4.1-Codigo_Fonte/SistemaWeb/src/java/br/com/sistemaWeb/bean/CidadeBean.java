@@ -9,13 +9,17 @@ import br.com.sistemaWeb.classes.Cidade;
 import br.com.sistemaWeb.classes.Estado;
 import br.com.sistemaWeb.dao.CidadeDao;
 import br.com.sistemaWeb.dao.EstadoDao;
+import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.faces.application.FacesMessage;
+import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
@@ -216,13 +220,8 @@ public class CidadeBean implements Serializable{
                 
                 break;
             case "Modificar":
-                try{
                 this.atualizar();
                 this.limpiar();
-                fecharDialogo = true;
-                }catch(Exception e2){
-                    
-                }
                 break;
         }
         context.addCallbackParam("fecharDialogo", fecharDialogo);
@@ -290,10 +289,7 @@ public class CidadeBean implements Serializable{
    }
    
    public void iniciarObjeto(){
-       System.out.println("=============================");
-       System.out.println("iniciarObjeto()");
        cidade = new Cidade();
-       System.out.println("estado da cidade " + this.cidade.getEstado().getNomeEstado());
    }
    
      public void abrirDialogoCidade(){

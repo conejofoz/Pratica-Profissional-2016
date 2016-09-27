@@ -98,7 +98,6 @@ public class CondicaoPagamentoDao {
 
             listaCondicaoPagamento.add(tempCondicaoPagamento);
         }
-        conexao.close();
         return listaCondicaoPagamento;
     }
 
@@ -116,7 +115,6 @@ public class CondicaoPagamentoDao {
                 tempCondicaoPagamento = new CondicaoPagamento();
                 tempCondicaoPagamento.setId(rs.getInt("id"));
                 tempCondicaoPagamento.setNomeCondicaoPagamento(rs.getString("nomeCondicaoPagamento"));
-                tempCondicaoPagamento.setQuantidadeParcelas(rs.getInt("qtdparcelas"));
                 
 
             }

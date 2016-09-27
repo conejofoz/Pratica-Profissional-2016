@@ -105,7 +105,7 @@ public class ClienteDao {
             
         }
         
-        conexao.close();
+        
         return listaCliente;
     }
 
@@ -130,7 +130,6 @@ public class ClienteDao {
             System.out.println(tempCliente.getNomeCliente());
         }
         System.out.println("aaa");
-        conexao.close();
         return listaCliente;
     }
     

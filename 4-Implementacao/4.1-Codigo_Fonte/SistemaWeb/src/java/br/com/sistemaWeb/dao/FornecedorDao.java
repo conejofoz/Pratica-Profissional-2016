@@ -67,7 +67,7 @@ public class FornecedorDao {
     }
 
     public void apagar(Fornecedor fornecedor) throws SQLException {
-        String sql = "DELETE FROM fornecedores WHERE id = ?";
+        String sql = "DELETE FROM fornecedor WHERE id = ?";
         conexao = FabricaConexao.conectar();
         pstm = conexao.prepareStatement(sql);
         pstm.setInt(1, fornecedor.getId());
@@ -75,7 +75,7 @@ public class FornecedorDao {
     }
 
     public void atualizar(Fornecedor fornecedor) throws SQLException {
-        String sql = "UPDATE fornecedores SET nomefornecedor=?, telefone=?, email=? WHERE id =?";
+        String sql = "UPDATE fornecedor SET nomefornecedor=?, telefone=?, email=? WHERE id =?";
         conexao = FabricaConexao.conectar();
         pstm = conexao.prepareStatement(sql);
         pstm.setString(1, fornecedor.getNomeFornecedor());
@@ -88,7 +88,7 @@ public class FornecedorDao {
     public List<Fornecedor> todosFornecedores() throws SQLException {
         List<Fornecedor> listaFornecedor = new ArrayList<Fornecedor>();
 
-        String sql = "SELECT id, nomefornecedor, telefone, email FROM fornecedores order by nomeFornecedor";
+        String sql = "SELECT id, nomefornecedor, telefone, email FROM fornecedor order by nomeFornecedor";
 
         conexao = FabricaConexao.conectar();
         pstm = conexao.prepareStatement(sql);
@@ -105,7 +105,7 @@ public class FornecedorDao {
             
         }
         
-        conexao.close();
+        
         return listaFornecedor;
     }
 
@@ -130,7 +130,6 @@ public class FornecedorDao {
             System.out.println(tempFornecedor.getNomeFornecedor());
         }
         System.out.println("aaa");
-        conexao.close();
         return listaFornecedor;
     }
     

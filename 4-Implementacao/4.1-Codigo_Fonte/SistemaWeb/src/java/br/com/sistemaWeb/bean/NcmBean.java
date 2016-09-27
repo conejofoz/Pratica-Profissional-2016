@@ -44,7 +44,7 @@ public class NcmBean implements Serializable {
         this.consultaNome = consultaNome;
     }
 
-    //  private LogEvento logEvento = new LogEvento();
+  //  private LogEvento logEvento = new LogEvento();
     //paga o log
     // private UsuarioBean usuarioBean = new UsuarioBean();
     public Ncm getNcmSelecionado() {
@@ -205,15 +205,9 @@ public class NcmBean implements Serializable {
 
                 break;
             case "Modificar":
-                try {
-                    this.atualizar();
-                    this.limpiar();
-                    fecharDialogo = true;
-                    break;
-                } catch (Exception e1) {
-                    System.out.println("Erro ao atualizar");
-                }
-
+                this.atualizar();
+                this.limpiar();
+                break;
         }
         context.addCallbackParam("fecharDialogo", fecharDialogo);
     }

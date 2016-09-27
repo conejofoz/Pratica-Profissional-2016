@@ -17,6 +17,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
+import javax.persistence.PersistenceException;
 import org.primefaces.context.RequestContext;
 
 /**
@@ -27,7 +28,7 @@ import org.primefaces.context.RequestContext;
 @ViewScoped
 public class GrupoBean implements Serializable{
     private static final long serialVersionUID = 1L;
-    private Grupo grupo = new Grupo();
+    private Grupo grupo;// = new Grupo();
     private List<Grupo> listaGrupo;
     private GrupoDao eDao;
 //    private LogEventoDAO eDaoLog;
@@ -94,36 +95,44 @@ public class GrupoBean implements Serializable{
             try {
                 eDao.apagar(grupoSelecionado);
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Aviso:", "Eliminado com sucesso"));
-            } catch (SQLException ex) {
+            } catch (Exception ex) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Aviso:", "Erro ao eliminar"));
             }
     }
     
     
    
-    public void salvar() {
+    public boolean salvar() {
+        boolean retorno = false;
         if (grupo != null) {
             eDao = new GrupoDao();
             
-            try {
+            //try {
                 try {
-                    if (!eDao.buscaPorNome(grupo)) {
+                    ////if (!eDao.buscaPorNome(grupo)) {
                         //carregarLog();
-                        eDao.salvar(grupo);
+                        eDao.salvarH(grupo);
+                        retorno = true;
                         //eDaoLog.salvar(logEvento);
                         System.out.println("passou no salvar");
                         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Aviso:", "Salvo com sucesso "));
-                    } else {
-                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Aviso:", "Grupo ja existe "));
-                    }
-                } catch (SQLException ex1) {
-                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro ao salvar evento", "Erro: " + ex1.getMessage()));
+                    ////} else {
+                    ////    retorno = false;
+                    ////    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Aviso:", "Grupo ja existe "));
+                    ////}
+                //} catch (PersistenceException pe){
+                //    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Já existe", "Erro: " + pe.getMessage()));
+                //    return false; 
+                } catch (Exception ex1) {
+                    retorno = false;
+                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro ao salvar Grupo", "Erro : " + ex1.getMessage()));
                 }
-            } catch (Exception ex2) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro ao salvar evento", "Erro: " + ex2.getMessage()));
-            }
+           // } catch (Exception ex2) {
+           //     FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro ao salvar evento", "Erro: " + ex2.getMessage()));
+           // }
             grupo = new Grupo();
         }
+        return retorno;
     }
 
     
@@ -146,7 +155,7 @@ public class GrupoBean implements Serializable{
     public void atualizar() {
         eDao = new GrupoDao();
         try {
-            eDao.atualizar(grupo);
+            eDao.atualizarH(grupo);
             System.out.println("passou no atualizar");
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Aviso:", "Alterado com sucesso "));
         } catch (SQLException ex) {
@@ -188,10 +197,11 @@ public class GrupoBean implements Serializable{
         switch (accion) {
             case "Registrar":
                 try{
-                   this.salvar();
+                   if (this.salvar()){
                    this.limpiar();
                    fecharDialogo = true;
                    System.out.println(fecharDialogo);
+                   }
                 }catch(Exception e){
                    System.out.println("passou no erro do operar");
                  
@@ -199,14 +209,9 @@ public class GrupoBean implements Serializable{
                 
                 break;
             case "Modificar":
-                try{
                 this.atualizar();
                 this.limpiar();
-                fecharDialogo = true;
                 break;
-                }catch(Exception ex1){
-                   System.out.println("erro ao atualizar grupo"); 
-                }
         }
         context.addCallbackParam("fecharDialogo", fecharDialogo);
     }

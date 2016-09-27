@@ -9,11 +9,11 @@
     <body>
         <ui:composition template="./WEB-INF/templates/telaPadrao.xhtml">
             <ui:define name="content">
-                <p:dialog header="Consulta CFOP" id="dialogoConsultaCfops" widgetVar="wdialogoConsultaCfops" width="750" height="300" visible="true" >
+                <p:panel id="painelPrincipal" header="Consulta de cfops" footer="SistemaWeb">
                     <!--pra funcionar a consulta tem que tirar o prerender view-->
-                    <f:event type="preRenderView" listener="#{cfopBean.listar()}" />
-                    <p:growl id="msjCfops" showDetail="true" />
-                    <h:form id="frmConsultaCfops" >
+                    <!--<f:event type="preRenderView" listener="" />-->
+                    <p:growl id="msj" showDetail="true" />
+                    <h:form id="frmConsultaCfop" style="height: 600px" >
                         <p:growl id="msgConsultaCfop" showDetail="true" />
                         
                         <p:panelGrid columns="3" >
@@ -25,7 +25,7 @@
                         </p:panelGrid>
                         <p:commandButton id="btnAcao" value="Novo" oncomplete="PF('wdialogoCadastroCfop').show();" actionListener="#{cfopBean.setAccion('Registrar')}" action="#{cfopBean.zerarCfop}" update=":dialogoCadastroCfop" />
                         <p:dataTable id="dataTabela" value="#{cfopBean.listaCfop}" var="var_cfop"
-                                     paginator="true" paginatorPosition="bottom"
+                                     paginator="true"
                                      paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                                      rowsPerPageTemplate="5,10,15" rows="10">
 
@@ -55,22 +55,16 @@
                                                  process="@this" />
                             </p:column>
                         </p:dataTable>
-                                               </h:form>
-                </p:dialog> 
-                        
-                        
-                        
 
                         <!--DIALOGO DE CONFIRMAÇÃO DE EXCLUSÃO**********************************************************************-->
                         <p:confirmDialog id="dialogoConfirmacaoExclusaoCfop" header="Exclusão"
                                          message="Tem certeza que deseja excluir? #{cfopBean.cfop.nomeCfop}"
                                          widgetVar="wdialogoConfirmacaoExclusaoCfop">
-                            <h:form id="frmExclusaoCfops" >
-                            <p:commandButton id="btnApagar" value="Sim" update=":frmConsultaCfops:dataTabela :frmConsultaCfops:msgConsultaCfop" oncomplete="PF('wdialogoConfirmacaoExclusaoCfop').hide();" action="#{cfopBean.apagar()}"/>
+
+                            <p:commandButton id="btnApagar" value="Sim" update="dataTabela :frmConsultaCfop:msgConsultaCfop" oncomplete="PF('wdialogoConfirmacaoExclusaoCfop').hide();" action="#{cfopBean.apagar()}"/>
                             <p:commandButton value="Não" oncomplete="PF('wdialogoConfirmacaoExclusaoCfop').hide();" />
-                            </h:form>
                         </p:confirmDialog>
-                    
+                    </h:form>
 
 
 
@@ -81,7 +75,7 @@
 
 
                     <!--DIALOGO DE CADASTRO-->
-                    <p:dialog header="Cadastro de CFOP" widgetVar="wdialogoCadastroCfop" id="dialogoCadastroCfop" position="center" showEffect="slide" width="600" height="100">
+                    <p:dialog header="Cadastro de cfops" widgetVar="wdialogoCadastroCfop" id="dialogoCadastroCfop" position="center" showEffect="slide" width="600" height="100">
                         <h:form id="frmDialogoCadastroCfop" >
                             <p:messages closable="true"/>
                             <p:growl id="msjCadastroCfop" showDetail="true" />
@@ -114,10 +108,10 @@
 
                                 <f:facet name="footer">
                                     <h:panelGrid id="painelGridRodapeCadastroCfop" columns="5">
-                                        <p:commandButton value="#{cfopBean.accion}" actionListener="#{cfopBean.operar}" oncomplete="tratarRequisicao(xhr, status, args)" update="frmDialogoCadastroCfop :frmConsultaCfops:dataTabela" />
+                                        <p:commandButton value="#{cfopBean.accion}" actionListener="#{cfopBean.operar}" oncomplete="tratarRequisicao(xhr, status, args)" update="frmDialogoCadastroCfop :frmConsultaCfop:dataTabela" />
                                         <p:commandButton value="Excluir" />
                                         <p:commandButton value="Limpar" />
-                                        <p:commandButton value="Sair" oncomplete="PF('wdialogoCadastroCfop').hide();" />
+                                        <p:commandButton value="Sair" />
 
                                     </h:panelGrid>
                                 </f:facet> 
@@ -189,6 +183,7 @@
 
 
                     </script>
+                </p:panel>
             </ui:define>
         </ui:composition>
 

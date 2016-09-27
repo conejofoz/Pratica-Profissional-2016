@@ -218,14 +218,9 @@ public class CfopBean implements Serializable {
 
                 break;
             case "Modificar":
-                try{
                 this.atualizar();
                 this.limpiar();
-                fecharDialogo = true;
                 break;
-                }catch(Exception e1){
-                    System.out.println("Erro ao atualizar cfop");
-                }
         }
         context.addCallbackParam("fecharDialogo", fecharDialogo);
     }

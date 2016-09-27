@@ -49,7 +49,7 @@ public class CstDao implements Serializable{
         conexao = FabricaConexao.conectar();
         pstm = conexao.prepareStatement(sql);
         pstm.setString(1, cst.getNomeCst());
-        pstm.setString(2, cst.getId());
+        pstm.setString(4, cst.getId());
         pstm.executeUpdate();
     }
 
@@ -65,7 +65,6 @@ public class CstDao implements Serializable{
             tempCst.setNomeCst(rs.getString("nomeCst"));
             listaCst.add(tempCst);
         }
-        conexao.close();
         return listaCst;
     }
 
@@ -88,7 +87,6 @@ public class CstDao implements Serializable{
             System.out.println(tempCst.getNomeCst());
         }
         System.out.println("aaa");
-        conexao.close();
         return listaCst;
     }
     

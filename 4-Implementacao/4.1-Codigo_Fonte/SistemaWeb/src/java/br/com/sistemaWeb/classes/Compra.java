@@ -18,15 +18,10 @@ public class Compra implements Serializable{
     private String modelo;
     private String serie;
     private Date emissao;
-    private Date dataEnvio;
+    private Date dataEnvio = new Date();
     private double totalProdutos;
     private double totalNota;
     private double totalDescontoNota;
-    private double totalBaseCalculoIcmsNota;
-    private double totalBaseCalculoIpiNota;
-    private double totalValorIcmsNota;
-    private double totalValorIpiNota;
-    private double totalValorFreteNota;
     private double totalParcelas;
     private Fornecedor fornecedor = new Fornecedor();
     private Transportadora transportadora = new Transportadora();
@@ -43,48 +38,6 @@ public class Compra implements Serializable{
         this.modelo  = "NF-e";
         this.serie = "1";
     }
-
-    public double getTotalBaseCalculoIcmsNota() {
-        return totalBaseCalculoIcmsNota;
-    }
-
-    public void setTotalBaseCalculoIcmsNota(double totalBaseCalculoIcmsNota) {
-        this.totalBaseCalculoIcmsNota = totalBaseCalculoIcmsNota;
-    }
-
-    public double getTotalBaseCalculoIpiNota() {
-        return totalBaseCalculoIpiNota;
-    }
-
-    public void setTotalBaseCalculoIpiNota(double totalBaseCalculoIpiNota) {
-        this.totalBaseCalculoIpiNota = totalBaseCalculoIpiNota;
-    }
-
-    public double getTotalValorIcmsNota() {
-        return totalValorIcmsNota;
-    }
-
-    public void setTotalValorIcmsNota(double totalValorIcmsNota) {
-        this.totalValorIcmsNota = totalValorIcmsNota;
-    }
-
-    public double getTotalValorIpiNota() {
-        return totalValorIpiNota;
-    }
-
-    public void setTotalValorIpiNota(double totalValorIpiNota) {
-        this.totalValorIpiNota = totalValorIpiNota;
-    }
-
-    public double getTotalValorFreteNota() {
-        return totalValorFreteNota;
-    }
-
-    public void setTotalValorFreteNota(double totalValorFreteNota) {
-        this.totalValorFreteNota = totalValorFreteNota;
-    }
-    
-    
 
     public Ncm getNcm() {
         return ncm;
